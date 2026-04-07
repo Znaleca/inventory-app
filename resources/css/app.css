@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ...;
+    
+    /* This lets you use bg-dark-bg and bg-dark-surface in HTML */
+    --color-dark-bg: #0B0C10;
+    --color-dark-surface: #13141B;
+}
