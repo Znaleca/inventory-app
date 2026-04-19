@@ -296,15 +296,16 @@
                             @change="isOther = ($event.target.value === '__other__'); if (!isOther) staffValue = $event.target.value"
                             class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
                             <option value="">— Select staff member —</option>
-                            @php $grouped = $staffList->groupBy('type'); @endphp
-                            @foreach(['doctor' => 'Doctors', 'nurse' => 'Nurses', 'technician' => 'Technicians', 'other' => 'Other'] as $type => $label)
-                                @if($grouped->has($type))
-                                    <optgroup label="{{ $label }}">
-                                        @foreach($grouped[$type] as $member)
-                                            <option value="{{ $member->display_name }}" {{ old('_used_by_staff') == $member->display_name ? 'selected' : '' }}>{{ $member->display_name }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                @endif
+                            @php 
+                                $grouped = $staffList->groupBy('type'); 
+                                $typeLabels = ['programmer' => 'Programmers', 'tech support' => 'IT / Tech Support', 'supervisor' => 'Supervisors', 'head' => 'Department Heads'];
+                            @endphp
+                            @foreach($grouped as $type => $members)
+                                <optgroup label="{{ $typeLabels[$type] ?? ucwords(str_replace('_', ' ', $type)) }}">
+                                    @foreach($members as $member)
+                                        <option value="{{ $member->display_name }}" {{ old('_used_by_staff') == $member->display_name ? 'selected' : '' }}>{{ $member->display_name }}</option>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
                             <option value="__other__" {{ old('_used_by_other') ? 'selected' : '' }}>— Others (type a name) —
                             </option>
