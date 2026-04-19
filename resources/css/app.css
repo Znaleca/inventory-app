@@ -6,9 +6,68 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ...;
-    
-    /* This lets you use bg-dark-bg and bg-dark-surface in HTML */
-    --color-dark-bg: #0B0C10;
-    --color-dark-surface: #13141B;
+    /* Fonts */
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* Custom Brand Colors */
+    --color-brand-emerald: #10b981;
+    --color-brand-teal: #0d9488;
+    --color-brand-blue: #0ea5e9;
+
+
+
+    /* Animation for EKG */
+    @keyframes ekg {
+        0% {
+            stroke-dashoffset: 1000;
+        }
+
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+}
+
+/* --- Base Layer Improvements --- */
+@layer base {
+    input,
+    select,
+    textarea {
+        @apply transition-all duration-200;
+    }
+}
+
+/* --- Utility Layer --- */
+@layer utilities {
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .glass-panel {
+        @apply bg-white/70 backdrop-blur-xl border border-white/80 shadow-xl transition-all duration-300;
+    }
+}
+
+/* --- Component Layer (TomSelect & Custom UI) --- */
+@layer components {
+
+    /* TomSelect Refined */
+    .ts-wrapper .ts-control {
+        @apply !py-3 !px-4 !rounded-xl !border-none !bg-transparent !shadow-none flex items-center;
+    }
+
+    .ts-dropdown {
+        @apply !rounded-xl !border-slate-200 !shadow-2xl !mt-1 !bg-white !z-50;
+    }
+
+    /* EKG Path Style */
+    .ekg-path {
+        stroke: #10b981;
+        stroke-width: 2;
+    }
 }

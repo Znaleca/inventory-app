@@ -88,7 +88,7 @@ class ProfileController extends Controller
                 'label'  => 'Item Returned',
                 'date'   => $r->returned_at ?? $r->updated_at,
                 'item'   => $r->item->name ?? 'Unknown Item',
-                'qty'    => $r->quantity_returned + ($r->item->is_one_time_use ? 0 : ($r->quantity_used ?? 0)),
+                'qty'    => $r->quantity_returned + ($r->item->item_type === 'consumable' ? 0 : ($r->quantity_used ?? 0)),
                 'notes'  => $r->notes,
                 'detail' => $r->quantity_used > 0 ? "{$r->quantity_used} used during borrow" : null,
             ]);

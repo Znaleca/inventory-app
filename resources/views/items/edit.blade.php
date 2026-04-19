@@ -3,288 +3,370 @@
 @section('title', 'Edit Item — ' . $item->name)
 
 @section('actions')
-<a href="{{ route('items.index') }}"
-    class="group inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:text-slate-900">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-        class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1">
-        <path fill-rule="evenodd"
-            d="M17 10a.75.75 0 01-.75.75H5.66l4.22 4.22a.75.75 0 11-1.06 1.06l-5.5-5.5a.75.75 0 010-1.06l5.5-5.5a.75.75 0 111.06 1.06l-4.22 4.22h10.59a.75.75 0 01.75.75z"
-            clip-rule="evenodd" />
-    </svg>
-    Back to Inventory
-</a>
+    <a href="{{ route('items.index') }}"
+        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        ← Back to Items
+    </a>
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-3xl">
-    <form action="{{ route('items.update', $item) }}" method="POST"
-        class="overflow-hidden rounded-[2rem] bg-white ring-1 ring-slate-200 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)]">
-        @csrf
-        @method('PUT')
+    <div class="mx-auto max-w-3xl">
 
-        {{-- Header Section --}}
-        <div class="border-b border-slate-100 bg-slate-50/50 px-8 py-6">
-            <div class="flex items-center gap-4">
-                <div
-                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-inset ring-indigo-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Edit Item Details</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Updating <span class="font-semibold text-slate-700">{{
-                            $item->name }}</span> ({{ $item->sku }})</p>
-                </div>
-            </div>
+        {{-- Page Header --}}
+        <div class="mb-5">
+            <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Items://Edit</p>
+            <h1 class="text-xl font-bold text-slate-800 tracking-tight">Edit Item Details</h1>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Updating <strong class="text-slate-600">{{ $item->name }}</strong></p>
         </div>
 
-        <div class="px-8 py-8 space-y-8">
+        @if ($errors->any())
+            <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
+                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
+                <ul class="ml-1 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li class="text-sm text-rose-700">— {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            {{-- SECTION: General Information --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm2.25 8.5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zm0 3a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    General Details
-                </h3>
+        <form action="{{ route('items.update', $item) }}" method="POST"
+            x-data="{
+                itemType: '{{ old('item_type', $item->item_type ?? 'consumable') }}',
+                isExpirable: {{ old('is_expirable', $item->is_expirable ? '1' : '0') == '1' ? 'true' : 'false' }},
+                allCategories: {{ Js::from($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'item_type' => $c->item_type])) }},
+                get filteredCategories() { return this.allCategories.filter(c => c.item_type === this.itemType); },
+                selectedCategoryId: '{{ old('category_id', $item->category_id) }}',
+                selectedCategoryName: '{{ old('category_id') ? optional($categories->firstWhere('id', old('category_id')))->name : optional($item->category)->name }}',
+                catSearch: '',
+                catOpen: false,
+                catAdding: false,
+                catNewValue: '',
+                get catFiltered() { return this.filteredCategories.filter(c => c.name.toLowerCase().includes(this.catSearch.toLowerCase())); },
+                selectCat(cat) { this.selectedCategoryId = cat.id; this.selectedCategoryName = cat.name; this.catOpen = false; this.catSearch = ''; },
+                saveCat() {
+                    if (!this.catNewValue.trim()) return;
+                    this.selectedCategoryId = this.catNewValue.trim();
+                    this.selectedCategoryName = this.catNewValue.trim();
+                    this.catAdding = false; this.catNewValue = ''; this.catOpen = false;
+                }
+            }">
+            @csrf
+            @method('PUT')
 
-                <div class="space-y-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Item Name <span
-                                class="text-rose-500">*</span></label>
-                        <input type="text" name="name" value="{{ old('name', $item->name) }}"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all"
-                            required>
-                        @error('name') <p class="mt-1.5 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+            {{-- ======================== --}}
+            {{-- SECTION 1: Item Type    --}}
+            {{-- ======================== --}}
+            <div class="bg-white border border-slate-200 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-blue-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">01 // Item Type</p>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <input type="hidden" name="item_type" :value="itemType">
+
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <label @click="itemType = 'consumable'; selectedCategoryId = ''; selectedCategoryName = ''"
+                            :class="itemType === 'consumable' ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                            <input type="radio" name="_item_type_radio" value="consumable" class="accent-indigo-600 w-4 h-4" :checked="itemType === 'consumable'">
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">Consumable</p>
+                                <p class="text-[10px] font-mono text-slate-500 mt-0.5">Gloves, syringes, medicines.</p>
+                            </div>
+                        </label>
+                        <label @click="itemType = 'device'; selectedCategoryId = ''; selectedCategoryName = ''"
+                            :class="itemType === 'device' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                            <input type="radio" name="_item_type_radio" value="device" class="accent-violet-600 w-4 h-4" :checked="itemType === 'device'">
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">Device / Equipment</p>
+                                <p class="text-[10px] font-mono text-slate-500 mt-0.5">Tracked with brand & serial.</p>
+                            </div>
+                        </label>
+                    </div>
+                    @error('item_type') <p class="mt-2 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+
+                    {{-- Expiry Toggle (only for consumables) --}}
+                    <div x-show="itemType === 'consumable'" class="mt-4 border-t border-dashed border-slate-100 pt-4">
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-3">// Expiry Behaviour</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label @click="isExpirable = true"
+                                :class="isExpirable ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                <input type="radio" name="_expiry_radio" class="accent-amber-500 w-4 h-4" :checked="isExpirable">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Has Expiry Date</p>
+                                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">Batches flagged near expiry on dashboard.</p>
+                                </div>
+                            </label>
+                            <label @click="isExpirable = false"
+                                :class="!isExpirable ? 'border-slate-500 bg-slate-100' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                <input type="radio" name="_expiry_radio" class="accent-slate-600 w-4 h-4" :checked="!isExpirable">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Does Not Expire</p>
+                                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">No expiry tracking, e.g. cables, clips.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Hidden input — devices always false, consumables use toggle --}}
+                    <input type="hidden" name="is_expirable" :value="itemType === 'device' ? '0' : (isExpirable ? '1' : '0')">
+                </div>
+            </div>
+
+            {{-- ========================== --}}
+            {{-- SECTION 2: General Info   --}}
+            {{-- ========================== --}}
+            <div class="bg-white border border-slate-200 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-sky-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">02 // General Details</p>
+                    </div>
+
+                    <div class="space-y-4 mt-1">
+                        {{-- Consumable: name only --}}
+                        <div x-show="itemType === 'consumable'">
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Item Name <span class="text-rose-500">*</span></label>
+                            <input type="text" name="name" value="{{ old('name', $item->name) }}"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                :required="itemType === 'consumable'">
+                            @error('name') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Device: brand, model, name --}}
+                        <div x-show="itemType === 'device'" style="display:none;">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Brand <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="brand" value="{{ old('brand', $item->brand) }}"
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        placeholder="e.g. Medtronic"
+                                        :required="itemType === 'device'">
+                                    @error('brand') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Model <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="model" value="{{ old('model', $item->model) }}"
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        placeholder="e.g. Endeavor Sprint"
+                                        :required="itemType === 'device'">
+                                    @error('model') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Category --}}
                         <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Category <span
-                                    class="text-rose-500">*</span></label>
-                            <div x-data="customDropdown(
-                                [
-                                    @foreach($categories as $cat)
-                                    { id: '{{ $cat->id }}', name: '{{ addslashes($cat->name) }}' },
-                                    @endforeach
-                                ], 
-                                '{{ old('category_id', $item->category_id) }}', 
-                                'category_id', 
-                                false
-                            )" class="relative w-full">
-                                <input type="hidden" :name="inputName" x-model="selectedId" required>
-                                
-                                <button type="button" @click="toggle()" class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all bg-white text-left flex justify-between items-center" :class="{'text-slate-400': !selectedId}">
-                                    <span x-text="selectedName || 'Select category...'" class="truncate block"></span>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Category <span class="text-rose-500">*</span></label>
+                            <input type="hidden" name="category_id" :value="selectedCategoryId" required>
+
+                            <div class="relative w-full">
+                                <button type="button" @click="catOpen = !catOpen"
+                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors text-left flex justify-between items-center"
+                                    :class="{'text-slate-400': !selectedCategoryId}">
+                                    <span x-text="selectedCategoryName || 'Select category...'" class="truncate block"></span>
                                     <svg class="h-4 w-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" /></svg>
                                 </button>
-                                
-                                <div x-show="isOpen" x-transition.opacity.duration.200ms @click.away="close()" class="absolute z-50 mt-2 w-full origin-top-right rounded-xl bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-slate-200 overflow-hidden flex flex-col" style="display: none;">
-                                    <div class="px-2 pt-2 pb-1 bg-white">
-                                        <input type="text" x-ref="searchInput" x-model="search" placeholder="Search categories..." class="block w-full rounded-lg border-0 py-2 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm transition-all bg-slate-50">
+
+                                <div x-show="catOpen" x-transition.opacity.duration.200ms @click.away="catOpen = false"
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-200 overflow-hidden flex flex-col"
+                                    style="display:none">
+                                    <div class="px-2 pt-2 pb-1 border-b border-slate-100">
+                                        <span class="text-[10px] font-mono font-bold uppercase tracking-widest"
+                                            :class="itemType === 'device' ? 'text-violet-500' : 'text-indigo-500'"
+                                            x-text="itemType === 'device' ? '⚙ Device Categories' : '⚡ Consumable Categories'"></span>
                                     </div>
-                                    
-                                    <ul class="max-h-60 overflow-y-auto mt-1 p-1 bg-white">
-                                        <template x-for="option in filteredOptions" :key="option.id">
-                                            <li @click="selectOption(option)" class="relative cursor-pointer select-none rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between" :class="{'bg-slate-50 font-bold text-slate-900 ring-1 ring-slate-200/50': selectedId == option.id}">
-                                                <span x-text="option.name" class="block truncate"></span>
-                                                <svg x-show="selectedId == option.id" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                    <div class="px-2 py-1.5">
+                                        <input type="text" x-model="catSearch" @click.stop placeholder="Search categories..."
+                                            class="block w-full border border-slate-200 bg-slate-50 focus:outline-none py-2 px-3 text-sm font-mono text-slate-800 transition-colors">
+                                    </div>
+                                    <ul class="max-h-52 overflow-y-auto p-1">
+                                        <template x-for="cat in catFiltered" :key="cat.id">
+                                            <li @click="selectCat(cat)"
+                                                class="relative cursor-pointer px-3 py-2 text-sm font-mono text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                                                :class="{'bg-slate-50 font-bold text-slate-900': selectedCategoryId == cat.id}">
+                                                <span x-text="cat.name" class="block truncate"></span>
+                                                <svg x-show="selectedCategoryId == cat.id" class="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                                             </li>
                                         </template>
-                                        <li x-show="filteredOptions.length === 0" class="px-3 py-4 text-center text-sm text-slate-400">
-                                            No matching options found.
+                                        <li x-show="catFiltered.length === 0" class="px-3 py-4 text-center text-xs font-mono text-slate-400">
+                                            <span x-text="filteredCategories.length === 0 ? 'No ' + itemType + ' categories yet.' : 'No matching categories.'"></span>
                                         </li>
                                     </ul>
-                                    
                                     <div class="border-t border-slate-100 bg-slate-50 p-2">
-                                        <button x-show="!isAdding" @click="isAdding = true; $nextTick(() => $refs.newInput.focus())" type="button" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 hover:bg-white ring-1 ring-transparent hover:ring-slate-200 transition-all">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                                            Add another option
+                                        <button x-show="!catAdding" @click="catAdding = true; $nextTick(() => $refs.catInput.focus())" type="button"
+                                            class="flex w-full items-center gap-2 px-3 py-2 text-xs font-mono font-bold text-indigo-600 hover:bg-white border border-transparent hover:border-slate-200 transition-all">
+                                            + Add new category
                                         </button>
-                                        
-                                        <div x-show="isAdding" class="flex items-center gap-2">
-                                            <input x-ref="newInput" type="text" x-model="newValue" @keydown.enter.prevent="saveNewOption()" placeholder="Type new option..." class="block w-full flex-1 rounded-lg border-0 py-2 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm bg-white">
-                                            <button type="button" @click="saveNewOption()" class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm transition-colors shrink-0">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                        <div x-show="catAdding" class="flex items-center gap-2">
+                                            <input x-ref="catInput" type="text" x-model="catNewValue" @click.stop @keydown.enter.prevent="saveCat()"
+                                                placeholder="New category name..."
+                                                class="block w-full flex-1 border border-slate-200 bg-white py-2 px-3 text-sm font-mono text-slate-800 focus:outline-none">
+                                            <button type="button" @click="saveCat()" class="flex h-8 w-8 items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shrink-0">
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                                             </button>
-                                            <button type="button" @click="isAdding = false; newValue = ''" class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 ring-1 ring-rose-200/50 shadow-sm transition-colors shrink-0">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            <button type="button" @click="catAdding = false; catNewValue = ''" class="flex h-8 w-8 items-center justify-center border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 transition-colors shrink-0">
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            @error('category_id') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Description</label>
-                        <textarea name="description" rows="3"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all"
-                            placeholder="Add specific details or item variations...">{{ old('description', $item->description) }}</textarea>
                     </div>
                 </div>
             </div>
 
-            <hr class="border-slate-100">
-
-            {{-- SECTION: Inventory & Pricing --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path
-                            d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2z" />
-                        <path
-                            d="M4 10a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h9a.75.75 0 00.75-.75v-4.5a.75.75 0 011.5 0v4.5a2.25 2.25 0 01-2.25 2.25h-9A2.25 2.25 0 012 15.25v-4.5A.75.75 0 014 10z" />
-                    </svg>
-                    Inventory & Pricing
-                </h3>
-
-                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">SKU / Item Code <span
-                                class="text-rose-500">*</span></label>
-                        <input type="text" name="sku" value="{{ old('sku', $item->sku) }}"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all"
-                            required>
-                        @error('sku') <p class="mt-1.5 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+            {{-- ========================== --}}
+            {{-- SECTION 3: Stock Settings --}}
+            {{-- ========================== --}}
+            <div class="bg-white border border-slate-200 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-teal-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">03 // Stock Settings</p>
                     </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Tracking Unit <span
-                                class="text-rose-500">*</span></label>
+
+                    <div class="mt-1">
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Tracking Unit <span class="text-rose-500">*</span></label>
                         <div x-data="customDropdown(
                             [
-                                @foreach($units as $u)
+                            @foreach($units as $u)
                                 { id: '{{ addslashes($u->name) }}', name: '{{ addslashes($u->name) }}' },
-                                @endforeach
-                            ], 
-                            '{{ old('unit', $item->unit) }}', 
-                            'unit', 
+                            @endforeach
+                            ],
+                            '{{ old('unit', $item->unit) }}',
+                            'unit',
                             true
                         )" class="relative w-full">
                             <input type="hidden" :name="inputName" x-model="selectedId" required>
-                            
-                            <button type="button" @click="toggle()" class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all bg-white text-left flex justify-between items-center" :class="{'text-slate-400': !selectedId}">
+                            <button type="button" @click="toggle()"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors text-left flex justify-between items-center"
+                                :class="{'text-slate-400': !selectedId}">
                                 <span x-text="selectedName || 'Select or type unit...'" class="truncate block"></span>
                                 <svg class="h-4 w-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" /></svg>
                             </button>
-                            
-                            <div x-show="isOpen" x-transition.opacity.duration.200ms @click.away="close()" class="absolute z-50 mt-2 w-full origin-top-right rounded-xl bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-slate-200 overflow-hidden flex flex-col" style="display: none;">
-                                
-                                <div class="px-2 pt-2 pb-1 bg-white">
-                                    <input type="text" x-ref="searchInput" x-model="search" placeholder="Search units..." class="block w-full rounded-lg border-0 py-2 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm transition-all bg-slate-50">
+                            <div x-show="isOpen" x-transition.opacity.duration.200ms @click.away="close()"
+                                class="absolute z-50 mt-1 w-full bg-white border border-slate-200 overflow-hidden flex flex-col" style="display: none;">
+                                <div class="px-2 pt-2 pb-1">
+                                    <input type="text" x-ref="searchInput" x-model="search" placeholder="Search units..."
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:outline-none py-2 px-3 text-sm font-mono text-slate-800 transition-colors">
                                 </div>
-                                
-                                <ul class="max-h-60 overflow-y-auto mt-1 p-1 bg-white">
+                                <ul class="max-h-60 overflow-y-auto p-1">
                                     <template x-for="option in filteredOptions" :key="option.id">
-                                        <li @click="selectOption(option)" class="relative cursor-pointer select-none rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between" :class="{'bg-slate-50 font-bold text-slate-900 ring-1 ring-slate-200/50': selectedId == option.id}">
+                                        <li @click="selectOption(option)"
+                                            class="relative cursor-pointer px-3 py-2 text-sm font-mono text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between"
+                                            :class="{'bg-slate-50 font-bold text-slate-900': selectedId == option.id}">
                                             <span x-text="option.name" class="block truncate"></span>
-                                            <svg x-show="selectedId == option.id" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                            <svg x-show="selectedId == option.id" class="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                                         </li>
                                     </template>
-                                    <li x-show="filteredOptions.length === 0" class="px-3 py-4 text-center text-sm text-slate-400">
-                                        No matching units found.
-                                    </li>
+                                    <li x-show="filteredOptions.length === 0" class="px-3 py-4 text-center text-xs font-mono text-slate-400">No matching units found.</li>
                                 </ul>
-                                
                                 <div class="border-t border-slate-100 bg-slate-50 p-2">
-                                    <button x-show="!isAdding" @click="isAdding = true; $nextTick(() => $refs.newInput.focus())" type="button" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 hover:bg-white ring-1 ring-transparent hover:ring-slate-200 transition-all">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                                        Add another option
+                                    <button x-show="!isAdding" @click="isAdding = true; $nextTick(() => $refs.newInput.focus())" type="button"
+                                        class="flex w-full items-center gap-2 px-3 py-2 text-xs font-mono font-bold text-indigo-600 hover:bg-white border border-transparent hover:border-slate-200 transition-all">
+                                        + Add another option
                                     </button>
-                                    
                                     <div x-show="isAdding" class="flex items-center gap-2">
-                                        <input x-ref="newInput" type="text" x-model="newValue" @keydown.enter.prevent="saveNewOption()" placeholder="Type new unit..." class="block w-full flex-1 rounded-lg border-0 py-2 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm bg-white">
-                                        <button type="button" @click="saveNewOption()" class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm transition-colors shrink-0">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                        <input x-ref="newInput" type="text" x-model="newValue" @keydown.enter.prevent="saveNewOption()" placeholder="Type new unit..."
+                                            class="block w-full flex-1 border border-slate-200 bg-white py-2 px-3 text-sm font-mono text-slate-800 focus:outline-none">
+                                        <button type="button" @click="saveNewOption()" class="flex h-8 w-8 items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shrink-0">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                                         </button>
-                                        <button type="button" @click="isAdding = false; newValue = ''" class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 ring-1 ring-rose-200/50 shadow-sm transition-colors shrink-0">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        <button type="button" @click="isAdding = false; newValue = ''" class="flex h-8 w-8 items-center justify-center border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 transition-colors shrink-0">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Unit Price <span
-                                class="text-slate-400 font-normal ml-1">(₱)</span> <span
-                                class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="unit_price"
-                            value="{{ old('unit_price', $item->unit_price) }}"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all"
-                            required>
+                </div>
+            </div>
+
+            {{-- ========================== --}}
+            {{-- SECTION 4: Location       --}}
+            {{-- ========================== --}}
+            <div class="bg-white border border-slate-200 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-violet-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-violet-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">04 // Storage Location</p>
                     </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Reorder Level <span
-                                class="text-rose-500">*</span></label>
-                        <input type="number" name="reorder_level"
-                            value="{{ old('reorder_level', $item->reorder_level) }}"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-all"
-                            required min="0">
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-1">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Storage Location</label>
+                            <input type="text" name="storage_location" value="{{ old('storage_location', $item->storage_location) }}" list="storage-locations"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                placeholder="e.g. Storage 1, Supply Room A...">
+                            <datalist id="storage-locations">
+                                @foreach($storageLocations as $loc)
+                                    <option value="{{ $loc->name }}"></option>
+                                @endforeach
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Section / Bin</label>
+                            <input type="text" name="storage_section" value="{{ old('storage_section', $item->storage_section) }}" list="storage-sections"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                placeholder="e.g. Section 1, Shelf B...">
+                            <datalist id="storage-sections">
+                                @foreach($storageSections as $loc)
+                                    <option value="{{ $loc->name }}"></option>
+                                @endforeach
+                            </datalist>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <hr class="border-slate-100">
-
-            {{-- SECTION: Item Behavior --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Item Behavior
-                </h3>
-
-                <label
-                    class="relative flex cursor-pointer items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 transition-all hover:bg-slate-100 has-[:checked]:border-indigo-500/50 has-[:checked]:bg-indigo-50/50 has-[:checked]:ring-1 has-[:checked]:ring-indigo-500/50 group">
-                    <div class="flex h-6 items-center">
-                        <input type="checkbox" name="is_one_time_use" value="1" id="is_one_time_use" {{
-                            old('is_one_time_use', $item->is_one_time_use) ? 'checked' : '' }} class="h-5 w-5 rounded
-                        border-slate-300 text-indigo-600 transition-all focus:ring-indigo-600
-                        group-hover:border-indigo-400">
+            {{-- ========================== --}}
+            {{-- SECTION 5: Description    --}}
+            {{-- ========================== --}}
+            <div class="bg-white border border-slate-200 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-slate-400 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">05 // Additional Details</p>
                     </div>
-                    <div class="min-w-0 flex-1 text-sm leading-6">
-                        <span class="block font-bold text-slate-900 group-has-[:checked]:text-indigo-900">One-Time Use
-                            (Disposable)</span>
-                        <span
-                            class="block mt-0.5 text-xs font-medium text-slate-500 group-has-[:checked]:text-indigo-700/80">If
-                            checked, the item is completely consumed upon use. If unchecked, it moves to the 'Used
-                            Stock' pool after usage.</span>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Description <span class="font-normal text-slate-400">(Optional)</span></label>
+                        <textarea name="description" rows="4"
+                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors placeholder:text-slate-400"
+                            placeholder="Enter detailed specifications or notes...">{{ old('description', $item->description) }}</textarea>
                     </div>
-                </label>
+                </div>
             </div>
 
-        </div>
-
-        {{-- Footer / Submit Area --}}
-        <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
-            <a href="{{ route('items.show', $item) }}"
-                class="rounded-xl px-5 py-2.5 text-sm font-bold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900">
-                Cancel
-            </a>
-            <button type="submit"
-                class="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/30 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
-                <span class="relative">Save Changes</span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                    class="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                        clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>
-    </form>
-</div>
-
-
+            {{-- Submit --}}
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <a href="{{ route('items.show', $item) }}"
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+                    <span>Save Changes</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection

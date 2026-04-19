@@ -135,11 +135,11 @@ class TransactionLogController extends Controller
             'type' => 'in',
             'date' => $r->returned_at ? ($r->returned_at instanceof \Carbon\Carbon ? $r->returned_at : \Carbon\Carbon::parse($r->returned_at)) : $r->updated_at,
             'item' => $r->item,
-            'quantity' => $r->quantity_returned + ($r->item->is_one_time_use ? 0 : $r->quantity_used),
+            'quantity' => $r->quantity_returned + ($r->item->item_type === 'consumable' ? 0 : $r->quantity_used),
             'lot_number' => null,
             'expiry_date' => null,
             'notes' => 'RETURNED BY: '.($r->borrower_name ?? $r->staff?->display_name ?? 'Unknown').'. '.
-                       ($r->quantity_used > 0 ? ($r->item->is_one_time_use ? '('.$r->quantity_used.' consumed) ' : '('.$r->quantity_used.' used) ') : '').
+                       ($r->quantity_used > 0 ? ($r->item->item_type === 'consumable' ? '('.$r->quantity_used.' consumed) ' : '('.$r->quantity_used.' used) ') : '').
                        $r->notes,
             'patient_id' => 'RETURNED',
             'procedure_type' => 'Item Return/Usage',

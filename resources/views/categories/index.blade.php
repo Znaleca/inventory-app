@@ -3,74 +3,85 @@
 @section('title', 'Categories')
 
 @section('actions')
-<a href="{{ route('categories.create') }}"
-    class="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-[0_8px_16px_-6px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_20px_-6px_rgba(15,23,42,0.6)] focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2">
-    <div
-        class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-    </div>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-        class="relative h-4 w-4 transition-transform duration-300 group-hover:rotate-90">
-        <path
-            d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
-    </svg>
-    <span class="relative">New Category</span>
-</a>
+    <a href="{{ route('categories.create') }}"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5">
+            <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
+        </svg>
+        New_Category
+    </a>
 @endsection
 
 @section('content')
-{{-- Main Table Card --}}
-<div
-    class="overflow-hidden rounded-[1.5rem] bg-white/80 ring-1 ring-slate-200/50 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] backdrop-blur-xl">
+
+{{-- Page Header --}}
+<div class="mb-5 flex items-end justify-between">
+    <div>
+        <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Inventory://Categories</p>
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight">Category Registry</h1>
+    </div>
+    <span class="text-[10px] font-mono text-slate-400">{{ $categories->count() }} records</span>
+</div>
+
+@if(session('success'))
+    <div class="mb-4 bg-emerald-50 border border-emerald-200 relative px-5 py-3">
+        <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+        <p class="text-sm font-mono font-bold text-emerald-700 ml-1">{{ session('success') }}</p>
+    </div>
+@endif
+
+{{-- Main Table --}}
+<div class="bg-white border border-slate-200 relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
 
     @if($categories->count() > 0)
-    <div class="overflow-x-auto p-2">
-        <table class="min-w-full text-sm border-separate border-spacing-y-1">
+    @php
+        $deviceCats = $categories->where('item_type', 'device');
+        $consumableCats = $categories->where('item_type', 'consumable');
+        $groups = collect([
+            ['label' => 'Device / Equipment', 'color' => 'violet', 'items' => $deviceCats],
+            ['label' => 'Consumable', 'color' => 'indigo', 'items' => $consumableCats],
+        ])->filter(fn($g) => $g['items']->count() > 0);
+    @endphp
+
+    <div class="overflow-x-auto">
+        @foreach($groups as $group)
+        {{-- Group header --}}
+        <div class="flex items-center gap-2 px-5 py-2.5 border-b border-dashed border-slate-100 bg-slate-50/50 ml-1">
+            <span class="h-2 w-2 inline-block {{ $group['color'] === 'violet' ? 'bg-violet-500' : 'bg-indigo-500' }}"></span>
+            <span class="text-[10px] font-mono font-bold uppercase tracking-widest {{ $group['color'] === 'violet' ? 'text-violet-600' : 'text-indigo-600' }}">
+                {{ $group['label'] }}
+            </span>
+            <span class="text-[10px] font-mono text-slate-400">{{ $group['items']->count() }} {{ Str::plural('category', $group['items']->count()) }}</span>
+        </div>
+
+        <table class="min-w-full text-sm">
             <thead>
-                <tr>
-                    <th scope="col"
-                        class="whitespace-nowrap px-3 py-2 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Category Identity</th>
-                    <th scope="col"
-                        class="whitespace-nowrap px-3 py-2 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Description</th>
-                    <th scope="col"
-                        class="whitespace-nowrap px-3 py-2 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Asset Count</th>
-                    <th scope="col"
-                        class="whitespace-nowrap px-3 py-2 text-right text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Actions</th>
+                <tr class="border-b border-slate-100 bg-slate-50/80">
+                    <th scope="col" class="whitespace-nowrap pl-5 pr-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Category Name</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Description</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-center text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Items</th>
+                    <th scope="col" class="whitespace-nowrap px-3 pr-5 py-3 text-right text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($categories as $category)
-                <tr
-                    class="group transition-all duration-200 hover:bg-white rounded-xl shadow-sm hover:shadow-md hover:ring-1 hover:ring-slate-200/50">
-
-                    {{-- Name --}}
-                    <td class="px-3 py-2.5 rounded-l-xl">
-                        <span class="block text-sm font-bold text-slate-800">{{ $category->name }}</span>
+            <tbody class="divide-y divide-slate-50">
+                @foreach($group['items'] as $category)
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="pl-5 pr-3 py-3">
+                        <span class="text-sm font-bold text-slate-800">{{ $category->name }}</span>
                     </td>
-
-                    {{-- Description --}}
-                    <td class="px-3 py-2.5">
-                        <span class="block text-xs font-medium text-slate-500 line-clamp-1 max-w-[250px]">
-                            {{ $category->description ?: '—' }}
+                    <td class="px-3 py-3">
+                        <span class="text-xs font-mono text-slate-500 line-clamp-1 max-w-[280px]">{{ $category->description ?: '—' }}</span>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-3 text-center">
+                        <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5">
+                            {{ number_format($category->items_count) }}
                         </span>
                     </td>
-
-                    {{-- Item Count --}}
-                    <td class="whitespace-nowrap px-3 py-2.5 text-center">
-                        <span
-                            class="inline-flex items-center justify-center rounded-lg bg-slate-100/80 px-2.5 py-1.5 text-[11px] font-bold text-slate-600 ring-1 ring-inset ring-slate-500/10">
-                            {{ number_format($category->items_count) }} Items
-                        </span>
-                    </td>
-
-                    {{-- Actions --}}
-                    <td class="whitespace-nowrap px-3 py-2.5 text-right rounded-r-xl">
-                        <div class="flex items-center justify-end gap-2">
+                    <td class="whitespace-nowrap px-3 pr-5 py-3 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
                             <a href="{{ route('categories.edit', $category) }}"
-                                class="inline-flex items-center rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-inset ring-slate-500/20 transition-all hover:bg-slate-800 hover:text-white hover:shadow-md hover:shadow-slate-800/20">
+                                class="inline-flex items-center border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-colors">
                                 Edit
                             </a>
                             <form action="{{ route('categories.destroy', $category) }}" method="POST" class="m-0"
@@ -78,7 +89,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
-                                    class="inline-flex items-center rounded-lg bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 ring-1 ring-inset ring-rose-500/20 transition-all hover:bg-rose-500 hover:text-white hover:shadow-md hover:shadow-rose-500/20">
+                                    class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">
                                     Delete
                                 </button>
                             </form>
@@ -88,43 +99,29 @@
                 @endforeach
             </tbody>
         </table>
+
+        @if(!$loop->last)
+            <div class="border-t border-slate-100 ml-1"></div>
+        @endif
+        @endforeach
     </div>
+
     @else
-    {{-- Glowing Empty State --}}
-    <div class="relative flex flex-col items-center justify-center px-3 py-22 text-center group">
-        <div class="absolute inset-0 flex items-center justify-center opacity-40">
-            <div
-                class="h-48 w-48 rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 blur-3xl transition-transform duration-700 group-hover:scale-110">
-            </div>
-        </div>
-
-        <div
-            class="relative z-10 mb-6 flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-white ring-1 ring-slate-200/80 shadow-xl shadow-slate-200/40">
-            <div class="absolute inset-0 rounded-[1.5rem] bg-gradient-to-br from-indigo-50/50 to-transparent"></div>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="relative h-8 w-8 text-indigo-400">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25a2.25 2.25 0 01-2.25 2.25h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" />
+    {{-- Empty State --}}
+    <div class="flex flex-col items-center justify-center py-20 text-center ml-1">
+        <div class="h-14 w-14 border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" />
             </svg>
         </div>
-        <h3 class="relative z-10 text-lg font-black text-slate-800">No categories found</h3>
-        <p class="relative z-10 mt-2 max-w-sm text-sm font-medium leading-relaxed text-slate-500">
-            Begin organizing your inventory by creating your first asset category.
-        </p>
-
+        <p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">// No records found</p>
+        <p class="text-sm font-semibold text-slate-500 mt-1">No categories yet. Create the first one.</p>
         <a href="{{ route('categories.create') }}"
-            class="relative z-10 mt-8 group inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 px-3 py-2 text-sm font-bold text-white shadow-[0_8px_16px_-6px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_20px_-6px_rgba(15,23,42,0.6)]">
-            <div
-                class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            </div>
-            <span class="relative">Create First Category</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                stroke="currentColor"
-                class="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
+            class="mt-6 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-blue-700">
+            + New Category
         </a>
     </div>
     @endif
 </div>
+
 @endsection

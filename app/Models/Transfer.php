@@ -9,7 +9,7 @@ class Transfer extends Model
 {
     protected $fillable = [
         'item_id', 'quantity', 'new_quantity', 'used_quantity', 'type', 'destination',
-        'transferred_by', 'transferred_to', 'department', 'bio_id', 'approved_by', 'transferred_at', 'notes',
+        'transferred_by', 'transferred_to', 'department', 'bio_id', 'approved_by', 'transferred_at', 'notes', 'serial_number',
     ];
 
     protected function casts(): array

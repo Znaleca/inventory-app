@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\Location;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -16,8 +17,7 @@ class ItemController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('brand', 'like', "%{$search}%");
             });
         }
 
@@ -35,13 +35,19 @@ class ItemController extends Controller
     {
         $categories = Category::orderBy('name')->get();
         $units = \App\Models\Unit::orderBy('name')->get();
-        return view('items.create', compact('categories', 'units'));
+        $locations = Location::orderBy('name')->get();
+        $storageLocations = $locations->where('type', 'storage');
+        $storageSections = $locations->where('type', 'section');
+        return view('items.create', compact('categories', 'units', 'storageLocations', 'storageSections'));
     }
 
     public function store(Request $request)
     {
         if ($request->filled('category_id') && !is_numeric($request->category_id)) {
-            $cat = Category::firstOrCreate(['name' => trim($request->category_id)]);
+            $cat = Category::firstOrCreate(
+                ['name' => trim($request->category_id)],
+                ['item_type' => $request->input('item_type', 'consumable')]
+            );
             $request->merge(['category_id' => $cat->id]);
         }
 
@@ -49,19 +55,29 @@ class ItemController extends Controller
             \App\Models\Unit::firstOrCreate(['name' => trim($request->unit)]);
         }
 
+        if ($request->input('item_type') === 'device') {
+            $request->merge([
+                'name' => trim($request->input('brand') . ' ' . $request->input('model'))
+            ]);
+        }
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:255|unique:items',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
-            'unit' => 'required|string|max:50',
-            'unit_price' => 'required|numeric|min:0',
-            'reorder_level' => 'required|integer|min:0',
-            'is_one_time_use' => 'nullable|boolean',
+            'item_type'      => 'required|in:device,consumable',
+            'brand'          => 'required_if:item_type,device|nullable|string|max:255',
+            'model'          => 'required_if:item_type,device|nullable|string|max:255',
+            'name'           => 'required|string|max:255',
+            'category_id'   => 'required|exists:categories,id',
+            'description'   => 'nullable|string',
+            'unit'          => 'required|string|max:50',
+            'is_expirable'  => 'nullable|boolean',
+            'storage_location' => 'nullable|string|max:255',
+            'storage_section'  => 'nullable|string|max:255',
         ]);
+        $validated['unit_price'] = 0;
 
         $itemData = $validated;
-        $itemData['is_one_time_use'] = $request->boolean('is_one_time_use');
+        // Devices never expire; consumables follow the form toggle
+        $itemData['is_expirable'] = $request->input('item_type') === 'device' ? false : $request->boolean('is_expirable');
         $itemData['condition'] = 'new';
         $itemData['stock_used'] = 0;
         
@@ -86,13 +102,19 @@ class ItemController extends Controller
     {
         $categories = Category::orderBy('name')->get();
         $units = \App\Models\Unit::orderBy('name')->get();
-        return view('items.edit', compact('item', 'categories', 'units'));
+        $locations = Location::orderBy('name')->get();
+        $storageLocations = $locations->where('type', 'storage');
+        $storageSections = $locations->where('type', 'section');
+        return view('items.edit', compact('item', 'categories', 'units', 'storageLocations', 'storageSections'));
     }
 
     public function update(Request $request, Item $item)
     {
         if ($request->filled('category_id') && !is_numeric($request->category_id)) {
-            $cat = Category::firstOrCreate(['name' => trim($request->category_id)]);
+            $cat = Category::firstOrCreate(
+                ['name' => trim($request->category_id)],
+                ['item_type' => $request->input('item_type', 'consumable')]
+            );
             $request->merge(['category_id' => $cat->id]);
         }
 
@@ -100,19 +122,29 @@ class ItemController extends Controller
             \App\Models\Unit::firstOrCreate(['name' => trim($request->unit)]);
         }
 
+        if ($request->input('item_type') === 'device') {
+            $request->merge([
+                'name' => trim($request->input('brand') . ' ' . $request->input('model'))
+            ]);
+        }
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:255|unique:items,sku,'.$item->id,
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
-            'unit' => 'required|string|max:50',
-            'unit_price' => 'required|numeric|min:0',
-            'reorder_level' => 'required|integer|min:0',
-            'is_one_time_use' => 'nullable|boolean',
+            'item_type'      => 'required|in:device,consumable',
+            'brand'          => 'required_if:item_type,device|nullable|string|max:255',
+            'model'          => 'required_if:item_type,device|nullable|string|max:255',
+            'name'           => 'required|string|max:255',
+            'category_id'   => 'required|exists:categories,id',
+            'description'   => 'nullable|string',
+            'unit'          => 'required|string|max:50',
+            'is_expirable'  => 'nullable|boolean',
+            'storage_location' => 'nullable|string|max:255',
+            'storage_section'  => 'nullable|string|max:255',
         ]);
+        $validated['unit_price'] = 0;
 
         $itemData = $validated;
-        $itemData['is_one_time_use'] = $request->boolean('is_one_time_use');
+        // Devices never expire; consumables follow the form toggle
+        $itemData['is_expirable'] = $request->input('item_type') === 'device' ? false : $request->boolean('is_expirable');
 
         $item->update($itemData);
 

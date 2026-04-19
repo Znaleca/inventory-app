@@ -3,235 +3,322 @@
 @section('title', 'New Borrow')
 
 @section('actions')
-<a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
-    class="group inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:text-slate-900">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-        class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1">
-        <path fill-rule="evenodd"
-            d="M17 10a.75.75 0 01-.75.75H5.66l4.22 4.22a.75.75 0 11-1.06 1.06l-5.5-5.5a.75.75 0 010-1.06l5.5-5.5a.75.75 0 111.06 1.06l-4.22 4.22h10.59a.75.75 0 01.75.75z"
-            clip-rule="evenodd" />
-    </svg>
-    Back to Borrows
-</a>
+    <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
+        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        ← Back to Borrows
+    </a>
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-3xl">
-    <form action="{{ route('borrows.store') }}" method="POST"
-        x-data="{ borrowType: '{{ old('type', 'out') }}' }"
-        class="overflow-hidden rounded-[2rem] bg-white ring-1 ring-slate-200 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)]">
-        @csrf
+    <div class="mx-auto max-w-4xl">
 
-        {{-- Validation Error Summary --}}
-        @if ($errors->any())
-        <div class="mx-6 mt-6 rounded-xl bg-rose-50 px-5 py-4 ring-1 ring-inset ring-rose-200">
-            <div class="flex gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 shrink-0 text-rose-500 mt-0.5">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
-                </svg>
-                <div>
-                    <p class="text-sm font-bold text-rose-700">Please fix the following errors:</p>
-                    <ul class="mt-1 list-disc list-inside text-sm text-rose-600 space-y-0.5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
+        {{-- Page Header --}}
+        <div class="mb-5">
+            <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Borrows://Record</p>
+            <h1 class="text-xl font-bold text-slate-800 tracking-tight">Record Borrow</h1>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Track items lent to or returned from staff.</p>
         </div>
+
+        @if ($errors->any())
+            <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
+                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
+                <ul class="ml-1 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li class="text-sm text-rose-700">— {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
-        {{-- Header Section --}}
-        <div class="border-b border-slate-100 bg-slate-50/50 px-8 py-6">
-            <div class="flex items-center gap-4">
-                <div
-                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
-                    </svg>
+        <form action="{{ route('borrows.store') }}" method="POST" x-data="borrowForm()">
+            @csrf
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                {{-- FULL COLUMN --}}
+                <div class="lg:col-span-12 space-y-4">
+                    
+                    {{-- ======================== --}}
+                    {{-- SECTION 1: Item Select  --}}
+                    {{-- ======================== --}}
+                    <div class="bg-white border border-slate-200 relative">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+                        <div class="px-5 py-4 ml-1">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="h-2 w-2 bg-sky-500 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">01 // Item Selection</p>
+                            </div>
+
+                            <div x-show="true">
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">Existing Item <span class="text-rose-500">*</span></label>
+                                <select name="item_id" required x-model="selectedItem" @change="onItemChange()"
+                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors">
+                                    <option value="">-- Choose an item --</option>
+                                    @foreach($items as $i)
+                                        <option value="{{ $i->id }}">
+                                            [{{ strtoupper($i->item_type) }}] {{ $i->name }} · {{ $i->total_stock }} new, {{ $i->effective_stock_used }} used
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    {{-- ======================================== --}}
+                    {{-- SECTION 3A: Device Selection (OUT ONLY) --}}
+                    {{-- ======================================== --}}
+                    <div class="bg-white border border-indigo-300 relative" x-show="isDevice()" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                        <div class="ml-1">
+                            <div class="px-5 py-4 border-b border-dashed border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-0.5">
+                                        <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
+                                        <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">02 // Select Devices to Lend</p>
+                                    </div>
+                                    <p class="text-xs text-slate-500">Choose the exact serial numbers to lend — new or used.</p>
+                                </div>
+                                <div class="shrink-0 flex items-center md:text-right gap-3">
+                                    <div class="text-right">
+                                        <p class="text-2xl font-black font-mono text-indigo-600 leading-none" x-text="selectedEntries.length"></p>
+                                        <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Qty selected</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {{-- Checkbox list --}}
+                            <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
+                                <template x-for="batch in getBatches()" :key="batch.id">
+                                    <label :for="'entry_' + batch.id"
+                                        :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'hover:bg-slate-50'"
+                                        class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors border-l-2 border-transparent">
+                                        <input type="checkbox" :id="'entry_' + batch.id" name="selected_entries[]"
+                                            :value="String(batch.id)" x-model="selectedEntries"
+                                            class="h-4 w-4 accent-indigo-600 shrink-0">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-bold font-mono text-slate-800"
+                                                x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')"></p>
+                                            <div class="flex items-center gap-2 mt-0.5">
+                                                <span x-show="!batch.is_used" class="flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-widest text-teal-700 bg-teal-100 px-1.5 py-0.5 border border-teal-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                                                    NEW
+                                                </span>
+                                                <span x-show="batch.is_used" class="flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 border border-amber-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
+                                                    USED
+                                                </span>
+                                                <p class="text-[10px] font-mono text-slate-400" x-text="'Remaining: ' + batch.remaining"></p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </template>
+                                <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
+                                    <p class="text-[11px] font-mono text-slate-400">// No device stock available to lend</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ============================================= --}}
+                    {{-- SECTION 3B: Quantity & Specifics            --}}
+                    {{-- ============================================= --}}
+                    <div class="bg-white border border-slate-200 relative" x-show="selectedItem" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
+                        <div class="px-5 py-4 ml-1">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="h-2 w-2 bg-teal-500 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
+                                    0<span x-text="isDevice() ? '3' : '2'"></span> // Quantities & Dates
+                                </p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                
+
+
+                                {{-- Quantities --}}
+                                <div x-show="!isDevice()" x-cloak>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrow Quantity <span class="text-rose-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="number" name="quantity_borrowed" x-model="manualQty" min="1" value="{{ old('quantity_borrowed', 1) }}"
+                                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors">
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                        </div>
+                                    </div>
+                                    @error('quantity_borrowed') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                </div>
+                                
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrow Date &amp; Time <span class="text-rose-500">*</span></label>
+                                    <input type="datetime-local" name="borrowed_at" value="{{ old('borrowed_at', now()->format('Y-m-d\TH:i')) }}"
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Expected Return Date <span class="text-slate-400 font-normal">(Optional)</span></label>
+                                    <input type="date" name="return_date" value="{{ old('return_date') }}"
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ======================== --}}
+                    {{-- SECTION 4: Party Info   --}}
+                    {{-- ======================== --}}
+                    <div class="bg-white border border-slate-200 relative" x-show="selectedItem" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+                        <div class="px-5 py-4 ml-1 space-y-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="h-2 w-2 bg-slate-400 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+                                    0<span x-text="isDevice() ? '4' : '3'"></span> // Borrower Details
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">
+                                        Name of Borrower <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="text" name="borrower_name" value="{{ old('borrower_name') }}" required
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                    @error('borrower_name') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrower Bio ID <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="bio_id" value="{{ old('bio_id') }}" required
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">
+                                        Borrower Department <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="text" name="department" value="{{ old('department') }}" required
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span class="font-normal text-slate-400">(Optional)</span></label>
+                                    <textarea name="notes" rows="3"
+                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors placeholder:text-slate-400"
+                                        placeholder="Condition of item, context...">{{ old('notes') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Borrow Details</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Record items borrowed by clinical staff. Returned items can
-                        be restocked or marked as used later.</p>
+
+            </div>
+
+            {{-- Submit --}}
+            <div class="flex items-center justify-end gap-3 pt-4">
+                <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    Cancel
+                </a>
+                
+                {{-- Dynamic validation handling --}}
+                <div x-data="{ 
+                    canSubmit() {
+                        if (!selectedItem) return false;
+                        if (isDevice()) {
+                            return selectedEntries.length > 0;
+                        }
+                        return (parseInt(manualQty) || 0) > 0;
+                    } 
+                }">
+                    <button type="submit" :disabled="!canSubmit()"
+                        :class="!canSubmit() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
+                        class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
+                        <span>Record Borrow</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
                 </div>
             </div>
-        </div>
 
-        {{-- Main Form Body --}}
-        <div class="px-8 py-8 space-y-8">
+        </form>
+    </div>
 
-            {{-- SECTION: Item Configuration --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd"
-                            d="M4 10a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h9a.75.75 0 00.75-.75v-4.5a.75.75 0 011.5 0v4.5a2.25 2.25 0 01-2.25 2.25h-9A2.25 2.25 0 012 15.25v-4.5A.75.75 0 014 10z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Item Configuration
-                </h3>
+    @php
+        // Mirroring transfer logic exactly
+        $itemsJs = [];
+        foreach ($items as $i) {
+            $itemsJs[$i->id] = [
+                'new' => $i->total_stock,
+                'used' => $i->effective_stock_used,
+                'unit' => $i->unit,
+                'type' => $i->item_type,
+                'batches' => array_values(array_merge($i->batches_breakdown ?? [], $i->used_devices_breakdown ?? [])),
+            ];
+        }
+    @endphp
 
-                <div class="space-y-6">
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Borrow Type <span class="text-rose-500">*</span></label>
-                            <select x-model="borrowType" name="type" required
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all bg-white">
-                                <option value="out">↑ Borrow Out (Lend an item)</option>
-                                <option value="in">↓ Borrow In (Receive an item)</option>
-                            </select>
-                            <p class="mt-2 text-[11px] text-slate-400 font-medium" x-show="borrowType === 'out'">You are lending an item *to* someone else.</p>
-                            <p class="mt-2 text-[11px] text-slate-400 font-medium" x-show="borrowType === 'in'" style="display: none;">You are borrowing an item *from* someone else.</p>
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Item <span
-                                    class="text-rose-500">*</span></label>
-                            <select id="item_id" name="item_id" required
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all bg-white">
-                                <option value="">Select an Item...</option>
-                                @foreach($items as $item)
-                                <option value="{{ $item->id }}" {{ old('item_id')==$item->id ? 'selected' : '' }}>
-                                    {{ $item->name }} (Available: {{ $item->total_stock }} {{ $item->unit }})
-                                </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    @error('item_id')<p class="mt-1 text-xs text-rose-500 font-medium">{{ $message }}</p>@enderror
-                    @error('type')<p class="mt-1 text-xs text-rose-500 font-medium">{{ $message }}</p>@enderror
+    <script>
+        function borrowForm() {
+            return {
+                selectedItem: {{ (old('item_id') ?? request('item_id')) ? (int) (old('item_id') ?? request('item_id')) : 'null' }},
+                selectedEntries: [],
+                manualQty: {{ old('quantity_borrowed', 1) }},
+                newUnitLabel: '',
+                items: {!! json_encode($itemsJs) !!},
 
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Quantity <span
-                                    class="text-rose-500">*</span></label>
-                            <input type="number" name="quantity_borrowed" id="quantity_borrowed" min="1"
-                                value="{{ old('quantity_borrowed') }}" required
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset {{ $errors->has('quantity_borrowed') ? 'ring-rose-400' : 'ring-slate-200' }} placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                            @error('quantity_borrowed')<p class="mt-1 text-xs text-rose-500 font-medium">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Borrow Date <span
-                                    class="text-rose-500">*</span></label>
-                            <input type="datetime-local" name="borrowed_at" id="borrowed_at" required
-                                value="{{ old('borrowed_at', now()->format('Y-m-d\TH:i')) }}"
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Expected Return <span
-                                    class="text-slate-400 font-normal">(Optional)</span></label>
-                            <input type="date" name="return_date" id="return_date"
-                                value="{{ old('return_date') }}"
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                        </div>
-                    </div>
-                </div>
-            </div>
+                isDevice() {
+                    return this.selectedItem && this.items[this.selectedItem] && this.items[this.selectedItem].type === 'device';
+                },
 
-            <hr class="border-slate-100">
+                getUnit() {
+                    return this.selectedItem && this.items[this.selectedItem] ? this.items[this.selectedItem].unit : 'units';
+                },
 
-            {{-- SECTION: Borrower Information --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path
-                            d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-                    </svg>
-                    Borrower Information
-                </h3>
+                getBatches() {
+                    if (!this.selectedItem || !this.items[this.selectedItem]) return [];
+                    return this.items[this.selectedItem].batches || [];
+                },
 
-                <div class="space-y-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Name of Borrower <span
-                                class="text-rose-500">*</span></label>
-                        <input type="text" name="borrower_name" id="borrower_name" value="{{ old('borrower_name') }}"
-                            required placeholder="e.g. Juan Dela Cruz"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset {{ $errors->has('borrower_name') ? 'ring-rose-400' : 'ring-slate-200' }} placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                        @error('borrower_name')<p class="mt-1 text-xs text-rose-500 font-medium">{{ $message }}</p>@enderror
-                    </div>
+                onItemChange() {
+                    this.selectedEntries = [];
+                    this.manualQty = 1;
+                },
 
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">Borrower Bio ID <span
-                                    class="text-rose-500">*</span></label>
-                            <input type="text" name="bio_id" id="bio_id" value="{{ old('bio_id') }}" required
-                                placeholder="e.g. 2024-X892"
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-sm font-bold text-slate-700">
-                                <span x-text="borrowType === 'in' ? 'Destination Department' : 'Borrower Department'"></span> <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" name="department" id="department" value="{{ old('department') }}"
-                                required :placeholder="borrowType === 'in' ? 'e.g. Storage/Internal' : 'e.g. Cardiology'"
-                                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                        </div>
-                    </div>
+                initSerial(e) {
+                    if (!e.target.value.trim()) {
+                        e.target.value = '1. ';
+                    }
+                },
 
-                    <div x-show="borrowType === 'in'" style="display: none;">
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Source Department (Lender) <span class="text-rose-500">*</span></label>
-                        <input type="text" name="source_department" id="source_department" value="{{ old('source_department') }}"
-                            :required="borrowType === 'in'" placeholder="e.g. ICU"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                    </div>
-                </div>
-            </div>
+                handleSerialEnter(e) {
+                    const el = e.target;
+                    const cursor = el.selectionStart;
+                    const val = el.value;
+                    const linesBefore = val.slice(0, cursor).split('\n');
+                    const nextLineNum = linesBefore.length + 1;
+                    const insert = '\n' + nextLineNum + '. ';
+                    el.value = val.slice(0, cursor) + insert + val.slice(cursor);
+                    el.selectionStart = el.selectionEnd = cursor + insert.length;
+                    
+                    this.handleSerialInput({target: el});
+                },
 
-            <hr class="border-slate-100">
-
-            {{-- SECTION: Additional Context --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Additional Details
-                </h3>
-
-                <div class="space-y-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Processed / Approved By</label>
-                        <input type="text" value="{{ Auth::user()->name }}" readonly
-                            title="This is automatically recorded as your account."
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-500 bg-slate-50 shadow-sm ring-1 ring-inset ring-slate-200 sm:text-sm sm:leading-6 cursor-not-allowed">
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Notes <span
-                                class="text-slate-400 font-normal ml-1">(Optional)</span></label>
-                        <textarea id="notes" name="notes" rows="3"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all"
-                            placeholder="Enter any additional context regarding this borrow...">{{ old('notes') }}</textarea>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        {{-- Footer / Submit Area --}}
-        <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
-            <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
-                class="rounded-xl px-5 py-2.5 text-sm font-bold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900">
-                Cancel
-            </a>
-            <button type="submit"
-                class="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                <span class="relative" x-text="borrowType === 'out' ? 'Confirm Borrow Out' : 'Confirm Borrow In'"></span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                    class="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                        clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>
-    </form>
-</div>
+                handleSerialInput(e) {
+                    const val = e.target.value;
+                    const lines = val.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(l => l.length > 0);
+                    // Borrow quantity usually must be at least 1, but we map it up actively
+                    this.manualQty = lines.length === 0 ? 1 : lines.length;
+                }
+            };
+        }
+    </script>
 @endsection

@@ -1,234 +1,361 @@
 @extends('layouts.app')
 
-@section('title', 'Process Return / Usage')
+@section('title', 'Process Return')
 
 @section('actions')
-<a href="{{ route('in-out.index', ['tab' => 'return']) }}"
-    class="group inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm ring-1 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:text-slate-900">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-        class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1">
-        <path fill-rule="evenodd"
-            d="M17 10a.75.75 0 01-.75.75H5.66l4.22 4.22a.75.75 0 11-1.06 1.06l-5.5-5.5a.75.75 0 010-1.06l5.5-5.5a.75.75 0 111.06 1.06l-4.22 4.22h10.59a.75.75 0 01.75.75z"
-            clip-rule="evenodd" />
-    </svg>
-    Back to Returns
-</a>
+    <a href="{{ route('in-out.index', ['tab' => 'return']) }}"
+        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        ← Back to Returns
+    </a>
 @endsection
 
 @section('content')
 <div class="mx-auto max-w-3xl">
+
+    <div class="mb-5">
+        <p class="text-[10px] font-mono font-semibold text-teal-600 uppercase tracking-[0.25em] mb-1">Returns://Process</p>
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight">Process Return</h1>
+        <p class="text-xs text-slate-400 font-mono mt-0.5">Record items being returned to stock or marked as consumed.</p>
+    </div>
+
+    @if ($errors->any())
+        <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
+            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+            <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
+            <ul class="ml-1 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li class="text-sm text-rose-700">— {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @php
+        $bNewOut      = $borrow->new_quantity  ?? 0;
+        $bUsedOut     = $borrow->used_quantity ?? 0;
+        $bPendingNew  = max(0, $bNewOut - $borrow->quantity_returned);
+        $bPendingUsed = $bUsedOut;
+        $totalPending = $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used;
+        $hasEntries   = $borrowEntries->count() > 0;
+    @endphp
+
     <form action="{{ route('returns.update', $borrow) }}" method="POST"
-        class="overflow-hidden rounded-[2rem] bg-white ring-1 ring-slate-200 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)]">
+        x-data="{
+            hasEntries: {{ $hasEntries ? 'true' : 'false' }},
+            selected: {},
+            dispositions: {},
+            conditions: {
+                @foreach($borrowEntries as $e)
+                '{{ $e->id }}': '{{ $e->original_condition }}',
+                @endforeach
+            },
+            selectedCount() { return Object.values(this.selected).filter(Boolean).length; },
+            allSet() {
+                const sel = Object.keys(this.selected).filter(k => this.selected[k]);
+                return sel.length > 0 && sel.every(k => this.dispositions[k]);
+            },
+            toggle(id) {
+                this.selected[id] = !this.selected[id];
+                if (!this.selected[id]) {
+                    delete this.dispositions[id];
+                } else if (this.conditions[id] === 'used') {
+                    this.dispositions[id] = 'returned_used';
+                }
+            }
+        }">
         @csrf
         @method('PUT')
 
-        {{-- Header Section --}}
-        <div class="border-b border-slate-100 bg-slate-50/50 px-8 py-6">
-            <div class="flex items-center gap-4">
-                <div
-                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Process Return / Usage</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Record items being returned to stock or marked as used.</p>
-                </div>
-            </div>
-        </div>
+        <div class="space-y-4">
 
-        {{-- Main Form Body with Alpine --}}
-        <div class="px-8 py-8 space-y-8"
-            x-data="{
-                pending: {{ $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used }},
-                intact: {{ old('quantity_returning', 0) }},
-                used: {{ old('quantity_using', 0) }},
-                get total() { return parseInt(this.intact || 0) + parseInt(this.used || 0); },
-                get overMax() { return this.total > this.pending; },
-                onIntactChange() {
-                    let i = parseInt(this.intact) || 0;
-                    let remaining = this.pending - i;
-                    this.used = remaining >= 0 ? remaining : 0;
-                    if (i > this.pending) this.intact = this.pending;
-                },
-                onUsedChange() {
-                    let u = parseInt(this.used) || 0;
-                    let remaining = this.pending - u;
-                    this.intact = remaining >= 0 ? remaining : 0;
-                    if (u > this.pending) this.used = this.pending;
-                }
-            }">
-
-
-            {{-- SECTION: Borrow Summary --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path
-                            d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-                    </svg>
-                    Borrow Summary
-                </h3>
-
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Item</p>
-                        <p class="mt-1 font-bold text-slate-900 line-clamp-1">{{ $borrow->item->name }}</p>
+            {{-- ======================== --}}
+            {{-- SECTION 1: Summary      --}}
+            {{-- ======================== --}}
+            <div class="bg-white border border-slate-200 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-teal-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">01 // Borrow Summary</p>
                     </div>
-                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Borrowed By</p>
-                        <p class="mt-1 font-bold text-slate-900 line-clamp-1">{{ $borrow->borrower_name ??
-                            $borrow->staff?->display_name ?? 'Unknown Staff' }}</p>
-                    </div>
-                    <div
-                        class="rounded-2xl border border-emerald-500/30 bg-emerald-50/50 p-5 shadow-sm ring-1 ring-inset ring-emerald-500/10">
-                        <p class="text-xs font-bold uppercase tracking-wider text-emerald-600">Pending Return</p>
-                        <p class="mt-1 flex items-baseline gap-1 text-2xl font-black text-emerald-700">
-                            {{ $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used }}
-                            <span class="text-sm font-bold text-emerald-600/70">{{ $borrow->item->unit }}</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
 
-            <hr class="border-slate-100">
-
-            {{-- SECTION: Return Quantities --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd"
-                            d="M4 10a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h9a.75.75 0 00.75-.75v-4.5a.75.75 0 011.5 0v4.5a2.25 2.25 0 01-2.25 2.25h-9A2.25 2.25 0 012 15.25v-4.5A.75.75 0 014 10z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Process Quantities
-                </h3>
-
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    {{-- Quantity Returning Intact --}}
-                    <div>
-                        <label for="quantity_returning"
-                            class="block text-sm font-bold leading-6 text-slate-700">Quantity Returning Intact</label>
-                        <p class="text-xs text-slate-500 mb-2">Items going back to available stock.</p>
-                        <div class="relative">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                <span class="text-emerald-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                        class="h-5 w-5">
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <input type="number" name="quantity_returning" id="quantity_returning" min="0"
-                                :max="pending"
-                                x-model.number="intact"
-                                @input="onIntactChange()"
-                                required
-                                class="block w-full rounded-xl border-0 py-3 pl-11 pr-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-emerald-500 sm:text-sm sm:leading-6 transition-all">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div class="bg-slate-50 border border-slate-200 px-4 py-3">
+                            <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-1">Item</p>
+                            <p class="text-sm font-bold text-slate-800 line-clamp-1">{{ $borrow->item->name }}</p>
+                            <p class="text-[10px] font-mono text-slate-400 mt-0.5 uppercase tracking-wider">{{ strtoupper($borrow->item->item_type) }}</p>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-emerald-600 font-semibold">→ Returns to available stock</p>
-                    </div>
-
-                    {{-- Quantity Used --}}
-                    <div>
-                        <label for="quantity_using" class="block text-sm font-bold leading-6 text-slate-700">Quantity
-                            Used on Patient</label>
-                        <p class="text-xs text-slate-500 mb-2">Items consumed and to be logged.</p>
-                        <div class="relative">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                <span class="text-rose-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                        class="h-5 w-5">
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <input type="number" name="quantity_using" id="quantity_using" min="0"
-                                :max="pending"
-                                x-model.number="used"
-                                @input="onUsedChange()"
-                                required
-                                class="block w-full rounded-xl border-0 py-3 pl-11 pr-4 text-slate-900 shadow-sm ring-1 ring-inset ring-rose-200 focus:ring-2 focus:ring-inset focus:ring-rose-500 sm:text-sm sm:leading-6 transition-all">
+                        <div class="bg-slate-50 border border-slate-200 px-4 py-3">
+                            <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-1">Borrowed By</p>
+                            <p class="text-sm font-bold text-slate-800">{{ $borrow->borrower_name ?? $borrow->staff?->display_name ?? 'Unknown' }}</p>
+                            <p class="text-[10px] font-mono text-slate-500 mt-0.5 uppercase tracking-wider">{{ $borrow->department ?? '' }}</p>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-rose-500 font-semibold">→ Goes to Used Stock</p>
+                        <div class="bg-teal-50 border border-teal-200 px-4 py-3 relative">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-teal-400"></div>
+                            <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-teal-600 mb-1 ml-1">Pending Return</p>
+                            @if($bNewOut > 0 || $bUsedOut > 0)
+                                @if($bPendingNew > 0)
+                                <div class="flex items-center gap-1.5 ml-1 mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3 text-teal-600 shrink-0"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                                    <span class="text-xl font-black text-teal-700">{{ $bPendingNew }}</span>
+                                    <span class="text-[10px] font-mono font-bold text-teal-600 uppercase">NEW {{ $borrow->item->unit }}</span>
+                                </div>
+                                @endif
+                                @if($bPendingUsed > 0)
+                                <div class="flex items-center gap-1.5 ml-1 mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3 text-amber-600 shrink-0"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
+                                    <span class="text-xl font-black text-amber-700">{{ $bPendingUsed }}</span>
+                                    <span class="text-[10px] font-mono font-bold text-amber-700 uppercase">USED {{ $borrow->item->unit }}</span>
+                                </div>
+                                @endif
+                            @else
+                                <div class="ml-1 mt-1">
+                                    <span class="text-xl font-black text-teal-700">{{ $totalPending }}</span>
+                                    <span class="text-[10px] font-mono font-bold text-teal-600 uppercase ml-1">{{ $borrow->item->unit }}</span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
-
-                {{-- Live Total Summary --}}
-                <div class="mt-5 flex items-center justify-between rounded-2xl px-5 py-4 ring-1 transition-all"
-                    :class="overMax ? 'bg-rose-50 ring-rose-300' : 'bg-slate-50 ring-slate-200'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold" :class="overMax ? 'text-rose-700' : 'text-slate-700'">Total accounted:</span>
-                        <span class="text-lg font-black" :class="overMax ? 'text-rose-600' : 'text-slate-900'" x-text="total"></span>
-                        <span class="text-sm text-slate-400">of</span>
-                        <span class="text-lg font-black text-emerald-600" x-text="pending"></span>
-                        <span class="text-sm text-slate-500">pending</span>
-                    </div>
-                    <div x-show="overMax" x-cloak class="text-xs font-bold text-rose-600">⚠ Exceeds pending</div>
-                    <div x-show="!overMax && total === pending" x-cloak class="text-xs font-bold text-emerald-600">✓ Fully accounted</div>
-                </div>
-
             </div>
 
-            <hr class="border-slate-100">
+            {{-- ============================================ --}}
+            {{-- SECTION 2A: Device Per-Unit Checklist       --}}
+            {{-- ============================================ --}}
+            @if($hasEntries)
+            <div class="bg-white border border-indigo-200 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                <div class="ml-1">
+                    <div class="px-5 py-4 border-b border-dashed border-slate-100 flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">02 // Device Disposition</p>
+                            </div>
+                            <p class="text-xs text-slate-500">Check devices being returned now, then set their outcome.</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <p class="text-2xl font-black font-mono text-indigo-600 leading-none" x-text="selectedCount()"></p>
+                            <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">of {{ $borrowEntries->count() }} returning</p>
+                        </div>
+                    </div>
 
-            {{-- SECTION: Additional Details --}}
-            <div>
-                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+                    {{-- Legend --}}
+                    <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-100 flex flex-wrap gap-4 text-[10px] font-mono">
+                        <span class="flex items-center gap-1.5 text-emerald-700 font-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                            RETURN NEW → back to new stock
+                        </span>
+                        <span class="flex items-center gap-1.5 text-amber-700 font-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
+                            MARK USED → goes to used pool
+                        </span>
+                    </div>
+
+                    <div class="divide-y divide-slate-100">
+                        @foreach($borrowEntries as $entry)
+                        @php $entryId = $entry->id; @endphp
+                        <div class="transition-colors"
+                            :class="selected['{{ $entryId }}'] ? 'bg-indigo-50/40 border-l-2 border-l-indigo-400' : 'border-l-2 border-l-transparent'">
+
+                            {{-- Checkbox row --}}
+                            <label class="flex items-center gap-4 px-5 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
+                                @click.prevent="toggle('{{ $entryId }}')"
+                                :class="selected['{{ $entryId }}'] ? 'hover:bg-indigo-50/60' : ''">
+
+                                {{-- Checkbox --}}
+                                <div class="shrink-0 w-5 h-5 border-2 flex items-center justify-center transition-colors"
+                                    :class="selected['{{ $entryId }}'] ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 bg-white'">
+                                    <svg x-show="selected['{{ $entryId }}']" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-white">
+                                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+
+                                {{-- Device Info --}}
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        @if($entry->original_condition === 'new')
+                                        <span class="flex items-center gap-1 text-[9px] font-mono font-bold text-teal-700 bg-teal-100 border border-teal-200 px-1.5 py-0.5 uppercase tracking-widest shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                                            WAS NEW
+                                        </span>
+                                        @else
+                                        <span class="flex items-center gap-1 text-[9px] font-mono font-bold text-amber-700 bg-amber-100 border border-amber-200 px-1.5 py-0.5 uppercase tracking-widest shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
+                                            WAS USED
+                                        </span>
+                                        @endif
+                                        <p class="text-sm font-bold font-mono text-slate-800">
+                                            {{ $entry->stockEntry->serial_number ?? ('Device #' . $entry->stockEntry->id) }}
+                                        </p>
+                                    </div>
+                                    @if($entry->stockEntry->serial_number)
+                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5">SN: {{ $entry->stockEntry->serial_number }}</p>
+                                    @endif
+                                </div>
+
+                                {{-- Not selected hint --}}
+                                <p x-show="!selected['{{ $entryId }}']" class="text-[10px] font-mono text-slate-400 shrink-0">click to include</p>
+                            </label>
+
+                            {{-- Disposition (only when selected) --}}
+                            <div x-show="selected['{{ $entryId }}']" class="px-5 pb-3 pl-[52px]">
+                                <div class="flex flex-wrap gap-2">
+                                    @if($entry->original_condition === 'new')
+                                    <label class="flex items-center gap-1.5 cursor-pointer border px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors"
+                                        :class="dispositions['{{ $entryId }}'] === 'returned_new' ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-400 hover:text-emerald-700'">
+                                        <input type="radio" name="dispositions[{{ $entryId }}]" value="returned_new"
+                                            x-model="dispositions['{{ $entryId }}']" class="sr-only">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                                        Return New
+                                    </label>
+                                    @endif
+                                    
+                                    <label class="flex items-center gap-1.5 cursor-pointer border px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors"
+                                        :class="dispositions['{{ $entryId }}'] === 'returned_used' ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-amber-400 hover:text-amber-700'">
+                                        <input type="radio" name="dispositions[{{ $entryId }}]" value="returned_used"
+                                            x-model="dispositions['{{ $entryId }}']" class="sr-only">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
+                                        Mark Used
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- ============================================ --}}
+            {{-- SECTION 2B: Qty-based (non-device / legacy) --}}
+            {{-- ============================================ --}}
+            @else
+            <div class="bg-white border border-slate-200 relative"
+                x-data="{
+                    pending: {{ $totalPending }},
+                    intact: {{ old('quantity_returning', 0) }},
+                    used: {{ old('quantity_using', 0) }},
+                    get total() { return parseInt(this.intact || 0) + parseInt(this.used || 0); },
+                    get overMax() { return this.total > this.pending; },
+                    onIntactChange() {
+                        let i = parseInt(this.intact) || 0;
+                        let remaining = this.pending - i;
+                        this.used = remaining >= 0 ? remaining : 0;
+                        if (i > this.pending) this.intact = this.pending;
+                    },
+                    onUsedChange() {
+                        let u = parseInt(this.used) || 0;
+                        let remaining = this.pending - u;
+                        this.intact = remaining >= 0 ? remaining : 0;
+                        if (u > this.pending) this.used = this.pending;
+                    }
+                }">
+                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="h-2 w-2 bg-emerald-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-widest">02 // Process Quantities</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-emerald-500"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
+                                Quantity Returning Intact
+                            </label>
+                            <input type="number" name="quantity_returning" min="0" :max="pending"
+                                x-model.number="intact" @input="onIntactChange()" required
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                            <p class="mt-1.5 text-[10px] font-mono text-emerald-600 font-bold">→ Returns to available stock</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-rose-500"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>
+                                Quantity Used / Consumed
+                            </label>
+                            <input type="number" name="quantity_using" min="0" :max="pending"
+                                x-model.number="used" @input="onUsedChange()" required
+                                class="block w-full border border-rose-200 bg-rose-50/30 focus:bg-white focus:border-rose-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                            <p class="mt-1.5 text-[10px] font-mono text-rose-600 font-bold">→ Deducted from stock</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 border px-4 py-3 flex items-center justify-between transition-all"
+                        :class="overMax ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'">
+                        <div class="flex items-center gap-3 font-mono text-sm">
+                            <span :class="overMax ? 'text-rose-600 font-bold' : 'text-slate-600'">Total:</span>
+                            <span class="font-black text-lg" :class="overMax ? 'text-rose-600' : 'text-slate-900'" x-text="total"></span>
+                            <span class="text-slate-400 text-xs">of</span>
+                            <span class="font-black text-lg text-teal-700" x-text="pending"></span>
+                            <span class="text-slate-400 text-xs">pending</span>
+                        </div>
+                        <div x-show="overMax" x-cloak class="flex items-center gap-1 text-[11px] font-mono font-bold text-rose-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                            Exceeds pending
+                        </div>
+                        <div x-show="!overMax && total === pending" x-cloak class="flex items-center gap-1 text-[11px] font-mono font-bold text-emerald-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>
+                            Fully accounted
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- ======================== --}}
+            {{-- SECTION 3: Date / Notes --}}
+            {{-- ======================== --}}
+            <div class="bg-white border border-slate-200 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="h-2 w-2 bg-slate-400 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">0{{ $hasEntries ? '3' : '3' }} // Time &amp; Notes</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Date &amp; Time Returned <span class="text-rose-500">*</span></label>
+                            <input type="datetime-local" name="returned_at" required
+                                value="{{ old('returned_at', now()->format('Y-m-d\TH:i')) }}"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span class="font-normal text-slate-400">(Optional)</span></label>
+                            <textarea name="notes" rows="3"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors placeholder:text-slate-400"
+                                placeholder="Condition on return, context...">{{ old('notes') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Submit --}}
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <a href="{{ route('in-out.index', ['tab' => 'return']) }}"
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    Cancel
+                </a>
+                @if($hasEntries)
+                <button type="submit"
+                    :disabled="!allSet()"
+                    :class="!allSet() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-teal-600 hover:bg-teal-700 border-teal-700'"
+                    class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
+                    Process Return
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                     </svg>
-                    Time & Notes
-                </h3>
-
-                <div class="space-y-6">
-                    <div>
-                        <label for="returned_at" class="mb-2 block text-sm font-bold text-slate-700">Date & Time
-                            Returned / Used <span class="text-rose-500">*</span></label>
-                        <input type="datetime-local" name="returned_at" id="returned_at" required
-                            value="{{ old('returned_at', now()->format('Y-m-d\TH:i')) }}"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">
-                    </div>
-
-                    <div>
-                        <label for="notes" class="mb-2 block text-sm font-bold text-slate-700">Notes <span
-                                class="text-slate-400 font-normal ml-1">(Optional)</span></label>
-                        <textarea id="notes" name="notes" rows="3"
-                            class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all">{{ old('notes') }}</textarea>
-                    </div>
-                </div>
+                </button>
+                @else
+                <button type="submit"
+                    class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 border border-teal-700 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors">
+                    Process Return
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                @endif
             </div>
 
-        </div>
-
-        {{-- Footer / Submit Area --}}
-        <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
-            <a href="{{ route('in-out.index', ['tab' => 'return']) }}"
-                class="rounded-xl px-5 py-2.5 text-sm font-bold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900">
-                Cancel
-            </a>
-            <button type="submit"
-                class="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                <span class="relative">Process Return</span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                    class="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
-                        clip-rule="evenodd" />
-                </svg>
-            </button>
         </div>
     </form>
 </div>

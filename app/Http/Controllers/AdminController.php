@@ -77,11 +77,9 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'quantity_used'  => 'required|integer|min:0',
-            'patient_id'     => 'nullable|string|max:255',
-            'procedure_type' => 'nullable|string|max:255',
-            'used_by'        => 'nullable|string|max:255',
             'used_at'        => 'nullable|date',
             'notes'          => 'nullable|string',
+            'used_by'        => 'nullable|string|max:255',
         ]);
 
         $usageLog->update($validated);

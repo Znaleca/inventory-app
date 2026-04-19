@@ -14,6 +14,12 @@ class UnitController extends Controller
         return view('units.index', compact('units'));
     }
 
+    public function create()
+    {
+        return view('units.create');
+    }
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([

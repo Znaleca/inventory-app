@@ -3,111 +3,109 @@
 @section('title', 'User Management')
 
 @section('content')
-<div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_24px_-8px_rgba(0,0,0,0.06)]">
+<div class="bg-white border border-slate-200 relative mb-6">
+    <div class="absolute top-0 left-0 w-1 h-full bg-slate-800"></div>
 
-    {{-- Section Header --}}
-    <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-8 py-5">
-        <div>
-            <h3 class="text-sm font-semibold text-slate-800">System Accounts</h3>
-            <p class="mt-0.5 text-xs text-slate-500">Manage personnel access and application roles.</p>
+    <div class="ml-1">
+        {{-- Section Header --}}
+        <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="h-2 w-2 bg-slate-800 inline-block"></span>
+                    <p class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">// System Accounts</p>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">System Users</h2>
+                <p class="text-xs text-slate-500 font-mono mt-1">Manage personnel access and application roles.</p>
+            </div>
+            <a href="{{ route('users.create') }}"
+                class="inline-flex items-center gap-2 bg-slate-900 px-5 py-2.5 text-[11px] font-mono font-bold text-white uppercase tracking-widest transition-colors hover:bg-slate-800 border border-slate-900">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                </svg>
+                New User Account
+            </a>
         </div>
-        <a href="{{ route('users.create') }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 hover:shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-            </svg>
-            New User Account
-        </a>
-    </div>
 
-    @if($users->isEmpty())
-    <div class="flex flex-col items-center justify-center px-6 py-16 text-center">
-        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-1 ring-inset ring-slate-200">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-8 w-8 text-slate-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-            </svg>
+        @if($users->isEmpty())
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="h-14 w-14 border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+            </div>
+            <p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">// No accounts found</p>
+            <p class="text-sm font-semibold text-slate-500 mt-1">Add user accounts.</p>
         </div>
-        <h3 class="text-sm font-semibold text-slate-900">No users found</h3>
-        <p class="mt-1 text-sm text-slate-500">Add user accounts to grant access to the application.</p>
-        <a href="{{ route('users.create') }}" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-            </svg>
-            Add First User
-        </a>
-    </div>
-    @else
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm border-separate border-spacing-y-1">
-            <thead>
-                <tr>
-                    <th class="px-3 py-2.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Personnel</th>
-                    <th class="px-3 py-2.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Bio ID</th>
-                    <th class="px-3 py-2.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Privilege</th>
-                    <th class="px-3 py-2.5 text-right text-xs font-bold uppercase tracking-widest text-slate-500">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($users as $user)
-                <tr class="group transition-all duration-200 hover:bg-white rounded-xl shadow-sm hover:shadow-md hover:ring-1 hover:ring-slate-200/50">
-                    <td class="px-3 py-2.5 rounded-l-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $user->role === 'admin' ? 'bg-indigo-100 text-indigo-700 ring-1 ring-inset ring-indigo-500/20' : 'bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-500/20' }} text-sm font-black transition-colors">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
+        @else
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-200">
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Personnel</th>
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Bio ID</th>
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Privilege</th>
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach($users as $user)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-900">{{ $user->name }}</span>
+                                    @if(!$user->is_active)
+                                    <span class="inline-flex mt-1 border border-rose-200 bg-rose-50 px-1.5 py-0.5 text-[9px] font-mono font-bold text-rose-500 tracking-wider">Deactivated</span>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex flex-col">
-                                <span class="font-bold text-slate-900">{{ $user->name }}</span>
-                                @if(!$user->is_active)
-                                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Deactivated</span>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            <span class="font-mono text-xs font-bold text-slate-500">{{ $user->bio_id }}</span>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @if($user->role === 'admin')
+                            <span class="inline-flex items-center gap-1.5 border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-indigo-700">
+                                <span class="h-1.5 w-1.5 bg-indigo-500"></span>
+                                Administrator
+                            </span>
+                            @else
+                            <span class="inline-flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
+                                <span class="h-1.5 w-1.5 bg-slate-400"></span>
+                                Standard_User
+                            </span>
+                            @endif
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <a href="{{ route('users.activity', $user) }}"
+                                    class="inline-flex items-center border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors"
+                                    title="View activity log">
+                                    Activity
+                                </a>
+                                <a href="{{ route('users.edit', $user) }}"
+                                    class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">
+                                    Edit
+                                </a>
+                                @if($user->id !== auth()->id())
+                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="m-0 inline"
+                                    onsubmit="return confirm('Are you sure you want to {{ $user->is_active ? 'deactivate' : 'activate' }} this user account?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="inline-flex items-center border {{ $user->is_active ? 'border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white hover:border-amber-500' : 'border-teal-200 bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white hover:border-teal-600' }} px-2.5 py-1.5 text-[10px] font-mono font-bold transition-colors">
+                                        {{ $user->is_active ? 'Disable' : 'Enable' }}
+                                    </button>
+                                </form>
                                 @endif
                             </div>
-                        </div>
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-2.5">
-                        <span class="font-mono text-xs font-bold text-slate-500">{{ $user->bio_id }}</span>
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-2.5">
-                        @if($user->role === 'admin')
-                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-extrabold text-indigo-700 ring-1 ring-inset ring-indigo-500/20">
-                            <div class="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
-                            Administrator
-                        </span>
-                        @else
-                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-extrabold text-slate-600 ring-1 ring-inset ring-slate-500/20">
-                            <div class="h-1.5 w-1.5 rounded-full bg-slate-400"></div>
-                            Standard User
-                        </span>
-                        @endif
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-2.5 text-right rounded-r-xl">
-                        <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('users.activity', $user) }}"
-                                class="inline-flex items-center rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-500/20 transition-all hover:bg-emerald-600 hover:text-white"
-                                title="View activity log">
-                                Activity
-                            </a>
-                            <a href="{{ route('users.edit', $user) }}"
-                                class="inline-flex items-center rounded-lg bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 ring-1 ring-inset ring-slate-500/20 transition-all hover:bg-slate-800 hover:text-white">
-                                Edit
-                            </a>
-                            @if($user->id !== auth()->id())
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="m-0 inline"
-                                onsubmit="return confirm('Are you sure you want to {{ $user->is_active ? 'deactivate' : 'activate' }} this user account?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="inline-flex items-center rounded-lg {{ $user->is_active ? 'bg-amber-50 text-amber-600 ring-amber-500/20 hover:bg-amber-500' : 'bg-emerald-50 text-emerald-600 ring-emerald-500/20 hover:bg-emerald-500' }} px-3 py-1.5 text-xs font-bold ring-1 ring-inset transition-all hover:text-white">
-                                    {{ $user->is_active ? 'Disable' : 'Enable' }}
-                                </button>
-                            </form>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
     </div>
-    @endif
 </div>
 @endsection

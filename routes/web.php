@@ -15,6 +15,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockEntryController;
 use App\Http\Controllers\TransactionLogController;
 use App\Http\Controllers\TransferController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\UsageLogController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -76,7 +77,8 @@ Route::middleware('auth')->group(function () {
 
     // Resource routes
     Route::resource('categories', CategoryController::class)->except(['show']);
-    Route::resource('units', UnitController::class)->except(['create', 'show']);
+    Route::resource('units', UnitController::class)->except(['show']);
+    Route::resource('locations', LocationController::class)->except(['show']);
     Route::resource('items', ItemController::class);
     Route::resource('staff', StaffController::class)->except(['show']);
 

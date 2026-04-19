@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class StockEntry extends Model
 {
     protected $fillable = [
-        'item_id', 'quantity', 'lot_number',
+        'item_id', 'quantity', 'lot_number', 'serial_number',
         'expiry_date', 'received_date', 'notes',
     ];
 
@@ -30,5 +30,10 @@ class StockEntry extends Model
     public function usageLogs(): HasMany
     {
         return $this->hasMany(UsageLog::class);
+    }
+
+    public function borrowEntries(): HasMany
+    {
+        return $this->hasMany(BorrowEntry::class);
     }
 }

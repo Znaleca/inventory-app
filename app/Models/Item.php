@@ -9,17 +9,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Item extends Model
 {
     protected $fillable = [
-        'category_id', 'name', 'condition', 'sku',
-        'description', 'unit', 'unit_price', 'reorder_level', 'stock_used',
-        'is_one_time_use',
+        'category_id', 'item_type', 'brand', 'model',
+        'name', 'condition', 'serial_number',
+        'description', 'unit', 'unit_price', 'stock_used',
+        'is_one_time_use', 'is_expirable', 'storage_location', 'storage_section',
     ];
 
     protected function casts(): array
     {
         return [
-            'unit_price' => 'decimal:2',
-            'reorder_level' => 'integer',
+            'unit_price'      => 'decimal:2',
             'is_one_time_use' => 'boolean',
+            'is_expirable'    => 'boolean',
         ];
     }
 
@@ -66,13 +67,24 @@ class Item extends Model
         $transferredIn   = $this->transfers()->where('type', 'in')->sum('new_quantity');
         $disposedNew     = $this->disposals()->where('type', 'new')->sum('quantity');
 
-        $borrowImpact = $this->borrows()->get()->sum(function($borrow) {
-            $net = $this->is_one_time_use 
-                ? ($borrow->quantity_borrowed - $borrow->quantity_returned) 
-                : $borrow->quantity_borrowed;
-            
-            return $borrow->type === 'in' ? -$net : $net;
-        });
+        // For devices, only the new_quantity borrow out counts against new stock
+        // For consumables, the full quantity_borrowed - quantity_returned counts
+        if ($this->item_type === 'device') {
+            $borrowImpact = $this->borrows()->with('borrowEntries')->get()->sum(function($borrow) {
+                if ($borrow->new_quantity > 0) {
+                    $returnedNew = $borrow->borrowEntries->where('disposition', 'returned_new')->count();
+                    $net = $borrow->new_quantity - $returnedNew;
+                } else {
+                    $net = ($borrow->used_quantity > 0 ? 0 : $borrow->quantity_borrowed - $borrow->quantity_returned); // legacy borrows
+                }
+                return $borrow->type === 'in' ? -$net : $net;
+            });
+        } else {
+            $borrowImpact = $this->borrows()->get()->sum(function($borrow) {
+                $net = $borrow->quantity_borrowed - $borrow->quantity_returned;
+                return $borrow->type === 'in' ? -$net : $net;
+            });
+        }
 
         return (int) max(0, $received + $transferredIn - $usedLogs - $transferredOut - $disposedNew - $borrowImpact);
     }
@@ -84,15 +96,20 @@ class Item extends Model
     {
         $usedOut = $this->transfers()->where('type', 'out')->sum('used_quantity');
         $usedIn  = $this->transfers()->where('type', 'in')->sum('used_quantity');
-        return (int) max(0, $this->stock_used - $usedOut + $usedIn);
+
+        // Subtract used devices that are currently lent out (pending return)
+        $usedBorrowedOut = $this->borrows()->where('type', 'out')->sum('used_quantity');
+        $usedBorrowedIn  = $this->borrows()->where('type', 'in')->sum('used_quantity');
+
+        return (int) max(0, $this->stock_used - $usedOut + $usedIn - $usedBorrowedOut + $usedBorrowedIn);
     }
 
     /**
-     * Check if the item is below its reorder level.
+     * Check if the item is out of stock.
      */
     public function getIsLowStockAttribute(): bool
     {
-        return $this->total_stock <= $this->reorder_level;
+        return $this->total_stock <= 0;
     }
 
     /**
@@ -120,18 +137,19 @@ class Item extends Model
             ->orderBy('received_date', 'ASC')
             ->get();
 
-        // 2. Calculate net unlinked deductions (Transfer Out + Borrows − Transfer In).
+        // 2. Calculate net unlinked deductions (Transfer Out + Disposed − Transfer In).
         // Transfer In adds stock, so we subtract it from deductions.
         $transferredOut = $this->transfers()->where('type', 'out')->sum('new_quantity');
         $transferredIn  = $this->transfers()->where('type', 'in')->sum('new_quantity');
         $disposedNew    = $this->disposals()->where('type', 'new')->sum('quantity');
-        $borrowImpact = $this->borrows()->get()->sum(function($borrow) {
-            $net = $this->is_one_time_use 
-                ? ($borrow->quantity_borrowed - $borrow->quantity_returned) 
-                : $borrow->quantity_borrowed;
-            
-            return $borrow->type === 'in' ? -$net : $net;
-        });
+        
+        $borrowImpact = 0;
+        if ($this->item_type !== 'device') {
+            $borrowImpact = $this->borrows()->get()->sum(function($borrow) {
+                $net = $borrow->quantity_borrowed - $borrow->quantity_returned;
+                return $borrow->type === 'in' ? -$net : $net;
+            });
+        }
 
         $unlinkedDeductions = max(0, $transferredOut + $borrowImpact + $disposedNew - $transferredIn);
         $breakdown = [];
@@ -144,6 +162,24 @@ class Item extends Model
 
             if ($available <= 0) continue;
 
+            if ($this->item_type === 'device') {
+                $borrowedCount = \App\Models\BorrowEntry::where('stock_entry_id', $batch->id)
+                    ->whereHas('borrow', function($q) {
+                        $q->where('status', 'active');
+                    })
+                    ->whereNull('disposition') // actively held by borrower
+                    ->count();
+                $available -= $borrowedCount;
+
+                // Make sure it hasn't been returned to the USED pool
+                $returnedUsedCount = \App\Models\BorrowEntry::where('stock_entry_id', $batch->id)
+                    ->where('disposition', 'returned_used')
+                    ->count();
+                if ($returnedUsedCount > 0) {
+                    $available = 0; // Device belongs to Used pool now
+                }
+            }
+
             // Deduct unlinked items from this batch (FIFO)
             $toDeduct = min($available, $unlinkedDeductions);
             $remaining = $available - $toDeduct;
@@ -153,6 +189,7 @@ class Item extends Model
                 $breakdown[] = [
                     'id' => $batch->id,
                     'lot_number' => $batch->lot_number,
+                    'serial_number' => $batch->serial_number,
                     'expiry_date' => $batch->expiry_date,
                     'received_date' => $batch->received_date,
                     'remaining' => $remaining,
@@ -161,6 +198,98 @@ class Item extends Model
         }
 
         return $breakdown;
+    }
+
+    /**
+     * Get a breakdown of specific USED devices still available.
+     */
+    public function getUsedDevicesBreakdownAttribute(): array
+    {
+        if ($this->item_type !== 'device') {
+            return [];
+        }
+
+        // Get all devices that have been logged as used OR have been returned used from a previous borrow
+        $usedBatches = $this->stockEntries()
+            ->where(function($query) {
+                $query->whereHas('usageLogs', function($q) {
+                    $q->where('quantity_used', '>', 0);
+                })->orWhereHas('borrowEntries', function($sub) {
+                    $sub->where('disposition', 'returned_used');
+                });
+            })
+            ->orderBy('received_date', 'ASC')
+            ->get();
+
+        $transferredOut = $this->transfers()->where('type', 'out')->sum('used_quantity');
+        $transferredIn  = $this->transfers()->where('type', 'in')->sum('used_quantity');
+        $disposedUsed   = $this->disposals()->where('type', 'used')->sum('quantity');
+
+        $usedUnlinkedDeductions = max(0, $transferredOut + $disposedUsed - $transferredIn);
+        
+        $breakdown = [];
+
+        foreach ($usedBatches as $batch) {
+            // For devices, the batch is always 1 unit per row.
+            $usedAmount = 1;
+
+            $borrowedCount = \App\Models\BorrowEntry::where('stock_entry_id', $batch->id)
+                ->whereHas('borrow', function($q) {
+                    $q->where('status', 'active');
+                })
+                ->whereNull('disposition') // actively held by borrower
+                ->count();
+            
+            $usedAmount -= $borrowedCount;
+            if ($usedAmount <= 0) continue;
+
+            // FIFO deduction for used items leaving the system through transfers or disposal
+            $toDeduct = min($usedAmount, $usedUnlinkedDeductions);
+            $remaining = $usedAmount - $toDeduct;
+            $usedUnlinkedDeductions -= $toDeduct;
+
+            if ($remaining > 0) {
+                $breakdown[] = [
+                    'id' => $batch->id,
+                    'lot_number' => $batch->lot_number,
+                    'serial_number' => $batch->serial_number,
+                    'expiry_date' => $batch->expiry_date,
+                    'received_date' => $batch->received_date,
+                    'remaining' => $remaining,
+                    'is_used' => true,
+                ];
+            }
+        }
+
+        return $breakdown;
+    }
+
+    /**
+     * Get the quantity of items currently lent out.
+     */
+    public function getActiveLentOutAttribute(): int
+    {
+        return (int) $this->borrows()
+            ->where('type', 'out')
+            ->whereIn('status', ['active', 'partial'])
+            ->get()
+            ->sum(function($borrow) {
+                return max(0, $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used);
+            });
+    }
+
+    /**
+     * Get the quantity of items currently borrowed from other departments.
+     */
+    public function getActiveBorrowedInAttribute(): int
+    {
+        return (int) $this->borrows()
+            ->where('type', 'in')
+            ->whereIn('status', ['active', 'partial'])
+            ->get()
+            ->sum(function($borrow) {
+                return max(0, $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used);
+            });
     }
 
     /**

@@ -38,11 +38,14 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        $totalStockValue = $items->sum(fn ($item) => $item->total_stock * $item->unit_price);
 
         // New Metrics
         $totalNewStock = $items->sum(fn ($item) => $item->total_stock);
         $totalUsedStock = $items->sum('stock_used');
+        
+        $totalStockValue = $items->sum(function ($item) {
+            return $item->total_stock * $item->unit_price;
+        });
         
         $activeBorrows = \App\Models\Borrow::whereIn('status', ['active', 'partial'])->get();
         $totalBorrowedCount = $activeBorrows->sum(function ($borrow) {
@@ -81,11 +84,16 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $recentlyAdded = Item::with('category')
+            ->orderByDesc('created_at')
+            ->limit(6)
+            ->get();
+
         return view('dashboard', compact(
             'totalItems', 'lowStockCount', 'lowStockItems',
-            'expiringItems', 'expiredItems', 'expiredCount', 'recentUsage', 'totalStockValue',
+            'expiringItems', 'expiredItems', 'expiredCount', 'recentUsage',
             'totalNewStock', 'totalUsedStock', 'totalBorrowedCount', 'pendingReturnsCount',
-            'recentReturns', 'recentDisposals'
+            'recentReturns', 'recentDisposals', 'totalStockValue', 'recentlyAdded'
         ));
     }
 }
