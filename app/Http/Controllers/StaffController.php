@@ -24,8 +24,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:50'],
-            'type' => ['required', 'in:doctor,nurse,technician,other'],
-            'specialization' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', 'in:programmer,tech support,supervisor,head'],
         ]);
 
         Staff::create($validated);
@@ -43,8 +42,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:50'],
-            'type' => ['required', 'in:doctor,nurse,technician,other'],
-            'specialization' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', 'in:programmer,tech support'],
         ]);
 
         $staff->update($validated);

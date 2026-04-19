@@ -107,6 +107,54 @@
         .status-pulse {
             animation: pulse-ring 2s infinite;
         }
+
+        /* Logo glow + hover spin */
+        @keyframes logo-glow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3)); }
+            50%       { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6)); }
+        }
+
+        .logo-img {
+            animation: logo-glow 3s ease-in-out infinite;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .logo-img:hover {
+            transform: rotate(10deg) scale(1.12);
+        }
+
+        /* Scanning sweep line */
+        @keyframes scan-sweep {
+            0%   { transform: translateX(-100%); opacity: 0; }
+            20%  { opacity: 1; }
+            80%  { opacity: 1; }
+            100% { transform: translateX(400%); opacity: 0; }
+        }
+
+        .scan-line {
+            animation: scan-sweep 4s ease-in-out infinite;
+        }
+
+        /* Blinking cursor for brand text */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
+        }
+
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Sidebar logo accent ring pulse */
+        @keyframes accent-ring {
+            0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70%  { box-shadow: 0 0 0 6px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        .logo-ring {
+            animation: accent-ring 2.5s ease-out infinite;
+        }
     </style>
 </head>
 
@@ -120,10 +168,10 @@
             class="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm lg:hidden" @click="mobileOpen = false"></div>
 
         {{-- ==================== --}}
-        {{-- SIDEBAR (Light Tech Theme) --}}
+        {{-- SIDEBAR (Dark Tech Theme) --}}
         {{-- ==================== --}}
         <aside
-            class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out lg:static lg:translate-x-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)]"
+            class="fixed inset-y-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.2)]"
             :class="{
                 '-translate-x-full': !mobileOpen,
                 'translate-x-0': mobileOpen,
@@ -131,29 +179,49 @@
                 'w-[76px]': !sidebarExpanded
             }" x-cloak>
 
-            <div class="relative flex flex-col h-full w-full">
+            {{-- Blueprint grid overlay on dark background --}}
+            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(rgba(99,102,241,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.3) 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+            <div class="relative flex flex-col h-full w-full z-10">
 
                 {{-- Branding --}}
-                <div class="flex items-center shrink-0 px-4 h-[70px] border-b border-slate-200 bg-slate-50/50 relative overflow-hidden"
+                <div class="flex items-center shrink-0 px-4 h-[70px] border-b border-slate-800 bg-slate-900/50 relative overflow-hidden"
                     :class="sidebarExpanded ? 'justify-start gap-3' : 'justify-center'">
 
-                    {{-- Decorative top tech line --}}
-                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500 to-indigo-500">
-                    </div>
+                    {{-- Decorative top gradient line --}}
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-600 to-indigo-500 z-10"></div>
+
+                    {{-- Animated scan sweep --}}
+                    <div class="absolute top-0 left-0 h-full w-1/4 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent pointer-events-none scan-line"></div>
+
+                    {{-- Corner accent nodes --}}
+                    <div class="absolute bottom-0 left-0 w-2 h-2 border-r border-t border-blue-500/40"></div>
+                    <div class="absolute bottom-0 right-0 w-2 h-2 border-l border-t border-indigo-500/40"></div>
 
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group w-full relative z-10">
-                        <div class="relative flex-shrink-0 p-1 bg-white border border-slate-200 shadow-sm">
+
+                        {{-- Logo: no border, just glow animation --}}
+                        <div class="relative flex-shrink-0">
                             <img src="{{ asset('favicon.ico') }}" alt="IMISS"
-                                class="h-7 w-7 object-contain group-hover:scale-105 transition-transform duration-300">
+                                class="h-8 w-8 object-contain logo-img brightness-150">
+                            {{-- Subtle ring pulse behind icon --}}
+                            <div class="absolute inset-0 rounded-sm logo-ring opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
 
-                        <div x-show="sidebarExpanded" x-transition:enter="transition-all duration-200"
+                        <div x-show="sidebarExpanded" x-transition:enter="transition-all duration-200 ease-out"
+                            x-transition:enter-start="opacity-0 translate-x-2"
+                            x-transition:enter-end="opacity-100 translate-x-0"
                             x-transition:leave="transition-all duration-100"
                             class="flex flex-col leading-none overflow-hidden whitespace-nowrap">
-                            <span
-                                class="text-[9px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">System://BGHMC</span>
-                            <span class="text-[17px] font-black tracking-tight text-slate-800">IMISS <span
-                                    class="text-slate-400 font-normal">Inventory</span></span>
+                            <span class="text-[9px] font-mono font-semibold text-blue-400 uppercase tracking-[0.25em] mb-1 flex items-center gap-1">
+                                <span class="h-1 w-1 bg-emerald-400 inline-block rounded-full status-pulse"></span>
+                                System://BGHMC
+                            </span>
+                            <span class="text-[17px] font-black tracking-tight text-white flex items-baseline gap-1">
+                                IMISS
+                                <span class="text-slate-400 font-normal text-[14px]">Inventory</span>
+                                <span class="text-blue-500 font-mono text-[16px] cursor-blink leading-none">_</span>
+                            </span>
                         </div>
                     </a>
                 </div>
@@ -163,7 +231,7 @@
                     :class="sidebarExpanded ? 'items-stretch' : 'items-center'">
 
                     {{-- Vertical tech line accent on the left --}}
-                    <div class="absolute left-3 top-6 bottom-6 w-px bg-slate-100 -z-10" x-show="sidebarExpanded"></div>
+                    <div class="absolute left-3 top-6 bottom-6 w-px bg-slate-800 -z-10" x-show="sidebarExpanded"></div>
 
                     @php
                         $navLinks = [
@@ -187,33 +255,31 @@
                                     @endphp
                                     <a href="{{ $targetUrl }}"
                                         @click="if(window.location.href === '{{ $targetUrl }}') $event.preventDefault()" class="relative flex items-center transition-all duration-300 group
-                                                                                                                                                                                                                            {{ $isActive
-                        ? 'bg-blue-50/80 text-blue-700'
-                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
+                                                                                                                                                                                                                            {{ $isActive ? 'bg-slate-800/80 text-blue-400' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white' }}"
                                         :class="sidebarExpanded ? 'w-full px-3 py-2.5 border border-transparent' : 'w-11 h-11 justify-center rounded-sm'"
                                         title="{{ $link['label'] }}">
 
                                         {{-- Active Tech Accents --}}
                                         @if($isActive)
-                                            <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-blue-500"></div>
+                                            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-blue-500"></div>
                                             <template x-if="sidebarExpanded">
                                                 <div>
-                                                    <div class="absolute right-0 top-0 bottom-0 w-[1px] bg-blue-200"></div>
-                                                    <div class="absolute top-0 left-0 right-0 h-[1px] bg-blue-200"></div>
-                                                    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-blue-200"></div>
+                                                    <div class="absolute right-0 top-0 bottom-0 w-[1px] bg-blue-500/20"></div>
+                                                    <div class="absolute top-0 left-0 right-0 h-[1px] bg-blue-500/20"></div>
+                                                    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-blue-500/20"></div>
                                                     <div
-                                                        class="absolute top-[-2px] right-[-2px] w-[5px] h-[5px] bg-white border border-blue-400">
+                                                        class="absolute top-[-2px] right-[-2px] w-[5px] h-[5px] bg-slate-900 border border-blue-500/50">
                                                     </div>
                                                     <div
-                                                        class="absolute bottom-[-2px] right-[-2px] w-[5px] h-[5px] bg-white border border-blue-400">
+                                                        class="absolute bottom-[-2px] right-[-2px] w-[5px] h-[5px] bg-slate-900 border border-blue-500/50">
                                                     </div>
                                                 </div>
                                             </template>
                                         @endif
 
                                         <div
-                                            class="relative z-10 flex items-center justify-center bg-white p-1 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-slate-100 {{ $isActive ? 'border-blue-200 shadow-blue-100' : 'group-hover:border-slate-300' }}">
-                                            <svg class="shrink-0 transition-colors {{ $isActive ? 'text-blue-600 w-[18px] h-[18px]' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]' }}"
+                                            class="relative z-10 flex items-center justify-center bg-slate-900 p-1 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.2)] border {{ $isActive ? 'border-blue-500/30' : 'border-slate-800 group-hover:border-slate-700' }}">
+                                            <svg class="shrink-0 transition-colors {{ $isActive ? 'text-blue-400 w-[18px] h-[18px]' : 'text-slate-500 group-hover:text-slate-300 w-[18px] h-[18px]' }}"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2.5' : '2' }}"
                                                 stroke="currentColor">
                                                 {!! $link['icon'] !!}
@@ -230,13 +296,13 @@
                     @if(Auth::user() && Auth::user()->role === 'admin')
                         <div class="pt-6 pb-2" :class="sidebarExpanded ? 'px-2' : 'flex justify-center'">
                             <span x-show="sidebarExpanded"
-                                class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-[0.15em] flex items-center gap-2">
-                                <span class="h-px bg-slate-200 flex-1 border-t border-dashed border-slate-300"></span>
+                                class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                                <span class="h-px bg-slate-800 flex-1 border-t border-dashed border-slate-700"></span>
                                 Admin Console
-                                <span class="h-px bg-slate-200 flex-1 border-t border-dashed border-slate-300"></span>
+                                <span class="h-px bg-slate-800 flex-1 border-t border-dashed border-slate-700"></span>
                             </span>
                             <div x-show="!sidebarExpanded"
-                                class="h-px w-6 bg-slate-200 border-t border-dashed border-slate-300"></div>
+                                class="h-px w-6 bg-slate-800 border-t border-dashed border-slate-700"></div>
                         </div>
 
                         @php
@@ -255,32 +321,30 @@
                                     @endphp
                                     <a href="{{ $targetUrl }}"
                                         @click="if(window.location.href === '{{ $targetUrl }}') $event.preventDefault()" class="relative flex items-center transition-all duration-300 group
-                                                                                                                                                                                                                            {{ $isActive
-                            ? 'bg-blue-50/80 text-blue-700'
-                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
+                                                                                                                                                                                                                            {{ $isActive ? 'bg-slate-800/80 text-blue-400' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white' }}"
                                         :class="sidebarExpanded ? 'w-full px-3 py-2.5 border border-transparent' : 'w-11 h-11 justify-center rounded-sm'"
                                         title="{{ $link['label'] }}">
 
                                         @if($isActive)
-                                            <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-blue-500"></div>
+                                            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-blue-500"></div>
                                             <template x-if="sidebarExpanded">
                                                 <div>
-                                                    <div class="absolute right-0 top-0 bottom-0 w-[1px] bg-blue-200"></div>
-                                                    <div class="absolute top-0 left-0 right-0 h-[1px] bg-blue-200"></div>
-                                                    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-blue-200"></div>
+                                                    <div class="absolute right-0 top-0 bottom-0 w-[1px] bg-blue-500/20"></div>
+                                                    <div class="absolute top-0 left-0 right-0 h-[1px] bg-blue-500/20"></div>
+                                                    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-blue-500/20"></div>
                                                     <div
-                                                        class="absolute top-[-2px] right-[-2px] w-[5px] h-[5px] bg-white border border-blue-400">
+                                                        class="absolute top-[-2px] right-[-2px] w-[5px] h-[5px] bg-slate-900 border border-blue-500/50">
                                                     </div>
                                                     <div
-                                                        class="absolute bottom-[-2px] right-[-2px] w-[5px] h-[5px] bg-white border border-blue-400">
+                                                        class="absolute bottom-[-2px] right-[-2px] w-[5px] h-[5px] bg-slate-900 border border-blue-500/50">
                                                     </div>
                                                 </div>
                                             </template>
                                         @endif
 
                                         <div
-                                            class="relative z-10 flex items-center justify-center bg-white p-1 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-slate-100 {{ $isActive ? 'border-blue-200 shadow-blue-100' : 'group-hover:border-slate-300' }}">
-                                            <svg class="shrink-0 transition-colors {{ $isActive ? 'text-blue-600 w-[18px] h-[18px]' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]' }}"
+                                            class="relative z-10 flex items-center justify-center bg-slate-900 p-1 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.2)] border {{ $isActive ? 'border-blue-500/30' : 'border-slate-800 group-hover:border-slate-700' }}">
+                                            <svg class="shrink-0 transition-colors {{ $isActive ? 'text-blue-400 w-[18px] h-[18px]' : 'text-slate-500 group-hover:text-slate-300 w-[18px] h-[18px]' }}"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="{{ $isActive ? '2.5' : '2' }}"
                                                 stroke="currentColor">
                                                 {!! $link['icon'] !!}
@@ -298,7 +362,7 @@
 
                 {{-- Collapse Toggle (Light Tech Style) --}}
                 <button @click="sidebarExpanded = !sidebarExpanded"
-                    class="hidden lg:flex absolute top-1/2 -translate-y-1/2 -right-3.5 z-50 items-center justify-center w-7 h-7 bg-white border border-slate-300 text-slate-400 rounded-sm hover:text-blue-600 hover:border-blue-400 hover:shadow-sm focus:outline-none transition-all duration-300">
+                    class="hidden lg:flex absolute top-1/2 -translate-y-1/2 -right-3.5 z-50 items-center justify-center w-7 h-7 bg-slate-900 border border-slate-700 text-slate-400 rounded-sm hover:text-blue-400 hover:border-blue-500 hover:shadow-sm focus:outline-none transition-all duration-300">
                     <svg class="w-3.5 h-3.5 transition-transform duration-300"
                         :class="sidebarExpanded ? 'rotate-0' : 'rotate-180'" fill="none" viewBox="0 0 24 24"
                         stroke-width="2.5" stroke="currentColor">
@@ -377,7 +441,7 @@
                             style="display: none;">
                             <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50">
                                 <p
-                                    class="text-[10px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    class="text-[10px] font-mono text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 bg-emerald-400 inline-block"></span> Active Session
                                 </p>
                             </div>

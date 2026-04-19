@@ -15,7 +15,7 @@
                     <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">// System Staff</p>
                 </div>
                 <h2 class="text-xl font-bold text-slate-800 tracking-tight">Staff Directory</h2>
-                <p class="text-xs text-slate-500 font-mono mt-1">Doctors, nurses, and technicians available when logging item usage.</p>
+                <p class="text-xs text-slate-500 font-mono mt-1">Programmers and tech support staff available when logging item usage.</p>
             </div>
             <a href="{{ route('staff.create') }}"
                 class="inline-flex items-center gap-2 bg-slate-900 px-5 py-2.5 text-[11px] font-mono font-bold text-white uppercase tracking-widest transition-colors hover:bg-slate-800 border border-slate-900">
@@ -33,7 +33,6 @@
                     <tr class="bg-slate-50/50 border-b border-slate-200">
                         <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Name</th>
                         <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Type</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Specialization</th>
                         <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -41,12 +40,12 @@
                     @foreach($staff as $member)
                     @php
                         $typeColors = [
-                            'doctor' => 'text-blue-600 bg-blue-50 border-blue-200',
-                            'nurse' => 'text-pink-600 bg-pink-50 border-pink-200',
-                            'technician' => 'text-violet-600 bg-violet-50 border-violet-200',
-                            'other' => 'text-slate-600 bg-slate-50 border-slate-200',
+                            'programmer' => 'text-blue-600 bg-blue-50 border-blue-200',
+                            'tech support' => 'text-emerald-600 bg-emerald-50 border-emerald-200',
+                            'supervisor' => 'text-amber-600 bg-amber-50 border-amber-200',
+                            'head' => 'text-violet-600 bg-violet-50 border-violet-200',
                         ];
-                        $colors = $typeColors[$member->type] ?? $typeColors['other'];
+                        $colors = $typeColors[$member->type] ?? 'text-slate-600 bg-slate-50 border-slate-200';
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4">
@@ -58,9 +57,6 @@
                             <span class="inline-flex items-center border px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase {{ $colors }}">
                                 {{ $member->type }}
                             </span>
-                        </td>
-                        <td class="px-6 py-4 font-mono text-xs text-slate-500">
-                            {{ $member->specialization ?: '—' }}
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-1.5">
@@ -92,7 +88,7 @@
                 </svg>
             </div>
             <p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">// No records found</p>
-            <p class="text-sm font-semibold text-slate-500 mt-1">Add doctors, nurses, or technicians.</p>
+            <p class="text-sm font-semibold text-slate-500 mt-1">Add programmers or tech support.</p>
         </div>
         @endif
     </div>

@@ -75,7 +75,7 @@
                             <input type="radio" name="_item_type_radio" value="consumable" class="accent-indigo-600 w-4 h-4" :checked="itemType === 'consumable'">
                             <div>
                                 <p class="text-sm font-bold text-slate-800">Consumable</p>
-                                <p class="text-[10px] font-mono text-slate-500 mt-0.5">Gloves, syringes, medicines.</p>
+                                <p class="text-[10px] font-mono text-slate-500 mt-0.5">Paper Clip, Gloves, Tape.</p>
                             </div>
                         </label>
                         <label @click="itemType = 'device'; selectedCategoryId = ''; selectedCategoryName = ''"
