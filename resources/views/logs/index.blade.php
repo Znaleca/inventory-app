@@ -16,6 +16,7 @@
         'Returns' => $rawReturns->count(),
         'Transfers' => $rawTransfers->count(),
         'Disposals' => $rawDisposals->count(),
+        'Items' => $items->count(),
     ];
 @endphp
 
@@ -133,6 +134,7 @@
             ['id' => 'returns',      'label' => 'Returns',        'count' => $catCounts['Returns'],      'active' => 'border-teal-500 text-teal-700 bg-teal-50'],
             ['id' => 'transfers',    'label' => 'Transfers',      'count' => $catCounts['Transfers'],    'active' => 'border-amber-500 text-amber-700 bg-amber-50'],
             ['id' => 'disposals',    'label' => 'Disposals',      'count' => $catCounts['Disposals'],    'active' => 'border-slate-600 text-slate-700 bg-slate-100'],
+            ['id' => 'items',        'label' => 'Items',          'count' => $catCounts['Items'],        'active' => 'border-violet-500 text-violet-700 bg-violet-50'],
         ];
     @endphp
     
@@ -406,6 +408,46 @@
     </div>
 
 
+    {{-- ══ ITEMS TAB ══ --}}
+    <div x-show="activeTab === 'items'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;" class="paper-box mt-0">
+        <div class="relative z-10 bg-white rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 bg-violet-500 inline-block font-mono"></span>
+                    <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">Master Item List</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Name</th>
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Category</th>
+                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Stock</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                    @forelse($items as $item)
+                    <tr class="hover:bg-slate-50 transition-colors" x-show="search === '' || '{{ strtolower($item->name) }}'.includes(search.toLowerCase())">
+                        <td class="px-6 py-4 font-bold text-slate-800">{{ $item->name }}</td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            <span class="inline-flex items-center border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
+                                {{ $item->category->name ?? 'Uncategorized' }}
+                            </span>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            <span class="font-mono font-black text-slate-700">{{ $item->stock_quantity }}</span>
+                            <span class="font-mono text-[10px] text-slate-400 ml-0.5">{{ $item->unit }}</span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="3" class="px-6 py-12 text-center"><p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest">// No items found</p></td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
@@ -454,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
         new Chart(ctxCat.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Stock In', 'Usage', 'Borrows', 'Returns', 'Transfers', 'Disposals'],
+                labels: ['Stock In', 'Usage', 'Borrows', 'Returns', 'Transfers', 'Disposals', 'Items'],
                 datasets: [{
                     label: 'Records',
                     data: [
@@ -463,9 +505,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         {{ $catCounts['Borrows'] }}, 
                         {{ $catCounts['Returns'] }}, 
                         {{ $catCounts['Transfers'] }}, 
-                        {{ $catCounts['Disposals'] }}
+                        {{ $catCounts['Disposals'] }},
+                        {{ $catCounts['Items'] }}
                     ],
-                    backgroundColor: ['#10b981', '#f43f5e', '#3b82f6', '#14b8a6', '#f59e0b', '#475569'],
+                    backgroundColor: ['#10b981', '#f43f5e', '#3b82f6', '#14b8a6', '#f59e0b', '#475569', '#8b5cf6'],
                     borderRadius: 4,
                     borderSkipped: false,
                     barThickness: 28,

@@ -12,8 +12,11 @@
         <p class="text-xs text-slate-400 font-mono mt-0.5">Edit or delete raw transaction and item records.</p>
     </div>
 
-    {{-- Tab Navigation --}}
+    {{-- Chart Data Calculation --}}
     @php
+        $totalIn = $stockEntries->sum('quantity') + $returns->sum('quantity_returned');
+        $totalOut = $usageLogs->sum('quantity_used') + $borrows->sum('quantity_borrowed') + $transfers->sum('quantity') + $disposals->sum('quantity');
+
         $tabs = [
             ['id' => 'stock-entries', 'label' => 'Stock Entries',  'count' => $stockEntries->count(), 'bar' => 'bg-emerald-500', 'active' => 'border-emerald-500 text-emerald-700 bg-emerald-50'],
             ['id' => 'usage-logs',   'label' => 'Usage Logs',     'count' => $usageLogs->count(),    'bar' => 'bg-rose-500',    'active' => 'border-rose-500 text-rose-700 bg-rose-50'],
@@ -24,6 +27,51 @@
             ['id' => 'items',        'label' => 'Items',          'count' => $items->count(),        'bar' => 'bg-violet-500',  'active' => 'border-violet-500 text-violet-700 bg-violet-50'],
         ];
     @endphp
+
+    {{-- Charts Top Row --}}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
+        {{-- Doughnut Chart: Flow Types --}}
+        <div class="paper-box mt-2">
+            <div class="paper-box-top"></div>
+            <div class="paper-box-accent" style="background: linear-gradient(90deg, #10b981, #3b82f6);"></div>
+            <div class="relative z-10 bg-white rounded-lg overflow-hidden flex flex-col h-full">
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
+                        <p class="text-sm font-bold text-slate-800">Directional Flow Volume</p>
+                    </div>
+                </div>
+                <div class="p-5 flex-1 w-full">
+                    <div class="h-[220px]">
+                        <canvas id="flowDoughnutChart"></canvas>
+                    </div>
+                    <div class="mt-4 flex flex-col items-center justify-center border-t border-slate-100 pt-3">
+                        <span class="text-[10px] font-mono text-slate-400">Total Recorded Units</span>
+                        <span class="text-2xl font-black text-slate-700 leading-tight">{{ number_format($totalIn + $totalOut) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Bar Chart: Categories --}}
+        <div class="paper-box mt-2">
+            <div class="paper-box-top"></div>
+            <div class="paper-box-accent" style="background: linear-gradient(90deg, #f59e0b, #ec4899);"></div>
+            <div class="relative z-10 bg-white rounded-lg overflow-hidden flex flex-col h-full">
+                <div class="px-5 py-4 border-b border-slate-100">
+                    <p class="text-[10px] font-mono text-rose-500 uppercase tracking-widest mb-0.5">Chart.02</p>
+                    <p class="text-sm font-bold text-slate-800">Records Breakdown By Category</p>
+                </div>
+                <div class="p-5 flex-1">
+                    <div class="h-[220px]">
+                        <canvas id="categoryBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tab Navigation --}}
     <div class="flex flex-wrap gap-1.5 mb-3">
         @foreach($tabs as $tab)
         <button @click="activeTab = '{{ $tab['id'] }}'"
@@ -463,4 +511,91 @@
     </div>
 
 </div>
+
+{{-- Charts Script --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Doughnut Chart (In vs Out)
+    const ctxFlow = document.getElementById('flowDoughnutChart');
+    if (ctxFlow) {
+        new Chart(ctxFlow.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Units In', 'Units Out'],
+                datasets: [{
+                    data: [{{ $totalIn }}, {{ $totalOut }}],
+                    backgroundColor: ['#10b981', '#f43f5e'],
+                    borderWidth: 4,
+                    borderColor: '#ffffff',
+                    hoverOffset: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '76%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'rectRot',
+                            color: '#64748b',
+                            font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Bar Chart (Category Breakdown)
+    const ctxCat = document.getElementById('categoryBarChart');
+    if (ctxCat) {
+        new Chart(ctxCat.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Stock In', 'Usage', 'Borrows', 'Returns', 'Transfers', 'Disposals', 'Items'],
+                datasets: [{
+                    label: 'Records',
+                    data: [
+                        {{ $stockEntries->count() }}, 
+                        {{ $usageLogs->count() }}, 
+                        {{ $borrows->count() }}, 
+                        {{ $returns->count() }}, 
+                        {{ $transfers->count() }}, 
+                        {{ $disposals->count() }},
+                        {{ $items->count() }}
+                    ],
+                    backgroundColor: ['#10b981', '#f43f5e', '#3b82f6', '#14b8a6', '#f59e0b', '#475569', '#8b5cf6'],
+                    borderRadius: 4,
+                    borderSkipped: false,
+                    barThickness: 28,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        border: { display: false, dash: [4,4] },
+                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: '#64748b', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
 @endsection
