@@ -171,7 +171,8 @@
         {{-- SIDEBAR (Dark Tech Theme) --}}
         {{-- ==================== --}}
         <aside
-            class="fixed inset-y-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.2)]"
+            class="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-800 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.2)]"
+            style="background: linear-gradient(135deg, #0f172a 0%, #1a3a52 100%);"
             :class="{
                 '-translate-x-full': !mobileOpen,
                 'translate-x-0': mobileOpen,
@@ -179,20 +180,20 @@
                 'w-[76px]': !sidebarExpanded
             }" x-cloak>
 
-            {{-- Blueprint grid overlay on dark background --}}
-            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(rgba(99,102,241,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.3) 1px, transparent 1px); background-size: 30px 30px;"></div>
+            {{-- Accent bar top matching login --}}
+            <div class="absolute top-0 left-0 right-0 h-[3px] z-20 pointer-events-none" style="background: linear-gradient(90deg, #3b82f6, #6366f1, #10b981);"></div>
+
+            {{-- Blueprint grid overlay matching login --}}
+            <div class="absolute inset-0 z-0 pointer-events-none" style="background-image: linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
 
             <div class="relative flex flex-col h-full w-full z-10">
 
                 {{-- Branding --}}
-                <div class="flex items-center shrink-0 px-4 h-[70px] border-b border-slate-800 bg-slate-900/50 relative overflow-hidden"
+                <div class="flex items-center shrink-0 px-4 h-[70px] border-b border-white/5 bg-transparent relative overflow-hidden"
                     :class="sidebarExpanded ? 'justify-start gap-3' : 'justify-center'">
 
-                    {{-- Decorative top gradient line --}}
-                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-600 to-indigo-500 z-10"></div>
-
-                    {{-- Animated scan sweep --}}
-                    <div class="absolute top-0 left-0 h-full w-1/4 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent pointer-events-none scan-line"></div>
+                    {{-- Animated scan sweep matching login --}}
+                    <div class="absolute inset-0 pointer-events-none scan-line" style="background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.5), transparent); height: 2px; width: 100%;"></div>
 
                     {{-- Corner accent nodes --}}
                     <div class="absolute bottom-0 left-0 w-2 h-2 border-r border-t border-blue-500/40"></div>
@@ -201,11 +202,9 @@
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group w-full relative z-10">
 
                         {{-- Logo: no border, just glow animation --}}
-                        <div class="relative flex-shrink-0">
+                        <div class="relative flex-shrink-0 flex items-center justify-center" style="width: 32px; height: 32px;">
                             <img src="{{ asset('favicon.ico') }}" alt="IMISS"
-                                class="h-8 w-8 object-contain logo-img brightness-150">
-                            {{-- Subtle ring pulse behind icon --}}
-                            <div class="absolute inset-0 rounded-sm logo-ring opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                class="h-8 w-8 object-contain logo-img brightness-150 absolute transition-all duration-300">
                         </div>
 
                         <div x-show="sidebarExpanded" x-transition:enter="transition-all duration-200 ease-out"

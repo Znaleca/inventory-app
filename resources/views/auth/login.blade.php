@@ -1,244 +1,1012 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="">
     <title>IMISS Inventory — BGHMC</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=fira-code:400,500,600|plus-jakarta-sans:300,400,500,600,700,800" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://fonts.bunny.net/css?family=fira-code:400,500,600|plus-jakarta-sans:300,400,500,600,700,800"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
     <style>
-        /* Blueprint grid background — matches app layout */
-        body {
-            background-color: #f8fafc;
-            background-image:
-                linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-                linear-gradient(rgba(59, 130, 246, 0.05) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 2px, transparent 2px);
-            background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
-            background-position: -1px -1px, -1px -1px, -2px -2px, -2px -2px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        @keyframes pulse-ring {
-            0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70%  { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --primary-light: #60a5fa;
+            --secondary: #6366f1;
+            --accent: #10b981;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --card-dark: #1e293b;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
         }
-        .status-pulse { animation: pulse-ring 2s infinite; }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2942 100%);
+            color: var(--text-light);
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* ==================== LEFT PANEL ==================== */
+        .left-panel {
+            flex: 0 0 58%;
+            padding: 4rem;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a3a52 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .accent-bar-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #6366f1, #10b981);
+            z-index: 5;
+        }
+
+        .corner-node {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            z-index: 5;
+        }
+
+        .corner-node.top-right {
+            top: 2rem;
+            right: 2rem;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .corner-node.bottom-left {
+            bottom: 2rem;
+            left: 2rem;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+            z-index: 2;
+            animation: scan 5s linear infinite;
+        }
 
         @keyframes scan {
-            0%   { transform: translateY(-100%); opacity: 0; }
-            10%  { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { transform: translateY(400%); opacity: 0; }
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
         }
-        .scan-line { animation: scan 4s linear infinite; }
+
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .branding {
+            margin-bottom: 3rem;
+        }
+
+        .branding-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .branding-bar {
+            width: 3px;
+            height: 32px;
+            background: linear-gradient(180deg, #3b82f6, #6366f1);
+        }
+
+        .branding-text p {
+            margin: 0;
+            font-size: 10px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .branding-text p:first-child {
+            color: #60a5fa;
+            margin-bottom: 0.25rem;
+        }
+
+        .branding-text p:last-child {
+            color: #64748b;
+            font-size: 9px;
+            letter-spacing: 0.15em;
+        }
+
+        .hero-section {
+            margin-bottom: 3rem;
+        }
+
+        .version-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: rgba(96, 165, 250, 0.7);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title span.primary {
+            color: var(--text-light);
+        }
+
+        .hero-title span.accent {
+            color: var(--primary);
+        }
+
+        .hero-desc {
+            max-width: 480px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            font-weight: 500;
+            border-left: 2px solid rgba(59, 130, 246, 0.3);
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-desc span.highlight {
+            color: var(--primary-light);
+        }
+
+        .info-boxes {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box {
+            border: 1px solid rgba(71, 85, 105, 0.6);
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .info-box-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .info-box-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .status-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 1px solid rgba(71, 85, 105, 0.6);
+            background: rgba(30, 41, 59, 0.5);
+            padding: 0.75rem 1rem;
+            width: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 var(--accent);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+        }
+
+        .status-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .ip-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 0.75rem;
+        }
+
+        /* ==================== RIGHT PANEL ==================== */
+        .right-panel {
+            flex: 0 0 42%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+        .auth-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            z-index: 20;
+        }
+
+        .auth-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .auth-badge-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ==================== 3D PAPER BOX ==================== */
+        .paper-box-container {
+            perspective: 1200px;
+        }
+
+        .paper-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            position: relative;
+        }
+
+        .paper-box-top {
+            position: absolute;
+            top: -12px;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background: linear-gradient(180deg, white 0%, #f8fafc 100%);
+            border-radius: 8px 8px 0 0;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+            z-index: 2;
+        }
+
+        .paper-box-top::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .paper-box-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #6366f1);
+            border-radius: 8px 8px 0 0;
+            z-index: 3;
+        }
+
+        .paper-box-content {
+            position: relative;
+            padding: 2rem;
+            padding-top: 2.5rem;
+        }
+
+        /* ==================== FORM STYLES ==================== */
+        .form-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .form-header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .form-header-text p {
+            margin: 0;
+            font-size: 10px;
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-header-text h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .form-title-section {
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+        }
+
+        .form-title-section h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .alert {
+            margin-bottom: 1.5rem;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            padding: 1rem;
+            position: relative;
+            border-left: 3px solid #ef4444;
+        }
+
+        .alert-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: #dc2626;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .alert-message {
+            font-size: 0.875rem;
+            color: #991b1b;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .form-input-wrapper {
+            position: relative;
+        }
+
+        .form-input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0f172a;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: #cbd5e1;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .form-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s ease;
+        }
+
+        .form-submit:hover::before {
+            left: 100%;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .form-submit svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .form-submit:hover svg {
+            transform: translateX(3px);
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px dashed #e2e8f0;
+            text-align: center;
+        }
+
+        .form-footer-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* ==================== TECH SUPPORT BOX ==================== */
+        .tech-support-box {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f0f4ff 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-support-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .tech-support-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-support-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .tech-support-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 0.875rem;
+        }
+
+        .tech-tools {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .tool-item:hover {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .tool-item i {
+            font-size: 0.875rem;
+            color: var(--primary);
+        }
+
+        .box-bottom-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        .footer-date,
+        .footer-ip {
+            font-family: 'Fira Code', monospace;
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                flex: 1;
+                background: linear-gradient(135deg, var(--dark-bg) 0%, #1a3a52 100%);
+            }
+
+            .right-panel::before {
+                background-image:
+                    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            }
+
+            .auth-badge {
+                border-color: rgba(71, 85, 105, 0.6);
+                background: rgba(30, 41, 59, 0.5);
+            }
+
+            .auth-badge-text {
+                color: var(--text-light);
+            }
+
+            .paper-box {
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .form-title-section h1,
+            .form-header-text h2 {
+                color: var(--text-light);
+            }
+
+            .form-input {
+                background: rgba(30, 41, 59, 0.5);
+                border-color: rgba(71, 85, 105, 0.6);
+                color: var(--text-light);
+            }
+
+            .form-input::placeholder {
+                color: rgba(148, 163, 184, 0.7);
+            }
+
+            .form-input:focus {
+                background: rgba(30, 41, 59, 0.7);
+                border-color: var(--primary);
+            }
+
+            .form-label,
+            .form-subtitle,
+            .alert-header {
+                color: var(--text-muted);
+            }
+
+            .tool-item {
+                background: rgba(30, 41, 59, 0.5);
+                border-color: rgba(59, 130, 246, 0.2);
+                color: var(--primary-light);
+            }
+
+            .tool-item:hover {
+                background: rgba(59, 130, 246, 0.1);
+            }
+
+            .tech-support-box {
+                background: rgba(59, 130, 246, 0.08);
+                border-color: rgba(59, 130, 246, 0.15);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .left-panel {
+                padding: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .form-wrapper {
+                max-width: 100%;
+            }
+
+            .paper-box-content {
+                padding: 1.5rem;
+                padding-top: 2rem;
+            }
+
+            .info-boxes {
+                flex-wrap: wrap;
+            }
+
+            .info-box {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .tech-tools {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
-<body class="antialiased min-h-screen text-slate-900 overflow-hidden" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+<body>
+    <div class="container">
 
-    <div class="flex min-h-screen w-full">
+        <!-- ======================== LEFT PANEL ======================== -->
+        <div class="left-panel">
+            <div class="accent-bar-top"></div>
+            <div class="corner-node top-right"></div>
+            <div class="corner-node bottom-left"></div>
+            <div class="scan-line"></div>
 
-        {{-- ======================== --}}
-        {{-- LEFT PANEL (Info)        --}}
-        {{-- ======================== --}}
-        <div class="hidden lg:flex w-7/12 flex-col justify-between p-14 xl:p-20 bg-slate-900 relative overflow-hidden">
+            <div class="content">
+                <!-- Branding -->
+                <div class="branding">
+                    <div class="branding-header">
+                        <div class="branding-bar"></div>
+                        <div class="branding-text">
+                            <p>System://BGHMC</p>
+                            <p>Bataan General Hospital &amp; Medical Center</p>
+                        </div>
+                    </div>
+                </div>
 
-            {{-- Blueprint grid overlay on dark background --}}
-            <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(99,102,241,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.3) 1px, transparent 1px); background-size: 40px 40px;"></div>
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <span class="version-badge">v1.0 // Inventory Module</span>
+                    <h1 class="hero-title">
+                        <span class="primary">IMISS</span><br>
+                        <span class="accent">INVENTORY</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Centralized system for managing
+                        <span class="highlight">technical devices</span>,
+                        <span class="highlight">equipment</span>, and
+                        <span class="highlight">consumables</span>
+                        with real-time tracking and secure access.
+                    </p>
 
-            {{-- Top accent bar --}}
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-600 to-indigo-500 z-10"></div>
-
-            {{-- Corner node decorations --}}
-            <div class="absolute top-5 right-5 w-3 h-3 border border-blue-500/40 bg-slate-900"></div>
-            <div class="absolute bottom-5 left-5 w-3 h-3 border border-blue-500/40 bg-slate-900"></div>
-
-            {{-- Scan line animation --}}
-            <div class="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent scan-line z-0 pointer-events-none"></div>
-
-            {{-- Branding --}}
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-[3px] h-8 bg-blue-500"></div>
-                    <div>
-                        <p class="font-mono text-[10px] font-semibold text-blue-400 tracking-[0.3em] uppercase">System://BGHMC</p>
-                        <p class="text-[9px] font-mono text-slate-500 uppercase tracking-[0.15em]">Bataan General Hospital &amp; Medical Center</p>
+                    <div class="info-boxes">
+                        <div class="info-box">
+                            <span class="info-box-label">Module</span>
+                            <span class="info-box-value">IMISS.v1</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-label">Facility</span>
+                            <span class="info-box-value">BGHMC</span>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-label">Access</span>
+                            <span class="info-box-value">RESTRICTED</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Hero Text --}}
-            <div class="relative z-10">
-                <p class="font-mono text-[10px] text-blue-500/70 tracking-[0.3em] uppercase mb-4">v1.0 // Inventory Module</p>
-
-                <h1 class="text-6xl xl:text-7xl font-black leading-[0.9] tracking-tighter mb-6">
-                    <span class="text-white">IMISS</span><br>
-                    <span class="text-blue-500">INVENTORY</span>
-                </h1>
-
-                <p class="max-w-sm text-slate-400 text-base leading-relaxed font-medium border-l-2 border-blue-500/30 pl-4">
-                    Centralized system for managing
-                    <span class="text-blue-400">technical devices</span>,
-                    <span class="text-blue-400">equipment</span>, and
-                    <span class="text-blue-400">consumables</span>
-                    with real-time tracking and secure access.
-                </p>
-
-                <div class="mt-8 flex gap-6">
-                    <div class="border border-slate-700 px-4 py-2.5">
-                        <p class="font-mono text-[9px] text-slate-500 uppercase tracking-widest mb-1">Module</p>
-                        <p class="font-mono text-xs text-slate-300 font-bold">IMISS.v1</p>
-                    </div>
-                    <div class="border border-slate-700 px-4 py-2.5">
-                        <p class="font-mono text-[9px] text-slate-500 uppercase tracking-widest mb-1">Facility</p>
-                        <p class="font-mono text-xs text-slate-300 font-bold">BGHMC</p>
-                    </div>
-                    <div class="border border-slate-700 px-4 py-2.5">
-                        <p class="font-mono text-[9px] text-slate-500 uppercase tracking-widest mb-1">Access</p>
-                        <p class="font-mono text-xs text-slate-300 font-bold">RESTRICTED</p>
-                    </div>
+            <!-- Status Footer -->
+            <div class="content">
+                <div class="status-footer">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">SYS.ONLINE &amp; SECURE</span>
                 </div>
-            </div>
-
-            {{-- Status Footer --}}
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 border border-slate-800 bg-slate-800/50 w-fit px-4 py-2.5">
-                    <span class="h-2 w-2 bg-emerald-400 status-pulse inline-block"></span>
-                    <span class="font-mono text-[10px] text-slate-300 uppercase tracking-[0.2em]">SYS.ONLINE &amp; SECURE</span>
-                </div>
-                <p class="font-mono text-[9px] text-slate-600 mt-3 uppercase tracking-widest">Gateway: {{ Request::ip() }}</p>
+                <p class="ip-badge">Gateway: 192.168.1.1</p>
             </div>
         </div>
 
-        {{-- ======================== --}}
-        {{-- RIGHT PANEL (Login Form) --}}
-        {{-- ======================== --}}
-        <div class="flex w-full lg:w-5/12 items-center justify-center p-8 relative">
-
-            {{-- Corner nodes matching the layout style --}}
-            <div class="absolute top-6 right-6 hidden lg:block">
-                <div class="flex items-center gap-2 border border-slate-200 bg-white px-3 py-1.5">
-                    <span class="h-1.5 w-1.5 bg-emerald-400 inline-block status-pulse"></span>
-                    <span class="font-mono text-[10px] text-slate-500 uppercase tracking-widest">Auth.Portal</span>
-                </div>
+        <!-- ======================== RIGHT PANEL ======================== -->
+        <div class="right-panel">
+            <div class="auth-badge">
+                <span class="auth-badge-dot"></span>
+                <span class="auth-badge-text">Auth.Portal</span>
             </div>
 
-            <div class="w-full max-w-sm">
+            <div class="form-wrapper">
+                <div class="paper-box-container">
+                    <div class="paper-box">
+                        <div class="paper-box-top"></div>
+                        <div class="paper-box-accent"></div>
 
-                {{-- Form Card --}}
-                <div class="bg-white border border-slate-200 relative shadow-sm">
-                    {{-- Top accent --}}
-                    <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                    {{-- Left accent bar --}}
-                    <div class="absolute top-0 left-0 bottom-0 w-1 bg-blue-500"></div>
-                    {{-- Corner nodes --}}
-                    <div class="absolute top-[-3px] right-[-3px] w-2 h-2 border border-blue-300 bg-white"></div>
-                    <div class="absolute bottom-[-3px] right-[-3px] w-2 h-2 border border-slate-200 bg-white"></div>
-
-                    <div class="p-8 pl-9">
-
-                        {{-- Header --}}
-                        <div class="mb-7">
-                            <div class="flex items-center gap-3 mb-5">
-                                {{-- Bare favicon — no border/ring --}}
-                                <img src="{{ asset('favicon.ico') }}" alt="BGHMC" class="h-9 w-9 object-contain">
-                                <div>
-                                    <p class="font-mono text-[9px] text-blue-600 uppercase tracking-[0.25em] mb-0.5">System://Auth</p>
-                                    <h2 class="text-lg font-black text-slate-800 tracking-tight">IMISS <span class="text-slate-400 font-normal">Inventory</span></h2>
+                        <div class="paper-box-content">
+                            <!-- Form Header -->
+                            <div class="form-header">
+                                <img src="{{ asset('favicon.ico') }}" alt="IMISS" style="width: 40px; height: 40px; object-fit: contain;">
+                                <div class="form-header-text">
+                                    <p>System://Auth</p>
+                                    <h2>IMISS <span style="color: #94a3b8; font-weight: 400;">Inventory</span></h2>
                                 </div>
                             </div>
-                            <div class="border-t border-dashed border-slate-200 pt-5">
-                                <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Sign In</h1>
-                                <p class="font-mono text-[10px] text-slate-400 uppercase tracking-[0.2em]">// Authenticate to continue</p>
+
+                            <!-- Title Section -->
+                            <div class="form-title-section">
+                                <h1>Sign In</h1>
+                                <p class="form-subtitle">// Authenticate to continue</p>
                             </div>
-                        </div>
 
-                        {{-- Error Alert --}}
-                        @if ($errors->any())
-                        <div class="mb-5 border border-rose-200 bg-rose-50 px-4 py-3 relative">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                            <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest mb-1">// Error</p>
-                            @foreach ($errors->all() as $error)
-                            <p class="text-sm text-rose-700 font-medium">{{ $error }}</p>
-                            @endforeach
-                        </div>
-                        @endif
+                            <!-- Error Alert -->
+                            @if ($errors->any())
+                            <div class="alert">
+                                <p class="alert-header">// Error</p>
+                                @foreach ($errors->all() as $error)
+                                <p class="alert-message">{{ $error }}</p>
+                                @endforeach
+                            </div>
+                            @endif
 
-                        {{-- Form --}}
-                        <form method="POST" action="{{ route('login') }}" class="space-y-4">
-                            @csrf
-
-                            {{-- Username --}}
-                            <div>
-                                <label class="font-mono text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mb-1.5 block">
-                                    Bio_ID / Username
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
+                            <!-- Login Form -->
+                            <form method="POST" action="{{ route('login') }}" class="login-form">
+                                @csrf
+                                <!-- Bio ID Input -->
+                                <div class="form-group">
+                                    <label class="form-label">Bio_ID / Username</label>
+                                    <div class="form-input-wrapper">
+                                        <div class="form-input-icon">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <input type="text" name="bio_id" class="form-input" placeholder="Enter credentials" required autofocus>
                                     </div>
-                                    <input type="text" name="bio_id" required autofocus
-                                        class="bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-0 transition-all block w-full py-3 pl-10 pr-4 text-sm font-medium text-slate-800 font-mono placeholder:font-sans placeholder:text-slate-400"
-                                        placeholder="Enter credentials">
                                 </div>
-                            </div>
 
-                            {{-- Password --}}
-                            <div>
-                                <label class="font-mono text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mb-1.5 block">
-                                    Password
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
+                                <!-- Password Input -->
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <div class="form-input-wrapper">
+                                        <div class="form-input-icon">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                        <input type="password" name="password" class="form-input" placeholder="••••••••" required>
                                     </div>
-                                    <input type="password" name="password" required
-                                        class="bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-0 transition-all block w-full py-3 pl-10 pr-4 text-sm font-medium text-slate-800 placeholder:tracking-normal tracking-widest"
-                                        placeholder="••••••••">
                                 </div>
-                            </div>
 
-                            {{-- Submit --}}
-                            <div class="pt-3">
-                                <button type="submit"
-                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] uppercase py-3.5 flex items-center justify-center gap-3 transition-colors tracking-[0.2em] font-mono border border-blue-700 relative group">
+                                <!-- Submit Button -->
+                                <button type="submit" class="form-submit">
                                     <span>Login</span>
-                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </button>
+                            </form>
+
+
+
+                            <!-- Footer -->
+                            <div class="form-footer">
+                                <p class="form-footer-text">BGHMC-IMISS // Restricted Access</p>
                             </div>
-                        </form>
 
-                        {{-- Footer --}}
-                        <div class="mt-6 pt-5 border-t border-dashed border-slate-200">
-                            <p class="font-mono text-[9px] text-slate-400 uppercase tracking-widest text-center">
-                                BGHMC-IMISS // Restricted Access
-                            </p>
+                            <!-- Bottom Footer -->
+                            <div class="box-bottom-footer">
+                                <span class="footer-date" id="currentDate"></span>
+                                <span class="footer-ip" id="currentIp">0.0.0.0</span>
+                            </div>
                         </div>
-
                     </div>
                 </div>
-
-                {{-- Below card --}}
-                <div class="mt-3 flex justify-between items-center">
-                    <span class="font-mono text-[9px] text-slate-400 uppercase tracking-widest">{{ now()->format('Y-m-d') }}</span>
-                    <span class="font-mono text-[9px] text-slate-400 uppercase tracking-widest">{{ Request::ip() }}</span>
-                </div>
-
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script>
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toISOString().split('T')[0];
+
+        // Get IP (simulated)
+        document.getElementById('currentIp').textContent = '192.168.1.' + Math.floor(Math.random() * 254 + 1);
+    </script>
 </body>
+
 </html>
