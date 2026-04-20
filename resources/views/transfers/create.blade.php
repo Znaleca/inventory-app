@@ -106,6 +106,23 @@
                                         class="text-rose-500">*</span></label>
                                 <select name="item_id" :required="!isNewItem" x-model="selectedItem"
                                     @change="onItemChange()"
+                                    x-init="
+                                        $nextTick(() => {
+                                            const ts = new TomSelect($el, {
+                                                create: false,
+                                                sortField: { field: 'text', direction: 'asc' }
+                                            });
+                                            ts.on('change', (val) => {
+                                                selectedItem = val;
+                                                onItemChange();
+                                            });
+                                            $watch('selectedItem', value => {
+                                                if (ts.getValue() != value) {
+                                                    ts.setValue(value, true);
+                                                }
+                                            });
+                                        });
+                                    "
                                     class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors">
                                     <option value="">-- Choose an item --</option>
                                     @foreach($items as $i)
