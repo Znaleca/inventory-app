@@ -71,9 +71,6 @@
                 @else
                     <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 border border-indigo-200">Consumable</span>
                 @endif
-                @if($item->item_type === 'consumable')
-                    <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-2 py-1 border border-rose-200">Disposable</span>
-                @endif
             </div>
         </div>
 
@@ -186,16 +183,7 @@
                                     @endif
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Usage Type</td>
-                                <td class="px-4 py-2.5">
-                                    @if($item->item_type === 'consumable')
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-1 border border-rose-200">Disposable</span>
-                                    @else
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 border border-emerald-200">Reusable</span>
-                                    @endif
-                                </td>
-                            </tr>
+
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry Tracking</td>
                                 <td class="px-4 py-2.5">
@@ -221,68 +209,108 @@
                 </div>
             </div>
 
-            {{-- Batch Breakdown --}}
+            {{-- Stock Overview Chart --}}
+            @php
+                $chartNew  = max(0, $item->total_stock);
+                $chartUsed = max(0, $item->effective_stock_used);
+                $chartLent = max(0, $item->active_lent_out);
+                $chartTotal = $chartNew + $chartUsed + $chartLent;
+                $totalReceived = $item->stockEntries->sum('quantity');
+                $totalUsedLogs = $item->usageLogs->sum('quantity_used');
+                $pctNew  = $chartTotal > 0 ? round(($chartNew  / $chartTotal) * 100) : 0;
+                $pctUsed = $chartTotal > 0 ? round(($chartUsed / $chartTotal) * 100) : 0;
+                $pctLent = $chartTotal > 0 ? round(($chartLent / $chartTotal) * 100) : 0;
+            @endphp
             <div class="bg-white border border-slate-200 relative">
                 <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                 <div class="ml-1">
-                    <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <div class="px-4 py-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
-                            <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">Stock Batches</p>
+                            <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">Stock Overview</p>
                         </div>
-                        <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">FIFO Tracked</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-100 bg-slate-50/50">
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">SN / Lot</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Received</th>
-                                    <th class="px-4 py-2 text-right text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
-                                @foreach($item->batches_breakdown as $batch)
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-4 py-2.5 font-mono text-xs font-bold text-slate-700 whitespace-nowrap">
-                                        {{ $batch['serial_number'] ?? ($batch['lot_number'] ?? '—') }}
-                                    </td>
-                                    <td class="px-4 py-2.5 whitespace-nowrap">
-                                        @if($batch['expiry_date'])
-                                            @php
-                                                $expiry = \Carbon\Carbon::parse($batch['expiry_date'])->startOfDay();
-                                                $today = now()->startOfDay();
-                                            @endphp
-                                            @if($expiry->isBefore($today))
-                                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-1.5 py-0.5 border border-rose-200">EXPIRED</span>
-                                            @elseif($today->diffInDays($expiry) <= 30)
-                                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-200">{{ $expiry->format('M d') }}</span>
-                                            @else
-                                                <span class="text-[9px] font-mono text-slate-500">{{ $expiry->format('M d, Y') }}</span>
-                                            @endif
-                                        @else
-                                            <span class="text-slate-300 font-mono text-xs">—</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-2.5 text-xs font-mono text-slate-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($batch['received_date'])->format('M d, Y') }}</td>
-                                    <td class="px-4 py-2.5 text-right whitespace-nowrap">
-                                        <span class="text-sm font-black font-mono text-slate-800">{{ $batch['remaining'] }}</span>
-                                        <span class="text-[9px] font-mono text-slate-400 ml-1">{{ $item->unit }}</span>
-                                    </td>
-                                </tr>
-                                @endforeach
-                                @if($item->stock_used > 0)
-                                <tr class="bg-amber-50/50 border-t-2 border-dashed border-amber-100">
-                                    <td colspan="3" class="px-4 py-2.5 text-[10px] font-mono font-bold text-amber-700 whitespace-nowrap uppercase tracking-widest">Accumulated Used Stock</td>
-                                    <td class="px-4 py-2.5 text-right whitespace-nowrap">
-                                        <span class="text-sm font-black font-mono text-amber-600">{{ $item->stock_used }}</span>
-                                        <span class="text-[9px] font-mono text-amber-400 ml-1">{{ $item->unit }}</span>
-                                    </td>
-                                </tr>
-                                @endif
-                            </tbody>
-                        </table>
+
+                    <div class="px-5 py-5">
+
+                        @if($chartTotal > 0)
+                        {{-- Donut Chart --}}
+                        <div class="flex items-center justify-center mb-6">
+                            <div class="relative w-40 h-40">
+                                <canvas id="stockDonut" width="160" height="160"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-2xl font-black font-mono text-slate-800">{{ $chartTotal }}</span>
+                                    <span class="text-[9px] font-mono text-slate-400 uppercase tracking-widest">{{ $item->unit }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Legend --}}
+                        <div class="grid grid-cols-3 gap-2 mb-5">
+                            <div class="text-center">
+                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                    <span class="h-2 w-2 bg-emerald-400 inline-block"></span>
+                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">New</span>
+                                </div>
+                                <p class="text-xl font-black font-mono text-emerald-600">{{ $chartNew }}</p>
+                                <p class="text-[9px] font-mono text-slate-400">{{ $pctNew }}%</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                    <span class="h-2 w-2 bg-amber-400 inline-block"></span>
+                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">Used</span>
+                                </div>
+                                <p class="text-xl font-black font-mono text-amber-500">{{ $chartUsed }}</p>
+                                <p class="text-[9px] font-mono text-slate-400">{{ $pctUsed }}%</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                    <span class="h-2 w-2 bg-indigo-400 inline-block"></span>
+                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">Lent</span>
+                                </div>
+                                <p class="text-xl font-black font-mono text-indigo-500">{{ $chartLent }}</p>
+                                <p class="text-[9px] font-mono text-slate-400">{{ $pctLent }}%</p>
+                            </div>
+                        </div>
+                        @else
+                        <div class="flex flex-col items-center justify-center py-10">
+                            <p class="text-[11px] font-mono text-slate-400">// No stock recorded yet</p>
+                        </div>
+                        @endif
+
+                        {{-- Throughput bars --}}
+                        <div class="space-y-3 border-t border-slate-100 pt-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Received</span>
+                                    <span class="text-[10px] font-mono font-bold text-teal-600">{{ $totalReceived }} {{ $item->unit }}</span>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                    <div class="h-full bg-teal-400" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Used</span>
+                                    <span class="text-[10px] font-mono font-bold text-rose-600">{{ $totalUsedLogs }} {{ $item->unit }}</span>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                    @php $usedPct = $totalReceived > 0 ? min(100, round(($totalUsedLogs / $totalReceived) * 100)) : 0; @endphp
+                                    <div class="h-full bg-rose-400" style="width: {{ $usedPct }}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Available</span>
+                                    <span class="text-[10px] font-mono font-bold text-emerald-600">{{ $chartNew }} {{ $item->unit }}</span>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                    @php $availPct = $totalReceived > 0 ? min(100, round(($chartNew / $totalReceived) * 100)) : 0; @endphp
+                                    <div class="h-full bg-emerald-400" style="width: {{ $availPct }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -388,4 +416,44 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+    (function() {
+        const canvas = document.getElementById('stockDonut');
+        if (!canvas) return;
+        const chartNew  = {{ $chartNew ?? 0 }};
+        const chartUsed = {{ $chartUsed ?? 0 }};
+        const chartLent = {{ $chartLent ?? 0 }};
+        const total = chartNew + chartUsed + chartLent;
+        if (total === 0) return;
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['New Stock', 'Used Stock', 'Lent Out'],
+                datasets: [{
+                    data: [chartNew, chartUsed, chartLent],
+                    backgroundColor: ['#34d399', '#fbbf24', '#818cf8'],
+                    borderColor:     ['#ffffff',  '#ffffff',  '#ffffff'],
+                    borderWidth: 3,
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                cutout: '72%',
+                animation: { animateScale: true, duration: 600 },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed / total * 100)}%)`
+                        },
+                        bodyFont: { family: 'monospace', size: 11 },
+                        padding: 8,
+                    }
+                }
+            }
+        });
+    })();
+    </script>
 @endsection

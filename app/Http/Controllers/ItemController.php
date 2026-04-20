@@ -25,6 +25,10 @@ class ItemController extends Controller
             $query->where('category_id', $request->category);
         }
 
+        if ($request->filled('type') && in_array($request->type, ['device', 'consumable'])) {
+            $query->where('item_type', $request->type);
+        }
+
         $items = $query->orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
 
@@ -154,14 +158,15 @@ class ItemController extends Controller
 
     public function destroy(Item $item)
     {
-        if (!$item->can_be_deleted) {
-            return redirect()->back()
-                ->with('error', 'Cannot delete item: It has associated stock, logs, or borrows. Dispose or return items first.');
-        }
-
+        // Force-delete the item and cascade all related records first
+        $item->stockEntries()->delete();
+        $item->usageLogs()->delete();
+        $item->borrows()->delete();
+        $item->transfers()->delete();
+        $item->disposals()->delete();
         $item->delete();
 
         return redirect()->route('items.index')
-            ->with('success', 'Item deleted successfully.');
+            ->with('success', 'Item and all related records deleted successfully.');
     }
 }

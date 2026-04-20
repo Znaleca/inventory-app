@@ -50,6 +50,14 @@
             @endforeach
         </select>
 
+        {{-- Type Filter --}}
+        <select name="type"
+            class="block w-full sm:w-40 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
+            <option value="">All Types</option>
+            <option value="device"     {{ request('type') === 'device'     ? 'selected' : '' }}>Device</option>
+            <option value="consumable" {{ request('type') === 'consumable' ? 'selected' : '' }}>Consumable</option>
+        </select>
+
         {{-- Actions --}}
         <div class="flex gap-2">
             <button type="submit"
@@ -60,7 +68,7 @@
                 Search
             </button>
 
-            @if(request('search') || request('category'))
+            @if(request('search') || request('category') || request('type'))
             <a href="{{ route('items.index') }}"
                 class="flex items-center gap-2 border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-300 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors">
                 Clear
@@ -243,9 +251,9 @@
         </div>
         <p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">// No records found</p>
         <p class="text-sm font-semibold text-slate-500 mt-1">
-            {{ request('search') || request('category') ? 'Try adjusting your filters.' : 'No items in inventory yet.' }}
+            {{ request('search') || request('category') || request('type') ? 'Try adjusting your filters.' : 'No items in inventory yet.' }}
         </p>
-        @unless(request('search') || request('category'))
+        @unless(request('search') || request('category') || request('type'))
         <a href="{{ route('items.create') }}"
             class="mt-6 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-blue-700">
             + Add First Item

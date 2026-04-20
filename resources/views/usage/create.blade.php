@@ -132,25 +132,47 @@
                 <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                 <div class="ml-1">
                     {{-- Header --}}
-                    <div class="px-5 py-4 border-b border-dashed border-slate-100 flex items-center justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
-                                <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">03 //
-                                    Select Devices to Use</p>
+                    <div class="px-5 py-4 border-b border-dashed border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
+                                    <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">03 // Select Devices to Use</p>
+                                </div>
+                                <p class="text-xs text-slate-500">Check each serial number you are taking out of inventory.</p>
                             </div>
-                            <p class="text-xs text-slate-500">Check each serial/lot number you are taking out of inventory.
-                            </p>
+                            <div class="shrink-0 ml-4 text-right">
+                                <p class="text-2xl font-black font-mono text-indigo-600" x-text="selectedEntries.length"></p>
+                                <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">selected</p>
+                            </div>
                         </div>
-                        <div class="shrink-0 ml-4 text-right">
-                            <p class="text-2xl font-black font-mono text-indigo-600" x-text="selectedEntries.length"></p>
-                            <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">selected</p>
+                        {{-- Search Input --}}
+                        <div class="relative mt-3">
+                            <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                                </svg>
+                            </span>
+                            <input
+                                id="device-serial-search"
+                                type="text"
+                                x-model="deviceSearch"
+                                placeholder="Search serial number…"
+                                class="w-full border border-indigo-200 bg-indigo-50/40 pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-400 transition-colors"
+                            />
+                            <button type="button" @click="deviceSearch = ''"
+                                x-show="deviceSearch.length > 0"
+                                class="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
                     {{-- Checkbox list --}}
                     <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
-                        <template x-for="batch in getBatches()" :key="batch.id">
+                        <template x-for="batch in filteredBatches()" :key="batch.id">
                             <label :for="'entry_' + batch.id"
                                 :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'hover:bg-slate-50'"
                                 class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
@@ -171,6 +193,9 @@
                                 </div>
                             </label>
                         </template>
+                        <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
+                            <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                        </div>
                         <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
                             <p class="text-[11px] font-mono text-slate-400">// No available units in stock</p>
                         </div>
@@ -179,8 +204,7 @@
                     {{-- Auto-computed hidden quantity_used --}}
                     <input type="hidden" name="quantity_used" :value="selectedEntries.length">
 
-                    @error('selected_entries') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}
-                    </p> @enderror
+                    @error('selected_entries') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -401,6 +425,7 @@
                 stockType: '{{ old('stock_type', 'new') }}',
                 selectedEntries: [],
                 selectedLot: '{{ old('lot_number', '') }}',
+                deviceSearch: '',
                 items: {!! json_encode($itemsJs) !!},
 
                 isDevice() {
@@ -416,6 +441,17 @@
                 getBatches() {
                     if (!this.selectedItem || !this.items[this.selectedItem]) return [];
                     return this.items[this.selectedItem].batches || [];
+                },
+
+                filteredBatches() {
+                    const all = this.getBatches();
+                    if (!this.deviceSearch.trim()) return all;
+                    const q = this.deviceSearch.trim().toLowerCase();
+                    return all.filter(b => {
+                        const sn = (b.serial_number || '').toLowerCase();
+                        const lot = (b.lot_number || '').toLowerCase();
+                        return sn.includes(q) || lot.includes(q);
+                    });
                 },
 
                 getExpirableBatches() {
@@ -444,6 +480,7 @@
                 onItemChange() {
                     this.selectedEntries = [];
                     this.selectedLot = '';
+                    this.deviceSearch = '';
                     const it = this.items[this.selectedItem];
                     if (!it) return;
                     if (it.new > 0 && it.used === 0) this.stockType = 'new';

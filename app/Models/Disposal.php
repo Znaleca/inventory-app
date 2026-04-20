@@ -8,6 +8,7 @@ class Disposal extends Model
 {
     protected $fillable = [
         'item_id',
+        'stock_entry_id',
         'type',
         'quantity',
         'disposed_by',
@@ -17,11 +18,16 @@ class Disposal extends Model
 
     protected $casts = [
         'disposed_at' => 'datetime',
-        'quantity' => 'integer',
+        'quantity'    => 'integer',
     ];
 
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function stockEntry()
+    {
+        return $this->belongsTo(StockEntry::class);
     }
 }
