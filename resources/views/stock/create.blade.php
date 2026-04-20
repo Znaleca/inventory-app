@@ -120,8 +120,8 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
                         @if($item->item_type === 'device')
                             <div class="batch-field sm:col-span-2">
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">Serial Numbers <span class="text-rose-500">*</span></label>
-                                <p class="mb-3 text-[10px] font-mono text-slate-500">Enter a unique serial number for each individual unit being added. One entry per device.</p>
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">Serial Numbers <span class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                                <p class="mb-3 text-[10px] font-mono text-slate-500">Enter a unique serial number for each individual unit being added. Leave blank to mark as N/A.</p>
                                 
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 max-h-72 overflow-y-auto">
                                     <template x-for="i in (qty > 0 ? qty : 1)" :key="i">
@@ -129,9 +129,9 @@
                                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                                 <span class="text-[10px] font-mono font-bold text-slate-400" x-text="'#' + i"></span>
                                             </div>
-                                            <input type="text" name="serial_numbers[]" required
+                                            <input type="text" name="serial_numbers[]"
                                                 class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:outline-none py-2.5 pl-9 pr-3 text-sm font-mono text-slate-800 transition-colors"
-                                                placeholder="Enter SN...">
+                                                placeholder="Enter SN... (Leave blank for N/A)">
                                         </div>
                                     </template>
                                 </div>

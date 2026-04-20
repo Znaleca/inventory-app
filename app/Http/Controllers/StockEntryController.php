@@ -27,7 +27,7 @@ class StockEntryController extends Controller
 
         if ($item->item_type === 'device') {
             $rules['serial_numbers']   = 'required|array|size:' . max(1, (int)$request->input('quantity', 1));
-            $rules['serial_numbers.*'] = 'required|string|max:255';
+            $rules['serial_numbers.*'] = 'nullable|string|max:255';
         } else {
             $rules['lot_number'] = $item->is_expirable ? 'required|string|max:255' : 'nullable|string|max:255';
         }
@@ -50,6 +50,7 @@ class StockEntryController extends Controller
                 $baseData['item_id'] = $item->id;
                 
                 foreach ($serialNumbers as $sn) {
+                    $sn = empty(trim((string)$sn)) ? 'N/A' : trim((string)$sn);
                     $entry = StockEntry::create(array_merge($baseData, [
                         'quantity'      => 1,
                         'serial_number' => $sn
@@ -76,6 +77,7 @@ class StockEntryController extends Controller
                 $baseData = collect($validated)->except(['serial_numbers', 'quantity', 'lot_number'])->toArray();
                 
                 foreach ($serialNumbers as $sn) {
+                    $sn = empty(trim((string)$sn)) ? 'N/A' : trim((string)$sn);
                     StockEntry::create(array_merge($baseData, [
                         'quantity'      => 1,
                         'serial_number' => $sn
