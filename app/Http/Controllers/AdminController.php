@@ -43,13 +43,24 @@ class AdminController extends Controller
 
     public function updateStockEntry(Request $request, StockEntry $stockEntry)
     {
-        $validated = $request->validate([
+        $rules = [
             'quantity'      => 'required|integer|min:0',
-            'lot_number'    => 'nullable|string|max:255',
-            'expiry_date'   => 'nullable|date',
             'received_date' => 'nullable|date',
             'notes'         => 'nullable|string',
-        ]);
+        ];
+
+        if ($stockEntry->item->item_type === 'device') {
+            $rules['serial_number'] = 'nullable|string|max:255';
+        } else {
+            $rules['lot_number']  = 'nullable|string|max:255';
+            $rules['expiry_date'] = 'nullable|date';
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($stockEntry->item->item_type === 'device') {
+            $validated['serial_number'] = empty(trim((string)$request->input('serial_number'))) ? 'N/A' : trim((string)$request->input('serial_number'));
+        }
 
         $stockEntry->update($validated);
 

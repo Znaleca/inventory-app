@@ -44,10 +44,19 @@
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="quantity" class="block text-sm font-bold text-slate-700 mb-1.5">Quantity</label>
-                        <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $stockEntry->quantity) }}" min="0"
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                        <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $stockEntry->quantity) }}" min="0" @if($stockEntry->item->item_type === 'device') readonly @endif
+                            class="block w-full border border-slate-200 {{ $stockEntry->item->item_type === 'device' ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none' }} py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
                         @error('quantity') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
+                    
+                    @if($stockEntry->item->item_type === 'device')
+                    <div>
+                        <label for="serial_number" class="block text-sm font-bold text-slate-700 mb-1.5">Serial Number <span class="text-slate-400 font-normal ml-1">(Optional)</span></label>
+                        <input type="text" name="serial_number" id="serial_number" value="{{ old('serial_number', $stockEntry->serial_number === 'N/A' ? '' : $stockEntry->serial_number) }}"
+                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors" placeholder="Leave blank for N/A">
+                        @error('serial_number') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+                    @else
                     <div>
                         <label for="lot_number" class="block text-sm font-bold text-slate-700 mb-1.5">Lot Number</label>
                         <input type="text" name="lot_number" id="lot_number" value="{{ old('lot_number', $stockEntry->lot_number) }}"
@@ -60,6 +69,7 @@
                             class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
                         @error('expiry_date') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
+                    @endif
                     <div>
                         <label for="received_date" class="block text-sm font-bold text-slate-700 mb-1.5">Received Date</label>
                         <input type="date" name="received_date" id="received_date" value="{{ old('received_date', $stockEntry->received_date?->format('Y-m-d')) }}"

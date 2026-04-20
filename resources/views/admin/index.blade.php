@@ -51,7 +51,7 @@
                         <thead><tr class="bg-slate-50/50 border-b border-slate-200">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Lot #</th>
+                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Lot / SN #</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Expiry</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Received</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
@@ -61,7 +61,13 @@
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4 font-bold text-slate-800">{{ $entry->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-slate-700">{{ $entry->quantity }}</span></td>
-                            <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">{{ $entry->lot_number ?? '—' }}</td>
+                            <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">
+                                @if(($entry->item->item_type ?? '') === 'device')
+                                    <span class="text-[10px] text-slate-400">SN:</span> {{ $entry->serial_number ?? '—' }}
+                                @else
+                                    {{ $entry->lot_number ?? '—' }}
+                                @endif
+                            </td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-500">{{ $entry->expiry_date?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-500">{{ $entry->received_date?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
