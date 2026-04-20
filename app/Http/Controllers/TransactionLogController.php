@@ -56,8 +56,15 @@ class TransactionLogController extends Controller
             ->when($from, fn ($q) => $q->whereDate('returned_at', '>=', $from))
             ->when($to, fn ($q) => $q->whereDate('returned_at', '<=', $to));
 
+        $rawStockEntries = $stockQuery->latest('received_date')->get();
+        $rawTransfers = $transferQuery->latest('transferred_at')->get();
+        $rawUsageLogs = $usageQuery->latest('used_at')->get();
+        $rawDisposals = $disposalQuery->latest('disposed_at')->get();
+        $rawBorrows = $borrowQuery->latest('borrowed_at')->get();
+        $rawReturns = $returnQuery->latest('returned_at')->get();
+
         // Normalise collections into a unified format
-        $stockEntries = ($type === 'out') ? collect() : $stockQuery->get()->map(fn ($s) => [
+        $stockEntries = ($type === 'out') ? collect() : $rawStockEntries->map(fn ($s) => [
             'id' => 'stock-'.$s->id,
             'type' => 'in',
             'date' => $s->received_date instanceof \Carbon\Carbon ? $s->received_date : \Carbon\Carbon::parse($s->received_date),
@@ -72,7 +79,7 @@ class TransactionLogController extends Controller
             'used_by' => null,
         ]);
 
-        $usageLogs = ($type === 'in') ? collect() : $usageQuery->get()->map(fn ($u) => [
+        $usageLogs = ($type === 'in') ? collect() : $rawUsageLogs->map(fn ($u) => [
             'id' => 'usage-'.$u->id,
             'type' => 'out',
             'date' => $u->used_at instanceof \Carbon\Carbon ? $u->used_at : \Carbon\Carbon::parse($u->used_at),
@@ -86,7 +93,7 @@ class TransactionLogController extends Controller
             'used_by' => $u->used_by,
         ]);
 
-        $transfers = ($type === 'in') ? collect() : $transferQuery->get()->map(fn ($t) => [
+        $transfers = ($type === 'in') ? collect() : $rawTransfers->map(fn ($t) => [
             'id' => 'transfer-'.$t->id,
             'type' => 'out',
             'date' => $t->transferred_at instanceof \Carbon\Carbon ? $t->transferred_at : \Carbon\Carbon::parse($t->transferred_at),
@@ -100,7 +107,7 @@ class TransactionLogController extends Controller
             'used_by' => ($t->transferred_to ?? $t->transferred_by ? 'Transferred To: '.($t->transferred_to ?? $t->transferred_by) : 'Transferred').($t->approved_by ? ' (Processed by: '.$t->approved_by.')' : ''),
         ]);
 
-        $disposals = ($type === 'in') ? collect() : $disposalQuery->get()->map(fn ($d) => [
+        $disposals = ($type === 'in') ? collect() : $rawDisposals->map(fn ($d) => [
             'id' => 'disposal-'.$d->id,
             'type' => 'out',
             'date' => $d->disposed_at instanceof \Carbon\Carbon ? $d->disposed_at : \Carbon\Carbon::parse($d->disposed_at),
@@ -114,7 +121,7 @@ class TransactionLogController extends Controller
             'used_by' => $d->disposed_by ? ('Disposed By: '.$d->disposed_by) : null,
         ]);
 
-        $borrows = ($type === 'in') ? collect() : $borrowQuery->get()->map(fn ($b) => [
+        $borrows = ($type === 'in') ? collect() : $rawBorrows->map(fn ($b) => [
             'id' => 'borrow-'.$b->id,
             'type' => 'out',
             'date' => $b->borrowed_at instanceof \Carbon\Carbon ? $b->borrowed_at : \Carbon\Carbon::parse($b->borrowed_at),
@@ -130,7 +137,7 @@ class TransactionLogController extends Controller
             'used_by' => ($b->borrower_name ?? $b->staff?->display_name ?? 'Unknown').($b->approved_by ? ' (Processed by: '.$b->approved_by.')' : ''),
         ]);
 
-        $returns = ($type === 'out') ? collect() : $returnQuery->get()->map(fn ($r) => [
+        $returns = ($type === 'out') ? collect() : $rawReturns->map(fn ($r) => [
             'id' => 'return-'.$r->id,
             'type' => 'in',
             'date' => $r->returned_at ? ($r->returned_at instanceof \Carbon\Carbon ? $r->returned_at : \Carbon\Carbon::parse($r->returned_at)) : $r->updated_at,
@@ -152,6 +159,8 @@ class TransactionLogController extends Controller
 
         $items = Item::orderBy('name')->get();
 
-        return view('logs.index', compact('transactions', 'items'));
+        return view('logs.index', compact(
+            'transactions', 'items', 'rawStockEntries', 'rawTransfers', 'rawUsageLogs', 'rawDisposals', 'rawBorrows', 'rawReturns'
+        ));
     }
 }

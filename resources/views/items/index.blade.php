@@ -165,17 +165,7 @@
                             </span>
                             @endif
 
-                            @if($expiredCount > 0)
-                            <span class="flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-2 py-1 text-xs font-bold font-mono text-rose-700">
-                                <span class="h-1.5 w-1.5 bg-rose-500 animate-pulse inline-block"></span>
-                                {{ $expiredCount }} Exp.
-                            </span>
-                            @endif
-                            @if($nearExpiryCount > 0)
-                            <span class="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-2 py-1 text-xs font-bold font-mono text-orange-700">
-                                {{ $nearExpiryCount }} Soon
-                            </span>
-                            @endif
+
                         </div>
                         {{-- Stock bar --}}
                         <div class="mt-2 h-1 w-28 bg-slate-100 border border-slate-200">
