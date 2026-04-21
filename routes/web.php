@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('units', UnitController::class)->except(['show']);
     Route::resource('locations', LocationController::class)->except(['show']);
+    Route::get('/items/export', [ItemController::class, 'export'])->name('items.export');
     Route::resource('items', ItemController::class);
     Route::resource('staff', StaffController::class)->except(['show']);
 

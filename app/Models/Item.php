@@ -209,14 +209,10 @@ class Item extends Model
             return [];
         }
 
-        // Get all devices that have been logged as used OR have been returned used from a previous borrow
+        // Get all devices that have been returned used from a previous borrow
         $usedBatches = $this->stockEntries()
-            ->where(function($query) {
-                $query->whereHas('usageLogs', function($q) {
-                    $q->where('quantity_used', '>', 0);
-                })->orWhereHas('borrowEntries', function($sub) {
-                    $sub->where('disposition', 'returned_used');
-                });
+            ->whereHas('borrowEntries', function($sub) {
+                $sub->where('disposition', 'returned_used');
             })
             ->orderBy('received_date', 'ASC')
             ->get();

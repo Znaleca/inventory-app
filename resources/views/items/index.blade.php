@@ -3,13 +3,71 @@
 @section('title', 'Items')
 
 @section('actions')
-<a href="{{ route('items.create') }}"
-    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5">
-        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
-    </svg>
-    New_Item
-</a>
+<div class="flex items-center gap-2">
+    <div x-data="{ open: false }" class="relative">
+        <button @click="open = !open" @click.away="open = false"
+            class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5 text-emerald-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Export_CSV
+        </button>
+        <div x-show="open" 
+            x-transition:enter="transition ease-out duration-200" 
+            x-transition:enter-start="opacity-0 translate-y-2" 
+            x-transition:enter-end="opacity-100 translate-y-0" 
+            x-transition:leave="transition ease-in duration-150" 
+            x-transition:leave-start="opacity-100 translate-y-0" 
+            x-transition:leave-end="opacity-0 translate-y-2" 
+            class="absolute right-0 mt-2 w-64 paper-box z-50 shadow-2xl" 
+            style="display: none;">
+            <div class="paper-box-top"></div>
+            <div class="paper-box-accent" style="background: linear-gradient(90deg, #10b981, #3b82f6);"></div>
+            <div class="relative z-10 bg-white p-1 flex flex-col">
+                <div class="px-3 py-2.5 border-b border-slate-100 mb-1 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <p class="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest">Global Presets</p>
+                </div>
+                
+                <a href="{{ route('items.export', ['preset' => 'all']) }}" class="flex items-center gap-3 px-3 py-2.5 text-[11px] font-mono font-bold text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                    <span class="h-1.5 w-1.5 bg-blue-500 block"></span>
+                    Export All Inventory
+                </a>
+                
+                <a href="{{ route('items.export', ['preset' => 'low_stock']) }}" class="flex items-center gap-3 px-3 py-2.5 text-[11px] font-mono font-bold text-slate-600 hover:bg-slate-50 hover:text-amber-600 transition-colors">
+                    <span class="h-1.5 w-1.5 bg-amber-500 block"></span>
+                    Low Stock / Reorder
+                </a>
+                
+                <a href="{{ route('items.export', ['preset' => 'expired']) }}" class="flex items-center gap-3 px-3 py-2.5 text-[11px] font-mono font-bold text-slate-600 hover:bg-slate-50 hover:text-rose-600 transition-colors">
+                    <span class="h-1.5 w-1.5 bg-rose-500 block"></span>
+                    Expired / Near Expiry
+                </a>
+
+                <div class="my-1 border-t border-slate-100"></div>
+                
+                <a href="{{ route('items.export', ['preset' => 'devices']) }}" class="flex items-center gap-3 px-3 py-2.5 text-[11px] font-mono font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
+                    <span class="h-1.5 w-1.5 bg-indigo-500 block"></span>
+                    Devices Only
+                </a>
+                
+                <a href="{{ route('items.export', ['preset' => 'consumables']) }}" class="flex items-center gap-3 px-3 py-2.5 text-[11px] font-mono font-bold text-slate-600 hover:bg-slate-50 hover:text-teal-600 transition-colors">
+                    <span class="h-1.5 w-1.5 bg-teal-500 block"></span>
+                    Consumables Only
+                </a>
+            </div>
+        </div>
+    </div>
+    <a href="{{ route('items.create') }}"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5">
+            <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
+        </svg>
+        New_Item
+    </a>
+</div>
 @endsection
 
 @section('content')

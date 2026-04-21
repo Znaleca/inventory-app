@@ -61,11 +61,6 @@ class UsageLogController extends Controller
                         'stock_type'     => 'new',
                     ]));
                 }
-
-                // Reusable devices move to used stock
-                if ($item->item_type !== 'consumable') {
-                    $item->increment('stock_used', $quantityUsed);
-                }
             });
 
             return redirect()->route('items.show', $validated['item_id'])
@@ -114,10 +109,6 @@ class UsageLogController extends Controller
                 // Fallback
                 if ($remainingToLog > 0) {
                     UsageLog::create(array_merge($validated, ['quantity_used' => $remainingToLog]));
-                }
-
-                if ($item->item_type !== 'consumable') {
-                    $item->increment('stock_used', $validated['quantity_used']);
                 }
             }
         });
