@@ -72,6 +72,37 @@
                             class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-amber-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
                         @error('bio_id') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
+
+                    @if(optional($transfer->item)->item_type === 'device')
+                    <div class="sm:col-span-2">
+                        <label for="serial_number" class="block text-sm font-bold text-slate-700 mb-1.5">Serial Number(s)</label>
+                        
+                        @if($transfer->type === 'out')
+                        @php
+                            $currentSerials = ($transfer->serial_number && $transfer->serial_number !== 'N/A') ? array_map('trim', explode(',', $transfer->serial_number)) : [];
+                            $oldSerials = old('serial_number');
+                            $initialSerials = is_array($oldSerials) ? $oldSerials : $currentSerials;
+                        @endphp
+                        <div x-data="{ selectedSerials: {{ json_encode($initialSerials) }} }" class="border border-slate-200 bg-slate-50 max-h-60 overflow-y-auto divide-y divide-slate-100">
+                            @forelse($deviceSerials ?? [] as $serial)
+                            <label class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white transition-colors" :class="selectedSerials.includes('{{ addslashes($serial) }}') ? 'bg-amber-50 border-l-2 border-l-amber-500 -ml-[2px]' : ''">
+                                <input type="checkbox" name="serial_number[]" value="{{ $serial }}" class="w-4 h-4 accent-amber-600" x-model="selectedSerials">
+                                <span class="text-sm font-mono text-slate-800 font-bold">SN: {{ $serial }}</span>
+                            </label>
+                            @empty
+                            <div class="px-4 py-6 text-center text-slate-500 text-sm font-mono bg-white">
+                                <p class="text-[11px] font-mono text-slate-400">// No known serial numbers for this device</p>
+                            </div>
+                            @endforelse
+                        </div>
+                        @else
+                        <input type="text" name="serial_number" id="serial_number" value="{{ old('serial_number', $transfer->serial_number === 'N/A' ? '' : $transfer->serial_number) }}"
+                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-amber-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors" placeholder="Leave blank for N/A">
+                        @endif
+
+                        @error('serial_number') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+                    @endif
                 </div>
 
                 <div>

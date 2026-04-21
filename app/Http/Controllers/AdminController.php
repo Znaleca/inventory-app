@@ -81,7 +81,14 @@ class AdminController extends Controller
     public function editUsageLog(UsageLog $usageLog)
     {
         $usageLog->load('item');
-        return view('admin.edit-usage-log', compact('usageLog'));
+        $stockEntries = [];
+        if ($usageLog->item && $usageLog->item->item_type === 'device') {
+            $stockEntries = \App\Models\StockEntry::where('item_id', $usageLog->item_id)
+                ->whereNotNull('serial_number')
+                ->where('serial_number', '!=', 'N/A')
+                ->get();
+        }
+        return view('admin.edit-usage-log', compact('usageLog', 'stockEntries'));
     }
 
     public function updateUsageLog(Request $request, UsageLog $usageLog)
@@ -91,6 +98,7 @@ class AdminController extends Controller
             'used_at'        => 'nullable|date',
             'notes'          => 'nullable|string',
             'used_by'        => 'nullable|string|max:255',
+            'stock_entry_id' => 'nullable|exists:stock_entries,id'
         ]);
 
         $usageLog->update($validated);
@@ -112,12 +120,29 @@ class AdminController extends Controller
     public function editBorrow(Borrow $borrow)
     {
         $borrow->load(['item', 'staff']);
-        return view('admin.edit-borrow', compact('borrow'));
+        
+        $deviceSerials = [];
+        if ($borrow->item && $borrow->item->item_type === 'device') {
+            $stockEntries = \App\Models\StockEntry::where('item_id', $borrow->item_id)->get();
+            foreach ($stockEntries as $entry) {
+                if ($entry->serial_number && $entry->serial_number !== 'N/A') {
+                    $serials = array_map('trim', explode(',', $entry->serial_number));
+                    foreach ($serials as $s) {
+                        if (!in_array($s, $deviceSerials) && $s !== '') {
+                            $deviceSerials[] = $s;
+                        }
+                    }
+                }
+            }
+            sort($deviceSerials);
+        }
+
+        return view('admin.edit-borrow', compact('borrow', 'deviceSerials'));
     }
 
     public function updateBorrow(Request $request, Borrow $borrow)
     {
-        $validated = $request->validate([
+        $rules = [
             'quantity_borrowed' => 'required|integer|min:0',
             'quantity_returned' => 'required|integer|min:0',
             'quantity_used'     => 'required|integer|min:0',
@@ -127,7 +152,25 @@ class AdminController extends Controller
             'borrowed_at'       => 'required|date',
             'returned_at'       => 'nullable|date',
             'notes'             => 'nullable|string',
-        ]);
+        ];
+
+        if ($borrow->item && $borrow->item->item_type === 'device') {
+            if ($borrow->type === 'out') {
+                $rules['serial_number'] = 'nullable|array';
+            } else {
+                $rules['serial_number'] = 'nullable|string|max:255';
+            }
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($borrow->item && $borrow->item->item_type === 'device') {
+            if ($borrow->type === 'out' && is_array($request->input('serial_number'))) {
+                $validated['serial_number'] = empty($request->input('serial_number')) ? 'N/A' : implode(', ', $request->input('serial_number'));
+            } else {
+                $validated['serial_number'] = empty(trim((string)$request->input('serial_number'))) ? 'N/A' : trim((string)$request->input('serial_number'));
+            }
+        }
 
         $borrow->update($validated);
 
@@ -148,19 +191,54 @@ class AdminController extends Controller
     public function editTransfer(Transfer $transfer)
     {
         $transfer->load('item');
-        return view('admin.edit-transfer', compact('transfer'));
+        
+        $deviceSerials = [];
+        if ($transfer->item && $transfer->item->item_type === 'device') {
+            $stockEntries = \App\Models\StockEntry::where('item_id', $transfer->item_id)->get();
+            foreach ($stockEntries as $entry) {
+                if ($entry->serial_number && $entry->serial_number !== 'N/A') {
+                    $serials = array_map('trim', explode(',', $entry->serial_number));
+                    foreach ($serials as $s) {
+                        if (!in_array($s, $deviceSerials) && $s !== '') {
+                            $deviceSerials[] = $s;
+                        }
+                    }
+                }
+            }
+            sort($deviceSerials);
+        }
+
+        return view('admin.edit-transfer', compact('transfer', 'deviceSerials'));
     }
 
     public function updateTransfer(Request $request, Transfer $transfer)
     {
-        $validated = $request->validate([
+        $rules = [
             'quantity'        => 'required|integer|min:0',
             'destination'     => 'required|string|max:255',
             'transferred_by'  => 'nullable|string|max:255',
             'bio_id'          => 'nullable|string|max:255',
             'transferred_at'  => 'required|date',
             'notes'           => 'nullable|string',
-        ]);
+        ];
+
+        if ($transfer->item && $transfer->item->item_type === 'device') {
+            if ($transfer->type === 'out') {
+                $rules['serial_number'] = 'nullable|array';
+            } else {
+                $rules['serial_number'] = 'nullable|string|max:255';
+            }
+        }
+
+        $validated = $request->validate($rules);
+
+        if ($transfer->item && $transfer->item->item_type === 'device') {
+            if ($transfer->type === 'out' && is_array($request->input('serial_number'))) {
+                $validated['serial_number'] = empty($request->input('serial_number')) ? 'N/A' : implode(', ', $request->input('serial_number'));
+            } else {
+                $validated['serial_number'] = empty(trim((string)$request->input('serial_number'))) ? 'N/A' : trim((string)$request->input('serial_number'));
+            }
+        }
 
         $transfer->update($validated);
 
@@ -181,16 +259,24 @@ class AdminController extends Controller
     public function editDisposal(Disposal $disposal)
     {
         $disposal->load('item');
-        return view('admin.edit-disposal', compact('disposal'));
+        $stockEntries = [];
+        if ($disposal->item && $disposal->item->item_type === 'device') {
+            $stockEntries = \App\Models\StockEntry::where('item_id', $disposal->item_id)
+                ->whereNotNull('serial_number')
+                ->where('serial_number', '!=', 'N/A')
+                ->get();
+        }
+        return view('admin.edit-disposal', compact('disposal', 'stockEntries'));
     }
 
     public function updateDisposal(Request $request, Disposal $disposal)
     {
         $validated = $request->validate([
-            'quantity'    => 'required|integer|min:0',
-            'reason'      => 'required|string',
-            'disposed_by' => 'nullable|string|max:255',
-            'disposed_at' => 'required|date',
+            'quantity'       => 'required|integer|min:0',
+            'reason'         => 'required|string',
+            'disposed_by'    => 'nullable|string|max:255',
+            'disposed_at'    => 'required|date',
+            'stock_entry_id' => 'nullable|exists:stock_entries,id'
         ]);
 
         $disposal->update($validated);

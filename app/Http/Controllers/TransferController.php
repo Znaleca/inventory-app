@@ -71,34 +71,35 @@ class TransferController extends Controller
             'notes'          => 'nullable|string',
         ]);
 
+        $newQty  = (int) ($validated['new_quantity']  ?? 0);
+        $usedQty = (int) ($validated['used_quantity'] ?? 0);
+        $serialParts = [];
+
         if ($hasSelectedEntries) {
             $stockEntries = \App\Models\StockEntry::with('usageLogs')->whereIn('id', $request->selected_entries)->get();
-            $newQty  = 0;
-            $usedQty = 0;
             foreach ($stockEntries as $entry) {
-                if ($entry->usageLogs->sum('quantity_used') > 0) {
+                // Device is counted as used if it has usage logs, returned logged, or imported tags
+                $isUsed = (bool) preg_match('/\[USED\]/i', $entry->serial_number ?? '') || ($entry->usageLogs->sum('quantity_used') > 0);
+                if ($isUsed) {
                     $usedQty++;
                 } else {
                     $newQty++;
                 }
             }
-            $validated['serial_number'] = $stockEntries->pluck('serial_number')->filter()->implode(', ');
-        } else {
-            $newQty  = (int) ($validated['new_quantity']  ?? 0);
-            $usedQty = (int) ($validated['used_quantity'] ?? 0);
+            $serialStr = $stockEntries->pluck('serial_number')->filter()->implode(', ');
+            if ($serialStr) $serialParts[] = $serialStr;
+        }
 
-            if ($validated['type'] === 'in') {
-                $newSerial = trim($request->input('new_serial_number', ''));
-                $usedSerial = trim($request->input('used_serial_number', ''));
-                
-                $serialParts = [];
-                if ($newSerial) $serialParts[] = "[NEW] " . implode(", ", array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', preg_replace('/^\d+\.\s*/m', '', $newSerial)))));
-                if ($usedSerial) $serialParts[] = "[USED] " . implode(", ", array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', preg_replace('/^\d+\.\s*/m', '', $usedSerial)))));
-                
-                if (count($serialParts) > 0) {
-                    $validated['serial_number'] = implode(" | ", $serialParts);
-                }
-            }
+        if ($validated['type'] === 'in' || $validated['type'] === 'out') {
+            $newSerial = trim($request->input('new_serial_number', ''));
+            $usedSerial = trim($request->input('used_serial_number', ''));
+            
+            if ($newSerial) $serialParts[] = "[NEW] " . implode(", ", array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', preg_replace('/^\d+\.\s*/m', '', $newSerial)))));
+            if ($usedSerial) $serialParts[] = "[USED] " . implode(", ", array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', preg_replace('/^\d+\.\s*/m', '', $usedSerial)))));
+        }
+        
+        if (count($serialParts) > 0) {
+            $validated['serial_number'] = implode(" | ", $serialParts);
         }
         
         $total = $newQty + $usedQty;

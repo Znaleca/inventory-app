@@ -1,0 +1,209 @@
+<?php
+
+namespace App\Exports;
+
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+
+class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents, WithTitle
+{
+    protected $items;
+    protected $selectedPresets;
+
+    public function __construct(Collection $items, array $selectedPresets = [])
+    {
+        $this->items = $items;
+        $this->selectedPresets = $selectedPresets;
+    }
+
+    public function title(): string
+    {
+        return 'Inventory Report';
+    }
+
+    public function collection()
+    {
+        return $this->items;
+    }
+
+    public function headings(): array
+    {
+        return [
+            'ID',
+            'Name',
+            'Category',
+            'Type',
+            'Status',
+            'New Stock',
+            'Used Stock',
+            'Lent Out',
+            'Reorder Level',
+            'Storage Location',
+            'Storage Section',
+        ];
+    }
+
+    public function map($item): array
+    {
+        $status = 'In Stock';
+        if ($item->total_stock <= 0) {
+            $status = 'Out of Stock';
+        } elseif ($item->total_stock <= ($item->reorder_level ?? 10)) {
+            $status = 'Reorder';
+        }
+
+        return [
+            $item->id,
+            $item->name,
+            $item->category->name ?? 'Uncategorized',
+            ucfirst($item->item_type),
+            $status,
+            $item->total_stock,
+            $item->effective_stock_used,
+            $item->active_lent_out ?? 0,
+            $item->reorder_level ?? 10,
+            $item->storage_location ?? '—',
+            $item->storage_section ?? '—',
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet  = $event->sheet->getDelegate();
+                $count  = $this->items->count();
+                $lastRow = $count + 1; // +1 for header row
+
+                // ── Header row styling ─────────────────────────────────────
+                $headerRange = "A1:K1";
+                $sheet->getStyle($headerRange)->applyFromArray([
+                    'font' => [
+                        'bold'  => true,
+                        'color' => ['argb' => 'FFFFFFFF'],
+                        'size'  => 10,
+                        'name'  => 'Calibri',
+                    ],
+                    'fill' => [
+                        'fillType'   => Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FF1E293B'], // slate-800
+                    ],
+                    'alignment' => [
+                        'vertical'   => Alignment::VERTICAL_CENTER,
+                        'horizontal' => Alignment::HORIZONTAL_LEFT,
+                        'wrapText'   => false,
+                    ],
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => Border::BORDER_MEDIUM,
+                            'color'       => ['argb' => 'FF10B981'], // emerald
+                        ],
+                    ],
+                ]);
+                $sheet->getRowDimension(1)->setRowHeight(20);
+
+                // ── Data rows ─────────────────────────────────────────────
+                for ($row = 2; $row <= $lastRow; $row++) {
+                    $isEven = ($row % 2 === 0);
+                    $rowBg  = $isEven ? 'FFF8FAFC' : 'FFFFFFFF'; // subtle zebra
+
+                    // Base row style
+                    $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
+                        'fill' => [
+                            'fillType'   => Fill::FILL_SOLID,
+                            'startColor' => ['argb' => $rowBg],
+                        ],
+                        'font' => [
+                            'size' => 10,
+                            'name' => 'Calibri',
+                        ],
+                        'alignment' => [
+                            'vertical' => Alignment::VERTICAL_CENTER,
+                        ],
+                        'borders' => [
+                            'bottom' => [
+                                'borderStyle' => Border::BORDER_HAIR,
+                                'color'       => ['argb' => 'FFE2E8F0'],
+                            ],
+                        ],
+                    ]);
+
+                    // ── Status column (E) color coding ─────────────────────
+                    $status = $sheet->getCell("E{$row}")->getValue();
+                    if ($status === 'Out of Stock') {
+                        $sheet->getStyle("E{$row}")->applyFromArray([
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FFDC2626']],
+                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFEF2F2']],
+                        ]);
+                    } elseif ($status === 'Reorder') {
+                        $sheet->getStyle("E{$row}")->applyFromArray([
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FFD97706']],
+                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFFFBEB']],
+                        ]);
+                    } elseif ($status === 'In Stock') {
+                        $sheet->getStyle("E{$row}")->applyFromArray([
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF16A34A']],
+                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF0FDF4']],
+                        ]);
+                    }
+
+                    // ── Type column (D) color coding ──────────────────────
+                    $type = $sheet->getCell("D{$row}")->getValue();
+                    if ($type === 'Device') {
+                        $sheet->getStyle("D{$row}")->applyFromArray([
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF7C3AED']],
+                        ]);
+                    } elseif ($type === 'Consumable') {
+                        $sheet->getStyle("D{$row}")->applyFromArray([
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF0891B2']],
+                        ]);
+                    }
+
+                    // ── Bold stock numbers ─────────────────────────────────
+                    $sheet->getStyle("F{$row}:I{$row}")->getFont()->setBold(true);
+                }
+
+                // ── Outer border ───────────────────────────────────────────
+                if ($lastRow >= 1) {
+                    $sheet->getStyle("A1:K{$lastRow}")->applyFromArray([
+                        'borders' => [
+                            'outline' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color'       => ['argb' => 'FF94A3B8'],
+                            ],
+                        ],
+                    ]);
+                }
+
+                // ── Freeze panes on header ─────────────────────────────────
+                $sheet->freezePane('A2');
+
+                // ── Auto-filter ────────────────────────────────────────────
+                $sheet->setAutoFilter("A1:K1");
+
+                // ── Set minimum column widths for key columns ──────────────
+                $sheet->getColumnDimension('A')->setWidth(6);   // ID
+                $sheet->getColumnDimension('B')->setWidth(28);  // Name
+                $sheet->getColumnDimension('C')->setWidth(18);  // Category
+                $sheet->getColumnDimension('D')->setWidth(13);  // Type
+                $sheet->getColumnDimension('E')->setWidth(14);  // Status
+                $sheet->getColumnDimension('F')->setWidth(11);  // New Stock
+                $sheet->getColumnDimension('G')->setWidth(11);  // Used Stock
+                $sheet->getColumnDimension('H')->setWidth(10);  // Lent Out
+                $sheet->getColumnDimension('I')->setWidth(13);  // Reorder Level
+                $sheet->getColumnDimension('J')->setWidth(20);  // Storage Location
+                $sheet->getColumnDimension('K')->setWidth(16);  // Storage Section
+            },
+        ];
+    }
+}

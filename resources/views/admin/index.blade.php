@@ -364,14 +364,21 @@
                             </td>
                             <td class="px-6 py-4 font-bold text-slate-800">{{ $transfer->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4">
+                                @php
+                                    $prefix = $transfer->type === 'in' ? '+' : '-';
+                                    $colorNew  = $transfer->type === 'in' ? 'text-emerald-600' : 'text-rose-600';
+                                    $colorUsed = $transfer->type === 'in' ? 'text-emerald-500' : 'text-rose-500';
+                                    $colorAll  = $transfer->type === 'in' ? 'text-emerald-600' : 'text-rose-600';
+                                @endphp
+
                                 @if(($transfer->new_quantity ?? 0) > 0)
-                                <div class="font-mono text-xs text-teal-600 font-black">{{ $transfer->new_quantity }} new</div>
+                                <div class="font-mono text-xs {{ $colorNew }} font-black">{{ $prefix }}{{ $transfer->new_quantity }} new</div>
                                 @endif
                                 @if(($transfer->used_quantity ?? 0) > 0)
-                                <div class="font-mono text-xs text-amber-600 font-black">{{ $transfer->used_quantity }} used</div>
+                                <div class="font-mono text-xs {{ $colorUsed }} font-black">{{ $prefix }}{{ $transfer->used_quantity }} used</div>
                                 @endif
                                 @if(($transfer->new_quantity ?? 0) == 0 && ($transfer->used_quantity ?? 0) == 0)
-                                <span class="font-mono font-black text-slate-600">{{ $transfer->quantity }}</span>
+                                <span class="font-mono font-black {{ $colorAll }}">{{ $prefix }}{{ $transfer->quantity }}</span>
                                 @endif
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-600">{{ $transfer->destination ?? '—' }}</td>

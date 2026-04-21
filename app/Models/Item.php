@@ -13,6 +13,7 @@ class Item extends Model
         'name', 'condition', 'serial_number',
         'description', 'unit', 'unit_price', 'stock_used',
         'is_one_time_use', 'is_expirable', 'storage_location', 'storage_section',
+        'reorder_level',
     ];
 
     protected function casts(): array
@@ -131,8 +132,16 @@ class Item extends Model
      */
     public function getBatchesBreakdownAttribute(): array
     {
-        // 1. Get all batches sorted by expiry (earliest first)
+        // 1. Get all NEW batches sorted by expiry (earliest first)
+        // A batch is NEW if it has no returned_used log AND it doesn't contain [USED] explicitly
         $batches = $this->stockEntries()
+            ->whereDoesntHave('borrowEntries', function($sub) {
+                $sub->where('disposition', 'returned_used');
+            })
+            ->where(function($q) {
+                $q->where('serial_number', 'NOT LIKE', '%[USED]%')
+                  ->orWhereNull('serial_number');
+            })
             ->orderByRaw('expiry_date IS NULL, expiry_date ASC')
             ->orderBy('received_date', 'ASC')
             ->get();
@@ -193,6 +202,7 @@ class Item extends Model
                     'expiry_date' => $batch->expiry_date,
                     'received_date' => $batch->received_date,
                     'remaining' => $remaining,
+                    'is_used' => false,
                 ];
             }
         }
@@ -209,10 +219,13 @@ class Item extends Model
             return [];
         }
 
-        // Get all devices that have been returned used from a previous borrow
+        // Get all devices that have been returned used from a previous borrow OR imported as used manually
         $usedBatches = $this->stockEntries()
-            ->whereHas('borrowEntries', function($sub) {
-                $sub->where('disposition', 'returned_used');
+            ->where(function($q) {
+                $q->whereHas('borrowEntries', function($sub) {
+                    $sub->where('disposition', 'returned_used');
+                })
+                ->orWhere('serial_number', 'LIKE', '%[USED]%');
             })
             ->orderBy('received_date', 'ASC')
             ->get();
@@ -226,8 +239,8 @@ class Item extends Model
         $breakdown = [];
 
         foreach ($usedBatches as $batch) {
-            // For devices, the batch is always 1 unit per row.
-            $usedAmount = 1;
+            // Respect the actual raw stock entry quantity
+            $usedAmount = $batch->quantity;
 
             $borrowedCount = \App\Models\BorrowEntry::where('stock_entry_id', $batch->id)
                 ->whereHas('borrow', function($q) {
@@ -235,8 +248,12 @@ class Item extends Model
                 })
                 ->whereNull('disposition') // actively held by borrower
                 ->count();
+                
+            $usedInLogs = $batch->usageLogs()->where('stock_type', 'used')->sum('quantity_used');
             
             $usedAmount -= $borrowedCount;
+            $usedAmount -= $usedInLogs;
+            
             if ($usedAmount <= 0) continue;
 
             // FIFO deduction for used items leaving the system through transfers or disposal

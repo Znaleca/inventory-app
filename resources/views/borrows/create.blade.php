@@ -80,6 +80,35 @@
                                 </select>
                             </div>
 
+                            <div x-show="selectedItem" class="mt-4 pt-4 border-t border-slate-100" x-cloak>
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">Stock to Borrow <span class="text-rose-500">*</span></label>
+                                <div class="grid grid-cols-2 gap-3 sm:w-2/3">
+                                    <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                        <input type="radio" name="stock_type" value="new" x-model="stockType"
+                                            @change="selectedEntries = []" class="accent-blue-600">
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">New Stock</p>
+                                            <p class="text-xs font-mono text-slate-500"
+                                                x-text="(items[selectedItem] ? items[selectedItem].new : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
+                                            </p>
+                                        </div>
+                                    </label>
+                                    <label x-show="items[selectedItem] && items[selectedItem].used > 0"
+                                        :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                        <input type="radio" name="stock_type" value="used" x-model="stockType"
+                                            @change="selectedEntries = []" class="accent-amber-500">
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Used Stock</p>
+                                            <p class="text-xs font-mono text-slate-500"
+                                                x-text="(items[selectedItem] ? items[selectedItem].used : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
+                                @error('stock_type') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                            </div>
 
                         </div>
                     </div>
@@ -87,7 +116,7 @@
                     {{-- ======================================== --}}
                     {{-- SECTION 3A: Device Selection (OUT ONLY) --}}
                     {{-- ======================================== --}}
-                    <div class="bg-white border border-indigo-300 relative" x-show="isDevice()" x-cloak x-transition>
+                    <div class="bg-white border border-indigo-300 relative" x-show="isDevice() && getBatches().length > 0" x-cloak x-transition>
                         <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                         <div class="ml-1">
                             <div class="px-5 py-4 border-b border-dashed border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -107,6 +136,14 @@
                             </div>
                             
                             {{-- Checkbox list --}}
+                            <div class="px-3 py-2 border-b border-slate-100 bg-slate-50/50" x-show="getBatches(false).length > 5" x-cloak>
+                                <div class="relative">
+                                    <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-slate-800 outline-none">
+                                </div>
+                            </div>
                             <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
                                 <template x-for="batch in getBatches()" :key="batch.id">
                                     <label :for="'entry_' + batch.id"
@@ -245,11 +282,10 @@
                     Cancel
                 </a>
                 
-                {{-- Dynamic validation handling --}}
                 <div x-data="{ 
                     canSubmit() {
                         if (!selectedItem) return false;
-                        if (isDevice()) {
+                        if (isDevice() && stockType === 'new') {
                             return selectedEntries.length > 0;
                         }
                         return (parseInt(manualQty) || 0) > 0;
@@ -287,7 +323,9 @@
         function borrowForm() {
             return {
                 selectedItem: {{ (old('item_id') ?? request('item_id')) ? (int) (old('item_id') ?? request('item_id')) : 'null' }},
+                stockType: 'new',
                 selectedEntries: [],
+                searchQuery: '',
                 manualQty: {{ old('quantity_borrowed', 1) }},
                 newUnitLabel: '',
                 items: {!! json_encode($itemsJs) !!},
@@ -300,9 +338,20 @@
                     return this.selectedItem && this.items[this.selectedItem] ? this.items[this.selectedItem].unit : 'units';
                 },
 
-                getBatches() {
+                getBatches(applySearch = true) {
                     if (!this.selectedItem || !this.items[this.selectedItem]) return [];
-                    return this.items[this.selectedItem].batches || [];
+                    const allBatches = this.items[this.selectedItem].batches || [];
+                    let batches = allBatches.filter(b => this.stockType === 'new' ? !b.is_used : b.is_used);
+                    
+                    if (applySearch && this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        batches = batches.filter(b => {
+                            const serialStr = b.serial_number ? b.serial_number.toLowerCase() : '';
+                            return serialStr.includes(q);
+                        });
+                    }
+                    
+                    return batches;
                 },
 
                 onItemChange() {

@@ -52,6 +52,12 @@ class DashboardController extends Controller
             return $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used;
         });
         $pendingReturnsCount = $activeBorrows->count();
+        $pendingReturnsList = \App\Models\Borrow::with(['item', 'staff'])
+            ->whereIn('status', ['active', 'partial'])
+            ->orderBy('return_date', 'asc') // those due earliest first
+            ->orderBy('borrowed_at', 'asc')
+            ->limit(5)
+            ->get();
 
         $expiredItems = Item::whereHas('stockEntries', function ($q) {
             $q->whereNotNull('expiry_date')
@@ -89,11 +95,18 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
+        $recentTransfersFeed = \App\Models\Transfer::with('item')
+            ->orderByDesc('transferred_at')
+            ->limit(5)
+            ->get();
+
+        $totalTransfersCount = \App\Models\Transfer::count();
+
         return view('dashboard', compact(
             'totalItems', 'lowStockCount', 'lowStockItems',
             'expiringItems', 'expiredItems', 'expiredCount', 'recentUsage',
-            'totalNewStock', 'totalUsedStock', 'totalBorrowedCount', 'pendingReturnsCount',
-            'recentReturns', 'recentDisposals', 'totalStockValue', 'recentlyAdded'
+            'totalNewStock', 'totalUsedStock', 'totalBorrowedCount', 'pendingReturnsCount', 'pendingReturnsList',
+            'recentReturns', 'recentDisposals', 'totalStockValue', 'recentlyAdded', 'recentTransfersFeed', 'totalTransfersCount'
         ));
     }
 }

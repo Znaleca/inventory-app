@@ -44,10 +44,26 @@
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="quantity" class="block text-sm font-bold text-slate-700 mb-1.5">Quantity</label>
-                        <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $disposal->quantity) }}" min="0"
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                        <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $disposal->quantity) }}" min="0" @if(optional($disposal->item)->item_type === 'device') readonly @endif
+                            class="block w-full border border-slate-200 {{ optional($disposal->item)->item_type === 'device' ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none' }} py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
                         @error('quantity') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
+                    
+                    @if(optional($disposal->item)->item_type === 'device')
+                    <div class="sm:col-span-2">
+                        <label for="stock_entry_id" class="block text-sm font-bold text-slate-700 mb-1.5">Serial Number</label>
+                        <select name="stock_entry_id" id="stock_entry_id" class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                            <option value="">-- Select Serial Number --</option>
+                            @foreach($stockEntries as $entry)
+                                <option value="{{ $entry->id }}" {{ old('stock_entry_id', $disposal->stock_entry_id) == $entry->id ? 'selected' : '' }}>
+                                    SN: {{ $entry->serial_number }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('stock_entry_id') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+                    @endif
+
                     <div>
                         <label for="disposed_by" class="block text-sm font-bold text-slate-700 mb-1.5">Disposed By</label>
                         <input type="text" name="disposed_by" id="disposed_by" value="{{ old('disposed_by', $disposal->disposed_by) }}"

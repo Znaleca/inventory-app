@@ -159,7 +159,7 @@
         </div>
 
         {{-- Needs Disposal --}}
-        <div class="px-4 py-4 flex-1">
+        <div class="px-4 py-4 border-b border-slate-100">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <span class="h-2 w-2 bg-rose-500 inline-block animate-pulse"></span>
@@ -169,7 +169,7 @@
             </div>
             @if($expiredItems->count() > 0)
             <div class="space-y-2">
-                @foreach($expiredItems->take(4) as $item)
+                @foreach($expiredItems->take(3) as $item)
                 @php $breakdownLookup = collect($item->batches_breakdown)->keyBy('id'); @endphp
                 @foreach($item->stockEntries as $entry)
                 @php
@@ -180,7 +180,6 @@
                 <div class="flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 last:border-0">
                     <div class="min-w-0">
                         <p class="text-sm font-semibold text-slate-800 truncate">{{ $item->name }}</p>
-                        <p class="text-[10px] font-mono text-slate-400">{{ $entry->expiry_date->format('Y-m-d') }}</p>
                     </div>
                     <span class="text-[10px] font-mono font-bold px-2 py-1 border border-rose-300 text-rose-600 bg-rose-50 shrink-0 ml-2">+{{ $daysPast }}D</span>
                 </div>
@@ -189,6 +188,70 @@
             </div>
             @else
             <p class="text-[11px] font-mono text-slate-400 py-2">// No disposal needed</p>
+            @endif
+        </div>
+
+        {{-- Pending Returns --}}
+        <div class="px-4 py-4 border-b border-slate-100">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 bg-cyan-500 inline-block"></span>
+                    <span class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">Pending_Returns</span>
+                </div>
+                <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}" class="text-[10px] font-mono text-blue-500 hover:text-blue-700 transition-colors">View →</a>
+            </div>
+            @if($pendingReturnsList->count() > 0)
+            <div class="space-y-2">
+                @foreach($pendingReturnsList as $borrow)
+                @php 
+                    $isOverdue = $borrow->return_date && $borrow->return_date < now()->startOfDay(); 
+                    $qty = $borrow->quantity_borrowed - $borrow->quantity_returned - $borrow->quantity_used;
+                @endphp
+                <div class="flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 last:border-0">
+                    <div class="min-w-0">
+                        <p class="text-[13px] font-semibold {{ $isOverdue ? 'text-rose-600' : 'text-slate-800' }} truncate">{{ $borrow->item->name }} <span class="text-[10px] text-slate-400 font-normal">x{{ $qty }}</span></p>
+                        <p class="text-[10px] font-mono text-slate-400 truncate w-32">by {{ $borrow->staff->name ?? $borrow->borrower_name }}</p>
+                    </div>
+                    @if($borrow->return_date)
+                    <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 border shrink-0 ml-2 {{ $isOverdue ? 'border-rose-300 text-rose-600 bg-rose-50' : 'border-slate-200 text-slate-500 bg-slate-50' }}">
+                        {{ $borrow->return_date->format('M d') }}
+                    </span>
+                    @else
+                    <span class="text-[9px] font-mono text-slate-300 bg-slate-50 px-1.5 shrink-0 ml-2">No Date</span>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+            @else
+            <p class="text-[11px] font-mono text-slate-400 py-2">// No pending returns</p>
+            @endif
+        </div>
+
+        {{-- Recent Transfers --}}
+        <div class="px-4 py-4 flex-1">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 bg-purple-500 inline-block"></span>
+                    <span class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">Recent_Transfers</span>
+                </div>
+                <a href="{{ route('admin.records.index', ['tab' => 'transfers']) }}" class="text-[10px] font-mono text-blue-500 hover:text-blue-700 transition-colors">View →</a>
+            </div>
+            @if($recentTransfersFeed->count() > 0)
+            <div class="space-y-2">
+                @foreach($recentTransfersFeed as $transfer)
+                <div class="flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 last:border-0">
+                    <div class="min-w-0">
+                        <p class="text-[13px] font-semibold text-slate-800 truncate">{{ $transfer->item->name ?? '—' }} <span class="text-[10px] text-slate-400 font-normal">x{{ $transfer->quantity }}</span></p>
+                        <p class="text-[10px] font-mono text-slate-400 truncate w-32">to {{ $transfer->destination }}</p>
+                    </div>
+                    <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 border {{ $transfer->type == 'out' ? 'border-amber-200 text-amber-600 bg-amber-50' : 'border-emerald-200 text-emerald-600 bg-emerald-50' }} shrink-0 ml-2">
+                        {{ strtoupper($transfer->type) }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+            @else
+            <p class="text-[11px] font-mono text-slate-400 py-2">// No recent transfers</p>
             @endif
         </div>
 
@@ -284,18 +347,41 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Helper to create glassmorphic gradients
+    const createGradient = (ctx, startColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
     const ctx1 = document.getElementById('inventoryStatusChart');
     if (ctx1) {
-        new Chart(ctx1.getContext('2d'), {
+        const ctx = ctx1.getContext('2d');
+        new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['New Stock', 'Used', 'Borrowed', 'Expired'],
                 datasets: [{
                     data: [{{ $totalNewStock }}, {{ $totalUsedStock }}, {{ $totalBorrowedCount }}, {{ $expiredCount }}],
-                    backgroundColor: ['#6366f1', '#0ea5e9', '#14b8a6', '#f43f5e'],
-                    borderWidth: 4,
-                    borderColor: '#ffffff',
-                    hoverOffset: 5
+                    backgroundColor: [
+                        createGradient(ctx, 'rgba(99, 102, 241, 0.9)', 'rgba(99, 102, 241, 0.4)'),   // Indigo
+                        createGradient(ctx, 'rgba(14, 165, 233, 0.9)', 'rgba(14, 165, 233, 0.4)'),   // Sky
+                        createGradient(ctx, 'rgba(20, 184, 166, 0.9)', 'rgba(20, 184, 166, 0.4)'),   // Teal
+                        createGradient(ctx, 'rgba(244, 63, 94, 0.9)', 'rgba(244, 63, 94, 0.4)')      // Rose
+                    ],
+                    borderColor: [
+                        '#6366f1', '#0ea5e9', '#14b8a6', '#f43f5e'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 0,
+                    hoverBorderWidth: 2,
+                    hoverBackgroundColor: [
+                        createGradient(ctx, 'rgba(99, 102, 241, 1)', 'rgba(99, 102, 241, 0.6)'),
+                        createGradient(ctx, 'rgba(14, 165, 233, 1)', 'rgba(14, 165, 233, 0.6)'),
+                        createGradient(ctx, 'rgba(20, 184, 166, 1)', 'rgba(20, 184, 166, 0.6)'),
+                        createGradient(ctx, 'rgba(244, 63, 94, 1)', 'rgba(244, 63, 94, 0.6)')
+                    ]
                 }]
             },
             options: {
@@ -308,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         labels: {
                             padding: 20,
                             usePointStyle: true,
-                            pointStyle: 'rectRot',
+                            pointStyle: 'circle',
                             color: '#64748b',
                             font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
                         }
@@ -318,19 +404,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const ctx2 = document.getElementById('inventoryHealthChart');
-    if (ctx2) {
-        new Chart(ctx2.getContext('2d'), {
+    const ctx2Element = document.getElementById('inventoryHealthChart');
+    if (ctx2Element) {
+        const ctx2 = ctx2Element.getContext('2d');
+        new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: ['Total', 'Low_Stock', 'Expiring', 'Expired', 'Borrowed'],
+                labels: ['Total', 'Low_Stock', 'Expiring', 'Expired', 'Borrowed', 'Transferred'],
                 datasets: [{
                     label: 'Count',
-                    data: [{{ $totalItems }}, {{ $lowStockCount }}, {{ $expiringItems->count() }}, {{ $expiredCount }}, {{ $totalBorrowedCount }}],
-                    backgroundColor: ['#6366f1', '#f97316', '#f59e0b', '#f43f5e', '#06b6d4'],
-                    borderRadius: 0,
+                    data: [{{ $totalItems }}, {{ $lowStockCount }}, {{ $expiringItems->count() }}, {{ $expiredCount }}, {{ $totalBorrowedCount }}, {{ $totalTransfersCount }}],
+                    backgroundColor: [
+                        createGradient(ctx2, 'rgba(99, 102, 241, 0.8)', 'rgba(99, 102, 241, 0.1)'), // Indigo
+                        createGradient(ctx2, 'rgba(249, 115, 22, 0.8)', 'rgba(249, 115, 22, 0.1)'), // Orange
+                        createGradient(ctx2, 'rgba(245, 158, 11, 0.8)', 'rgba(245, 158, 11, 0.1)'), // Amber
+                        createGradient(ctx2, 'rgba(244, 63, 94, 0.8)', 'rgba(244, 63, 94, 0.1)'),   // Rose
+                        createGradient(ctx2, 'rgba(6, 182, 212, 0.8)', 'rgba(6, 182, 212, 0.1)'),   // Cyan
+                        createGradient(ctx2, 'rgba(168, 85, 247, 0.8)', 'rgba(168, 85, 247, 0.1)')  // Purple
+                    ],
+                    borderColor: [
+                        '#6366f1', '#f97316', '#f59e0b', '#f43f5e', '#06b6d4', '#a855f7'
+                    ],
+                    borderWidth: { top: 2, right: 2, bottom: 0, left: 2 },
+                    borderRadius: 4,
                     borderSkipped: false,
-                    barThickness: 28,
+                    barThickness: 32,
+                    hoverBackgroundColor: [
+                        createGradient(ctx2, 'rgba(99, 102, 241, 1)', 'rgba(99, 102, 241, 0.4)'),
+                        createGradient(ctx2, 'rgba(249, 115, 22, 1)', 'rgba(249, 115, 22, 0.4)'),
+                        createGradient(ctx2, 'rgba(245, 158, 11, 1)', 'rgba(245, 158, 11, 0.4)'),
+                        createGradient(ctx2, 'rgba(244, 63, 94, 1)', 'rgba(244, 63, 94, 0.4)'),
+                        createGradient(ctx2, 'rgba(6, 182, 212, 1)', 'rgba(6, 182, 212, 0.4)'),
+                        createGradient(ctx2, 'rgba(168, 85, 247, 1)', 'rgba(168, 85, 247, 0.4)')
+                    ]
                 }]
             },
             options: {

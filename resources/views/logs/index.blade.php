@@ -355,7 +355,13 @@
                     @forelse($rawTransfers as $transfer)
                     <tr class="hover:bg-slate-50 transition-colors" x-show="search === '' || '{{ strtolower($transfer->item->name ?? '') }}'.includes(search.toLowerCase())">
                         <td class="px-6 py-4 font-bold text-slate-800">{{ $transfer->item->name ?? '—' }}</td>
-                        <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-amber-600">{{ $transfer->quantity }}</span></td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @if($transfer->type === 'in')
+                                <span class="font-mono font-black text-emerald-600">+{{ $transfer->quantity }}</span>
+                            @else
+                                <span class="font-mono font-black text-rose-600">-{{ $transfer->quantity }}</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-xs font-semibold text-slate-700">{{ $transfer->destination }}</td>
                         <td class="px-6 py-4 text-xs text-slate-600">{{ $transfer->transferred_by ?? '—' }} @if($transfer->bio_id)<div class="font-mono text-[10px] text-slate-400 mt-0.5">Bio: {{ $transfer->bio_id }}</div>@endif</td>
                         <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-500">{{ $transfer->transferred_at?->format('M d, Y') ?? '—' }}</td>

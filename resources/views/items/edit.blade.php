@@ -292,6 +292,16 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Reorder Level --}}
+                    <div class="mt-4 border-t border-dashed border-slate-100 pt-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Reorder Level <span class="font-normal text-slate-400">(Alert threshold)</span></label>
+                        <p class="text-[10px] font-mono text-slate-400 mb-2">When new stock falls to or below this number, the item will be flagged as <span class="font-bold text-amber-500">Reorder</span>.</p>
+                        <input type="number" name="reorder_level" value="{{ old('reorder_level', $item->reorder_level ?? 10) }}" min="0"
+                            class="block w-full sm:w-40 border border-slate-200 bg-slate-50 focus:bg-white focus:border-amber-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                            placeholder="10">
+                        @error('reorder_level') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 

@@ -125,8 +125,8 @@
                     <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
                     @if($totalQty <= 0)
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-1 border border-rose-200">Out_of_Stock</span>
-                    @elseif($item->is_low_stock && $totalQty <= $item->reorder_level)
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">Low_Stock</span>
+                    @elseif($item->total_stock <= $item->reorder_level)
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">Reorder</span>
                     @else
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 border border-emerald-200">In_Stock</span>
                     @endif
@@ -181,6 +181,13 @@
                                     @else
                                         <span class="text-slate-400">Not assigned</span>
                                     @endif
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Reorder Level</td>
+                                <td class="px-4 py-2.5">
+                                    <span class="text-sm font-mono font-bold text-amber-600">{{ $item->reorder_level ?? 10 }}</span>
+                                    <span class="text-[10px] font-mono text-slate-400 ml-1">{{ $item->unit }} threshold</span>
                                 </td>
                             </tr>
 

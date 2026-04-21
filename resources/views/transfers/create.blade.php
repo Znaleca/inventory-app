@@ -230,7 +230,7 @@
                     {{-- ======================================== --}}
                     {{-- SECTION 3A: Device Selection (OUT ONLY) --}}
                     {{-- ======================================== --}}
-                    <div class="bg-white border border-indigo-300 relative" x-show="direction === 'out' && isDevice()"
+                    <div class="bg-white border border-indigo-300 relative" x-show="direction === 'out' && isDevice() && getBatches().length > 0"
                         x-cloak x-transition>
                         <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                         <div class="ml-1">
@@ -256,6 +256,14 @@
                             </div>
 
                             {{-- Checkbox list --}}
+                            <div class="px-3 py-2 border-b border-slate-100 bg-slate-50/50" x-show="getBatches(false).length > 5" x-cloak>
+                                <div class="relative">
+                                    <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-slate-800 outline-none">
+                                </div>
+                            </div>
                             <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
                                 <template x-for="batch in getBatches()" :key="batch.id">
                                     <label :for="'entry_' + batch.id"
@@ -307,11 +315,18 @@
 
                             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                                {{-- Incoming Device Serial Manual input --}}
-                                <div x-show="direction === 'in' && isDevice()" x-cloak class="md:col-span-2">
+                                {{-- Devices Only: Manual Serials for IN, or Legacy OUT --}}
+                                <div x-show="isDevice()" class="md:col-span-2" x-cloak>
+                                    <label class="block text-sm font-bold text-slate-800 mb-2 border-b pb-2">
+                                        <span x-text="direction === 'out' ? 'Unlisted Legacy Devices? Record Their Serials Manually.' : 'Record Incoming Device Serials'"></span>
+                                        <div class="mt-0.5 text-xs font-normal text-slate-500">
+                                            <span x-show="direction === 'out'">If a device is missing from the checkbox list above, type its serial here to transfer it out safely.</span>
+                                            <span x-show="direction !== 'out'">Enter one Serial Number per line.</span>
+                                        </div>
+                                    </label>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         {{-- New Serials --}}
-                                        <div>
+                                        <div x-show="direction === 'in' || stockType === 'new'">
                                             <div class="flex items-center justify-between mb-1.5">
                                                 <label class="block text-sm font-bold text-slate-700">Incoming Serial Numbers
                                                     <span class="text-rose-500">*</span>
@@ -330,9 +345,9 @@
                                         </div>
 
                                         {{-- Used Serials --}}
-                                        <div>
+                                        <div x-show="direction === 'in' || stockType === 'used'">
                                             <div class="flex items-center justify-between mb-1.5">
-                                                <label class="block text-sm font-bold text-slate-700">Incoming Serial Numbers
+                                                <label class="block text-sm font-bold text-slate-700">Serial Numbers
                                                     <span class="text-rose-500">*</span>
                                                 </label>
                                                 <span class="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 border border-amber-200">
@@ -343,8 +358,7 @@
                                             <textarea name="used_serial_number" rows="4" @focus="initSerial" id="incoming_used_serial"
                                                 @keydown.enter.prevent="handleSerialEnter" @input="recalculateConditionQty"
                                                 class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors placeholder:text-slate-400"
-                                                placeholder="1. "
-                                                x-bind:disabled="direction !== 'in'">{{ old('used_serial_number') }}</textarea>
+                                                placeholder="1. "></textarea>
                                             <p class="mt-1.5 text-[10px] font-mono text-[9px] text-slate-400">Lines typed here map to Used Quantity.</p>
                                         </div>
                                     </div>
@@ -354,35 +368,41 @@
                                     @enderror
                                 </div>
 
-                                {{-- Quantities --}}
-                                <div x-show="!isDevice()" x-cloak>
+                                {{-- Stock Type Selection (Non-Devices) --}}
+                                <div x-show="!isDevice() && (!isNewItem && selectedItem)" class="mb-4" x-cloak>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                                        <span x-text="direction === 'out' ? 'Quantity to Transfer Out (New Stock)' : 'New Stock Transferred In'"></span>
-                                        <span x-show="direction === 'out' && selectedItem && items[selectedItem]" 
-                                            class="text-[10px] font-mono text-teal-600 bg-teal-50 px-2 py-0.5 border border-teal-200"
-                                            x-text="'Avail: ' + (items[selectedItem] ? items[selectedItem].new : 0)"></span>
+                                        <span>Stock to Transfer <span class="text-rose-500">*</span></span>
                                     </label>
-                                    <div class="relative">
-                                        <input type="number" name="new_quantity" x-model="manualNewQty" min="0"
-                                            value="{{ old('new_quantity', 0) }}"
-                                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors">
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
-                                                x-text="getUnit()"></span>
-                                        </div>
+                                    <div class="grid grid-cols-2 gap-3 sm:w-2/3">
+                                        <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                            <input type="radio" name="stock_type_selected" value="new" x-model="stockType" class="accent-blue-600 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
+                                            <div>
+                                                <p class="text-sm font-bold text-slate-800">New Stock</p>
+                                                <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].new + ' avail.' : 'Transfer In'"></p>
+                                            </div>
+                                        </label>
+                                        <label x-show="direction === 'in' || hasUsedStock()"
+                                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                            <input type="radio" name="stock_type_selected" value="used" x-model="stockType" class="accent-amber-500 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
+                                            <div>
+                                                <p class="text-sm font-bold text-slate-800">Used Stock</p>
+                                                <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].used + ' avail.' : 'Transfer In'"></p>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
 
-                                <div x-show="!isNewItem && !isDevice() && direction === 'out' && hasUsedStock()" x-cloak>
+                                {{-- Quantities --}}
+                                <div x-show="!isDevice() || (direction === 'out' && getBatches().length === 0)" x-cloak class="mb-4">
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                                        <span x-text="'Quantity to Transfer Out (Used Stock)'"></span>
-                                        <span x-show="selectedItem && items[selectedItem]" 
-                                            class="text-[10px] font-mono text-amber-600 bg-amber-50 px-2 py-0.5 border border-amber-200"
-                                            x-text="'Avail: ' + (items[selectedItem] ? items[selectedItem].used : 0)"></span>
+                                        <span x-text="direction === 'out' ? 'Quantity to Transfer Out' : 'Quantity Transferred In'"></span>
                                     </label>
                                     <div class="relative">
-                                        <input type="number" name="used_quantity" x-model="manualUsedQty" min="0"
-                                            value="{{ old('used_quantity', 0) }}"
+                                        <input type="number" :name="stockType === 'new' ? 'new_quantity' : 'used_quantity'" 
+                                            :x-model="stockType === 'new' ? 'manualNewQty' : 'manualUsedQty'" 
+                                            min="0"
                                             class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors">
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                             <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
@@ -515,8 +535,10 @@
                 direction: '{{ old('type', 'out') }}',
                 isNewItem: {{ old('is_new_item') ? 'true' : 'false' }},
                 newItemType: '{{ old('new_item_type', 'consumable') }}',
+                stockType: 'new',
                 selectedItem: {{ (old('item_id') ?? request('item_id')) ? (int) (old('item_id') ?? request('item_id')) : 'null' }},
                 selectedEntries: [],
+                searchQuery: '',
                 manualNewQty: {{ old('new_quantity', 0) }},
                 manualUsedQty: {{ old('used_quantity', 0) }},
                 newUnitLabel: '',
@@ -534,10 +556,20 @@
                     return this.selectedItem && this.items[this.selectedItem] ? this.items[this.selectedItem].unit : 'units';
                 },
 
-                getBatches() {
+                getBatches(applySearch = true) {
                     if (this.isNewItem) return [];
                     if (!this.selectedItem || !this.items[this.selectedItem]) return [];
-                    return this.items[this.selectedItem].batches || [];
+                    let batches = this.items[this.selectedItem].batches || [];
+                    
+                    if (applySearch && this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        batches = batches.filter(b => {
+                            const serialStr = b.serial_number ? b.serial_number.toLowerCase() : '';
+                            return serialStr.includes(q);
+                        });
+                    }
+                    
+                    return batches;
                 },
 
                 hasUsedStock() {

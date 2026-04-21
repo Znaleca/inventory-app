@@ -55,78 +55,47 @@ class ItemController extends Controller
             $query->where('item_type', $request->type);
         }
 
-        if ($request->filled('preset')) {
-            $preset = $request->preset;
-            if ($preset === 'consumables') {
-                $query->where('item_type', 'consumable');
-            } elseif ($preset === 'devices') {
-                $query->where('item_type', 'device');
-            }
+        // Parse presets — supports both ?preset=x (legacy) and ?presets=x,y (new combined)
+        $selectedPresets = [];
+        if ($request->filled('presets')) {
+            $selectedPresets = array_filter(explode(',', $request->presets));
+        } elseif ($request->filled('preset')) {
+            $selectedPresets = [$request->preset];
+        }
+
+        // Apply TYPE filter at query level (device/consumable)
+        $typePresets = array_intersect($selectedPresets, ['devices', 'consumables']);
+        if (count($typePresets) === 1) {
+            $type = in_array('devices', $typePresets) ? 'device' : 'consumable';
+            $query->where('item_type', $type);
         }
 
         $items = $query->orderBy('name')->get();
 
-        if ($request->filled('preset')) {
-            $preset = $request->preset;
-            if ($preset === 'low_stock') {
-                $items = $items->filter(function($item) {
-                    return $item->total_stock <= 0 || ($item->is_low_stock && $item->total_stock <= config('inventory.reorder_level', 10));
-                });
-            } elseif ($preset === 'expired') {
-                $items = $items->filter(function($item) {
-                    $hasExpiredOrSoon = false;
-                    foreach ($item->stockEntries as $entry) {
-                        if ($entry->expiry_date) {
-                            $days = now()->diffInDays(\Carbon\Carbon::parse($entry->expiry_date), false);
-                            if ($days <= 30) {
-                                $hasExpiredOrSoon = true;
-                                break;
+        // Apply STATUS filters at collection level (OR logic within status group)
+        $statusPresets = array_intersect($selectedPresets, ['all', 'low_stock', 'out_of_stock', 'expired']);
+        if (!empty($statusPresets) && !in_array('all', $statusPresets)) {
+            $items = $items->filter(function($item) use ($statusPresets) {
+                foreach ($statusPresets as $preset) {
+                    if ($preset === 'low_stock' && $item->total_stock > 0 && $item->total_stock <= ($item->reorder_level ?? 10)) return true;
+                    if ($preset === 'out_of_stock' && $item->total_stock <= 0) return true;
+                    if ($preset === 'expired') {
+                        foreach ($item->stockEntries as $entry) {
+                            if ($entry->expiry_date) {
+                                $days = now()->diffInDays(\Carbon\Carbon::parse($entry->expiry_date), false);
+                                if ($days <= 30) return true;
                             }
                         }
                     }
-                    return $hasExpiredOrSoon;
-                });
-            }
+                }
+                return false;
+            });
         }
 
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=inventory_items_export_".date('Y-m-d_H-i').".csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $filenamePresets = !empty($selectedPresets) ? implode('_', array_slice($selectedPresets, 0, 3)) : 'all';
+        $filename = 'inventory_export_' . $filenamePresets . '_' . date('Y-m-d') . '.xlsx';
 
-        $callback = function() use($items) {
-            $file = fopen('php://output', 'w');
-            // Adding BOM for excel UTF-8 proper reading
-            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
-            
-            fputcsv($file, ['ID', 'Name', 'Category', 'Type', 'Status', 'New Stock', 'Used Stock', 'Lent Out', 'Storage Location', 'Storage Section']);
-
-            foreach ($items as $item) {
-                $status = 'In Stock';
-                if ($item->total_stock <= 0) $status = 'Out of Stock';
-                elseif ($item->is_low_stock && $item->total_stock <= config('inventory.reorder_level', 10)) $status = 'Low Stock';
-
-                fputcsv($file, [
-                    $item->id,
-                    $item->name,
-                    $item->category->name ?? 'Uncategorized',
-                    ucfirst($item->item_type),
-                    $status,
-                    $item->total_stock,
-                    $item->effective_stock_used,
-                    $item->active_lent_out ?? 0,
-                    $item->storage_location ?? '-',
-                    $item->storage_section ?? '-',
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ItemsExport($items, $selectedPresets), $filename);
     }
 
     public function create()
@@ -170,7 +139,9 @@ class ItemController extends Controller
             'is_expirable'  => 'nullable|boolean',
             'storage_location' => 'nullable|string|max:255',
             'storage_section'  => 'nullable|string|max:255',
+            'reorder_level'    => 'nullable|integer|min:0',
         ]);
+        $validated['reorder_level'] = $validated['reorder_level'] ?? 10;
         $validated['unit_price'] = 0;
 
         $itemData = $validated;
@@ -237,7 +208,9 @@ class ItemController extends Controller
             'is_expirable'  => 'nullable|boolean',
             'storage_location' => 'nullable|string|max:255',
             'storage_section'  => 'nullable|string|max:255',
+            'reorder_level'    => 'nullable|integer|min:0',
         ]);
+        $validated['reorder_level'] = $validated['reorder_level'] ?? 10;
         $validated['unit_price'] = 0;
 
         $itemData = $validated;

@@ -48,9 +48,9 @@ class BorrowController extends Controller
             'department'        => 'required|string|max:255',
             'quantity_borrowed' => $hasSelectedEntries ? 'nullable' : 'required|integer|min:1',
             'borrowed_at'       => 'required|date',
-            'return_date'       => 'nullable|date|after_or_equal:borrowed_at',
             'serial_number'     => 'nullable|string|max:255',
             'notes'             => 'nullable|string',
+            'stock_type'        => 'nullable|in:new,used',
         ]);
 
         $validated['type'] = 'out';
@@ -68,9 +68,15 @@ class BorrowController extends Controller
             }
             $validated['quantity_borrowed'] = $newQty + $usedQty;
             $validated['serial_number'] = $stockEntries->pluck('serial_number')->filter()->implode(', ');
+            $validated['serial_number'] = $stockEntries->pluck('serial_number')->filter()->implode(', ');
         } else {
-            $newQty  = $validated['quantity_borrowed'] ?? 0;
-            $usedQty = 0;
+            if (isset($validated['stock_type']) && $validated['stock_type'] === 'used') {
+                $newQty  = 0;
+                $usedQty = $validated['quantity_borrowed'] ?? 0;
+            } else {
+                $newQty  = $validated['quantity_borrowed'] ?? 0;
+                $usedQty = 0;
+            }
         }
 
         $item = Item::findOrFail($validated['item_id']);
