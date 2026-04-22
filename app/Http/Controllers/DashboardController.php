@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\StockEntry;
+use App\Models\Transfer;
 use App\Models\UsageLog;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -102,11 +105,46 @@ class DashboardController extends Controller
 
         $totalTransfersCount = \App\Models\Transfer::count();
 
+        $trendDates = collect(range(6, 0))->map(fn ($daysAgo) => now()->subDays($daysAgo)->startOfDay());
+        $trendLabels = $trendDates->map(fn ($date) => $date->format('M d'))->values();
+
+        $stockInByDate = StockEntry::query()
+            ->selectRaw('DATE(received_date) as day, SUM(quantity) as qty')
+            ->whereDate('received_date', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('day')
+            ->pluck('qty', 'day');
+
+        $usageOutByDate = UsageLog::query()
+            ->selectRaw('DATE(used_at) as day, SUM(quantity_used) as qty')
+            ->whereDate('used_at', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('day')
+            ->pluck('qty', 'day');
+
+        $transfersByDate = Transfer::query()
+            ->selectRaw("DATE(transferred_at) as day, SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END) as qty_in, SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) as qty_out")
+            ->whereDate('transferred_at', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('day')
+            ->get()
+            ->keyBy('day');
+
+        $trendStockIn = $trendDates->map(function ($date) use ($stockInByDate, $transfersByDate) {
+            $key = $date->toDateString();
+            $transferIn = data_get($transfersByDate, "{$key}.qty_in", 0);
+            return (int) (($stockInByDate[$key] ?? 0) + $transferIn);
+        })->values();
+
+        $trendStockOut = $trendDates->map(function ($date) use ($usageOutByDate, $transfersByDate) {
+            $key = $date->toDateString();
+            $transferOut = data_get($transfersByDate, "{$key}.qty_out", 0);
+            return (int) (($usageOutByDate[$key] ?? 0) + $transferOut);
+        })->values();
+
         return view('dashboard', compact(
             'totalItems', 'lowStockCount', 'lowStockItems',
             'expiringItems', 'expiredItems', 'expiredCount', 'recentUsage',
             'totalNewStock', 'totalUsedStock', 'totalBorrowedCount', 'pendingReturnsCount', 'pendingReturnsList',
-            'recentReturns', 'recentDisposals', 'totalStockValue', 'recentlyAdded', 'recentTransfersFeed', 'totalTransfersCount'
+            'recentReturns', 'recentDisposals', 'totalStockValue', 'recentlyAdded', 'recentTransfersFeed', 'totalTransfersCount',
+            'trendLabels', 'trendStockIn', 'trendStockOut'
         ));
     }
 }

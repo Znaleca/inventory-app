@@ -46,20 +46,31 @@ class UsageLogController extends Controller
         if ($hasSelectedEntries) {
             $entryIds     = array_map('intval', $request->selected_entries);
             $quantityUsed = count($entryIds);
+            $selectedStockType = $validated['stock_type'] ?? 'new';
 
-            if ($quantityUsed > $item->total_stock) {
+            if ($selectedStockType === 'used' && $quantityUsed > $item->effective_stock_used) {
+                return back()->withErrors([
+                    'selected_entries' => "Not enough Used stock. You selected {$quantityUsed} but only {$item->effective_stock_used} available.",
+                ])->withInput();
+            }
+
+            if ($selectedStockType === 'new' && $quantityUsed > $item->total_stock) {
                 return back()->withErrors([
                     'selected_entries' => "Not enough New stock. You selected {$quantityUsed} but only {$item->total_stock} available.",
                 ])->withInput();
             }
 
-            \Illuminate\Support\Facades\DB::transaction(function () use ($entryIds, $item, $validated, $quantityUsed) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($entryIds, $item, $validated, $quantityUsed, $selectedStockType) {
                 foreach ($entryIds as $entryId) {
                     UsageLog::create(array_merge($validated, [
                         'quantity_used'  => 1,
                         'stock_entry_id' => $entryId,
-                        'stock_type'     => 'new',
+                        'stock_type'     => $selectedStockType,
                     ]));
+                }
+
+                if ($selectedStockType === 'used') {
+                    $item->decrement('stock_used', $quantityUsed);
                 }
             });
 

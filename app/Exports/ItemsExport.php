@@ -85,18 +85,22 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                 $count  = $this->items->count();
                 $lastRow = $count + 1; // +1 for header row
 
-                // ── Header row styling ─────────────────────────────────────
+                // Global sheet defaults for readability
+                $sheet->getDefaultRowDimension()->setRowHeight(20);
+                $sheet->getStyle("A1:K{$lastRow}")->getFont()->setName('Calibri')->setSize(10);
+
+                // ── Header row styling (clean + professional) ─────────────
                 $headerRange = "A1:K1";
                 $sheet->getStyle($headerRange)->applyFromArray([
                     'font' => [
                         'bold'  => true,
                         'color' => ['argb' => 'FFFFFFFF'],
-                        'size'  => 10,
+                        'size'  => 11,
                         'name'  => 'Calibri',
                     ],
                     'fill' => [
                         'fillType'   => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'FF1E293B'], // slate-800
+                        'startColor' => ['argb' => 'FF0F4C81'], // professional blue
                     ],
                     'alignment' => [
                         'vertical'   => Alignment::VERTICAL_CENTER,
@@ -110,12 +114,12 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                         ],
                     ],
                 ]);
-                $sheet->getRowDimension(1)->setRowHeight(20);
+                $sheet->getRowDimension(1)->setRowHeight(24);
 
                 // ── Data rows ─────────────────────────────────────────────
                 for ($row = 2; $row <= $lastRow; $row++) {
                     $isEven = ($row % 2 === 0);
-                    $rowBg  = $isEven ? 'FFF8FAFC' : 'FFFFFFFF'; // subtle zebra
+                    $rowBg  = $isEven ? 'FFF5F7FA' : 'FFFFFFFF'; // softer zebra
 
                     // Base row style
                     $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
@@ -133,7 +137,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                         'borders' => [
                             'bottom' => [
                                 'borderStyle' => Border::BORDER_HAIR,
-                                'color'       => ['argb' => 'FFE2E8F0'],
+                                'color'       => ['argb' => 'FFD8DEE9'],
                             ],
                         ],
                     ]);
@@ -142,18 +146,15 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                     $status = $sheet->getCell("E{$row}")->getValue();
                     if ($status === 'Out of Stock') {
                         $sheet->getStyle("E{$row}")->applyFromArray([
-                            'font' => ['bold' => true, 'color' => ['argb' => 'FFDC2626']],
-                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFEF2F2']],
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FFB91C1C']],
                         ]);
                     } elseif ($status === 'Reorder') {
                         $sheet->getStyle("E{$row}")->applyFromArray([
-                            'font' => ['bold' => true, 'color' => ['argb' => 'FFD97706']],
-                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFFFBEB']],
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FFB45309']],
                         ]);
                     } elseif ($status === 'In Stock') {
                         $sheet->getStyle("E{$row}")->applyFromArray([
-                            'font' => ['bold' => true, 'color' => ['argb' => 'FF16A34A']],
-                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF0FDF4']],
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF15803D']],
                         ]);
                     }
 
@@ -161,15 +162,17 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                     $type = $sheet->getCell("D{$row}")->getValue();
                     if ($type === 'Device') {
                         $sheet->getStyle("D{$row}")->applyFromArray([
-                            'font' => ['bold' => true, 'color' => ['argb' => 'FF7C3AED']],
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF4338CA']],
                         ]);
                     } elseif ($type === 'Consumable') {
                         $sheet->getStyle("D{$row}")->applyFromArray([
-                            'font' => ['bold' => true, 'color' => ['argb' => 'FF0891B2']],
+                            'font' => ['bold' => true, 'color' => ['argb' => 'FF0F766E']],
                         ]);
                     }
 
-                    // ── Bold stock numbers ─────────────────────────────────
+                    // ── Numeric columns aligned right ──────────────────────
+                    $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle("F{$row}:I{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                     $sheet->getStyle("F{$row}:I{$row}")->getFont()->setBold(true);
                 }
 
@@ -187,9 +190,6 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
 
                 // ── Freeze panes on header ─────────────────────────────────
                 $sheet->freezePane('A2');
-
-                // ── Auto-filter ────────────────────────────────────────────
-                $sheet->setAutoFilter("A1:K1");
 
                 // ── Set minimum column widths for key columns ──────────────
                 $sheet->getColumnDimension('A')->setWidth(6);   // ID

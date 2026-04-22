@@ -124,8 +124,7 @@
             </div>
 
             {{-- ======================================== --}}
-            {{-- SECTION 3A: Serial Number Checkboxes --}}
-            {{-- Only for devices using New Stock --}}
+            {{-- SECTION 3A: Device Selection (New) --}}
             {{-- ======================================== --}}
             <div class="bg-white border border-indigo-300 mb-4 relative" x-show="isDevice() && stockType === 'new'" x-cloak
                 x-transition>
@@ -208,6 +207,87 @@
                 </div>
             </div>
 
+            {{-- ======================================== --}}
+            {{-- SECTION 3A2: Device Selection (Used) --}}
+            {{-- ======================================== --}}
+            <div class="bg-white border border-amber-300 mb-4 relative" x-show="isDevice() && stockType === 'used'" x-cloak
+                x-transition>
+                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                <div class="ml-1">
+                    <div class="px-5 py-4 border-b border-dashed border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="h-2 w-2 bg-amber-500 inline-block"></span>
+                                    <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">03 // Select Used Devices</p>
+                                </div>
+                                <p class="text-xs text-slate-500">Pick one or more used serial numbers to log as used.</p>
+                            </div>
+                            <div class="shrink-0 ml-4 text-right">
+                                <p class="text-2xl font-black font-mono text-amber-600" x-text="selectedEntries.length"></p>
+                                <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">selected</p>
+                            </div>
+                        </div>
+                        {{-- Search Input --}}
+                        <div class="relative mt-3">
+                            <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                                </svg>
+                            </span>
+                            <input
+                                id="used-device-serial-search"
+                                type="text"
+                                x-model="deviceSearch"
+                                placeholder="Search serial number…"
+                                class="w-full border border-amber-200 bg-amber-50/40 pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                            />
+                            <button type="button" @click="deviceSearch = ''"
+                                x-show="deviceSearch.length > 0"
+                                class="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
+                        <template x-for="batch in filteredBatches()" :key="'used_' + batch.id">
+                            <label :for="'used_entry_' + batch.id"
+                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-slate-50'"
+                                class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
+                                <input type="checkbox" :id="'used_entry_' + batch.id" name="selected_entries[]"
+                                    :value="String(batch.id)" x-model="selectedEntries"
+                                    class="h-4 w-4 accent-amber-500 shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold font-mono text-slate-800"
+                                        x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
+                                    </p>
+                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5"
+                                        x-text="batch.received_date ? 'Added: ' + String(batch.received_date).substring(0, 10) : ''">
+                                    </p>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    <span class="text-xs font-mono font-bold text-amber-600"
+                                        x-text="batch.remaining + ' avail.'"></span>
+                                </div>
+                            </label>
+                        </template>
+                        <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
+                            <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                        </div>
+                        <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
+                            <p class="text-[11px] font-mono text-slate-400">// No used devices available</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="quantity_used" :value="selectedEntries.length">
+
+                    @error('selected_entries') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
             {{-- ============================================== --}}
             {{-- SECTION 3C: Batch Selector (expirable items) --}}
             {{-- ============================================== --}}
@@ -265,7 +345,7 @@
             {{-- SECTION 3B: Quantity (consumables / used) --}}
             {{-- ============================================= --}}
             <div class="bg-white border border-slate-200 mb-4 relative"
-                x-show="selectedItem && !(isDevice() && stockType === 'new')" x-cloak x-transition>
+                x-show="selectedItem && !isDevice()" x-cloak x-transition>
                 <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
                 <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
@@ -302,7 +382,7 @@
             </div>
 
             {{-- Date for device/new mode (shown separately) --}}
-            <div class="bg-white border border-slate-200 mb-4 relative" x-show="isDevice() && stockType === 'new'" x-cloak>
+            <div class="bg-white border border-slate-200 mb-4 relative" x-show="isDevice()" x-cloak>
                 <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
                 <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
@@ -377,11 +457,11 @@
                     class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
                     Cancel
                 </a>
-                <button type="submit" :disabled="isDevice() && stockType === 'new' && selectedEntries.length === 0"
-                    :class="(isDevice() && stockType === 'new' && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
+                <button type="submit" :disabled="isDevice() && selectedEntries.length === 0"
+                    :class="(isDevice() && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
                     class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
                     <span
-                        x-text="isDevice() && stockType === 'new' ? 'Log ' + selectedEntries.length + ' Device(s)' : 'Log Usage'">Log
+                        x-text="isDevice() ? 'Log ' + selectedEntries.length + ' Device(s)' : 'Log Usage'">Log
                         Usage</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                         <path fill-rule="evenodd"
@@ -402,6 +482,7 @@
         foreach ($items as $i) {
             // Build batches sorted FEFO: expirable items sort by expiry asc, non-expirable by received_date asc
             $batches = array_values($i->batches_breakdown);
+            $usedBatches = array_values($i->used_devices_breakdown ?? []);
             if ($i->is_expirable) {
                 usort($batches, fn($a, $b) =>
                     ($a['expiry_date'] ?? '9999-12-31') <=> ($b['expiry_date'] ?? '9999-12-31')
@@ -414,6 +495,7 @@
                 'type'        => $i->item_type,
                 'is_expirable'=> (bool) $i->is_expirable,
                 'batches'     => $batches,
+                'usedBatches' => $usedBatches,
             ];
         }
     @endphp
@@ -423,7 +505,7 @@
             return {
                 selectedItem: {{ (old('item_id') ?? request('item_id')) ? (int) (old('item_id') ?? request('item_id')) : 'null' }},
                 stockType: '{{ old('stock_type', 'new') }}',
-                selectedEntries: [],
+                selectedEntries: @json(array_map('strval', old('selected_entries', []))),
                 selectedLot: '{{ old('lot_number', '') }}',
                 deviceSearch: '',
                 items: {!! json_encode($itemsJs) !!},
@@ -440,6 +522,9 @@
 
                 getBatches() {
                     if (!this.selectedItem || !this.items[this.selectedItem]) return [];
+                    if (this.stockType === 'used' && this.isDevice()) {
+                        return this.items[this.selectedItem].usedBatches || [];
+                    }
                     return this.items[this.selectedItem].batches || [];
                 },
 

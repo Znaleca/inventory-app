@@ -138,6 +138,9 @@ class Item extends Model
             ->whereDoesntHave('borrowEntries', function($sub) {
                 $sub->where('disposition', 'returned_used');
             })
+            ->whereDoesntHave('usageLogs', function($sub) {
+                $sub->where('quantity_used', '>', 0);
+            })
             ->where(function($q) {
                 $q->where('serial_number', 'NOT LIKE', '%[USED]%')
                   ->orWhereNull('serial_number');
@@ -224,6 +227,9 @@ class Item extends Model
             ->where(function($q) {
                 $q->whereHas('borrowEntries', function($sub) {
                     $sub->where('disposition', 'returned_used');
+                })
+                ->orWhereHas('usageLogs', function($sub) {
+                    $sub->where('quantity_used', '>', 0);
                 })
                 ->orWhere('serial_number', 'LIKE', '%[USED]%');
             })

@@ -89,6 +89,20 @@
             </div>
         </div>
 
+        {{-- Line Chart --}}
+        <div class="bg-white border border-slate-200 relative">
+            <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
+            <div class="px-5 py-4 border-b border-slate-100 ml-1">
+                <p class="text-[10px] font-mono text-cyan-600 uppercase tracking-widest mb-0.5">Chart.03</p>
+                <p class="text-sm font-bold text-slate-800">7-Day Movement Trend</p>
+            </div>
+            <div class="p-5 ml-1">
+                <div class="h-[240px]">
+                    <canvas id="inventoryTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- RIGHT: Alert Feed (1/3) --}}
@@ -443,6 +457,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        border: { display: false, dash: [4,4] },
+                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: '#64748b', font: { family: "'Fira Code', monospace", size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    const ctx3Element = document.getElementById('inventoryTrendChart');
+    if (ctx3Element) {
+        const ctx3 = ctx3Element.getContext('2d');
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: @json($trendLabels),
+                datasets: [
+                    {
+                        label: 'In',
+                        data: @json($trendStockIn),
+                        borderColor: '#14b8a6',
+                        backgroundColor: createGradient(ctx3, 'rgba(20, 184, 166, 0.30)', 'rgba(20, 184, 166, 0.02)'),
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
+                        pointBackgroundColor: '#14b8a6'
+                    },
+                    {
+                        label: 'Out',
+                        data: @json($trendStockOut),
+                        borderColor: '#f43f5e',
+                        backgroundColor: createGradient(ctx3, 'rgba(244, 63, 94, 0.30)', 'rgba(244, 63, 94, 0.02)'),
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
+                        pointBackgroundColor: '#f43f5e'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            color: '#64748b',
+                            font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
+                        }
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,

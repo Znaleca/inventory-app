@@ -31,41 +31,35 @@
     {{-- Charts Top Row --}}
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
         {{-- Doughnut Chart: Flow Types --}}
-        <div class="paper-box mt-2">
-            <div class="paper-box-top"></div>
-            <div class="paper-box-accent" style="background: linear-gradient(90deg, #10b981, #3b82f6);"></div>
-            <div class="relative z-10 bg-white rounded-lg overflow-hidden flex flex-col h-full">
-                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
-                        <p class="text-sm font-bold text-slate-800">Directional Flow Volume</p>
-                    </div>
+        <div class="bg-white border border-slate-200 relative">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between ml-1">
+                <div>
+                    <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
+                    <p class="text-sm font-bold text-slate-800">Directional Flow Volume</p>
                 </div>
-                <div class="p-5 flex-1 w-full">
-                    <div class="h-[220px]">
-                        <canvas id="flowDoughnutChart"></canvas>
-                    </div>
-                    <div class="mt-4 flex flex-col items-center justify-center border-t border-slate-100 pt-3">
-                        <span class="text-[10px] font-mono text-slate-400">Total Recorded Units</span>
-                        <span class="text-2xl font-black text-slate-700 leading-tight">{{ number_format($totalIn + $totalOut) }}</span>
-                    </div>
+                <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+                    <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
+                    LIVE
+                </span>
+            </div>
+            <div class="p-5 ml-1">
+                <div class="h-[240px]">
+                    <canvas id="flowDoughnutChart"></canvas>
                 </div>
             </div>
         </div>
 
         {{-- Bar Chart: Categories --}}
-        <div class="paper-box mt-2">
-            <div class="paper-box-top"></div>
-            <div class="paper-box-accent" style="background: linear-gradient(90deg, #f59e0b, #ec4899);"></div>
-            <div class="relative z-10 bg-white rounded-lg overflow-hidden flex flex-col h-full">
-                <div class="px-5 py-4 border-b border-slate-100">
-                    <p class="text-[10px] font-mono text-rose-500 uppercase tracking-widest mb-0.5">Chart.02</p>
-                    <p class="text-sm font-bold text-slate-800">Records Breakdown By Category</p>
-                </div>
-                <div class="p-5 flex-1">
-                    <div class="h-[220px]">
-                        <canvas id="categoryBarChart"></canvas>
-                    </div>
+        <div class="bg-white border border-slate-200 relative">
+            <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+            <div class="px-5 py-4 border-b border-slate-100 ml-1">
+                <p class="text-[10px] font-mono text-indigo-600 uppercase tracking-widest mb-0.5">Chart.02</p>
+                <p class="text-sm font-bold text-slate-800">Records Breakdown By Category</p>
+            </div>
+            <div class="p-5 ml-1">
+                <div class="h-[240px]">
+                    <canvas id="categoryBarChart"></canvas>
                 </div>
             </div>
         </div>
@@ -523,32 +517,44 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const createGradient = (ctx, startColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
     // Doughnut Chart (In vs Out)
     const ctxFlow = document.getElementById('flowDoughnutChart');
     if (ctxFlow) {
-        new Chart(ctxFlow.getContext('2d'), {
+        const flowCtx = ctxFlow.getContext('2d');
+        new Chart(flowCtx, {
             type: 'doughnut',
             data: {
                 labels: ['Units In', 'Units Out'],
                 datasets: [{
                     data: [{{ $totalIn }}, {{ $totalOut }}],
-                    backgroundColor: ['#10b981', '#f43f5e'],
-                    borderWidth: 4,
-                    borderColor: '#ffffff',
-                    hoverOffset: 5
+                    backgroundColor: [
+                        createGradient(flowCtx, 'rgba(20, 184, 166, 0.9)', 'rgba(20, 184, 166, 0.4)'),
+                        createGradient(flowCtx, 'rgba(244, 63, 94, 0.9)', 'rgba(244, 63, 94, 0.4)')
+                    ],
+                    borderColor: ['#14b8a6', '#f43f5e'],
+                    borderWidth: 2,
+                    hoverOffset: 0,
+                    hoverBorderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '76%',
+                cutout: '72%',
                 plugins: {
                     legend: {
                         position: 'right',
                         labels: {
                             padding: 20,
                             usePointStyle: true,
-                            pointStyle: 'rectRot',
+                            pointStyle: 'circle',
                             color: '#64748b',
                             font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
                         }
@@ -561,7 +567,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Bar Chart (Category Breakdown)
     const ctxCat = document.getElementById('categoryBarChart');
     if (ctxCat) {
-        new Chart(ctxCat.getContext('2d'), {
+        const catCtx = ctxCat.getContext('2d');
+        new Chart(catCtx, {
             type: 'bar',
             data: {
                 labels: ['Stock In', 'Usage', 'Borrows', 'Returns', 'Transfers', 'Disposals', 'Items'],
@@ -576,10 +583,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         {{ $disposals->count() }},
                         {{ $items->count() }}
                     ],
-                    backgroundColor: ['#10b981', '#f43f5e', '#3b82f6', '#14b8a6', '#f59e0b', '#475569', '#8b5cf6'],
+                    backgroundColor: [
+                        createGradient(catCtx, 'rgba(16, 185, 129, 0.8)', 'rgba(16, 185, 129, 0.1)'),
+                        createGradient(catCtx, 'rgba(244, 63, 94, 0.8)', 'rgba(244, 63, 94, 0.1)'),
+                        createGradient(catCtx, 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.1)'),
+                        createGradient(catCtx, 'rgba(20, 184, 166, 0.8)', 'rgba(20, 184, 166, 0.1)'),
+                        createGradient(catCtx, 'rgba(245, 158, 11, 0.8)', 'rgba(245, 158, 11, 0.1)'),
+                        createGradient(catCtx, 'rgba(71, 85, 105, 0.8)', 'rgba(71, 85, 105, 0.1)'),
+                        createGradient(catCtx, 'rgba(139, 92, 246, 0.8)', 'rgba(139, 92, 246, 0.1)')
+                    ],
+                    borderColor: ['#10b981', '#f43f5e', '#3b82f6', '#14b8a6', '#f59e0b', '#475569', '#8b5cf6'],
+                    borderWidth: { top: 2, right: 2, bottom: 0, left: 2 },
                     borderRadius: 4,
                     borderSkipped: false,
-                    barThickness: 28,
+                    barThickness: 32,
                 }]
             },
             options: {

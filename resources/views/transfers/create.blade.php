@@ -308,65 +308,11 @@
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
-                                    0<span x-text="(direction === 'out' && isDevice()) ? '4' : '3'"></span> // Quantities &
-                                    Details
+                                    Quantities & Details
                                 </p>
                             </div>
 
                             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-
-                                {{-- Devices Only: Manual Serials for IN, or Legacy OUT --}}
-                                <div x-show="isDevice()" class="md:col-span-2" x-cloak>
-                                    <label class="block text-sm font-bold text-slate-800 mb-2 border-b pb-2">
-                                        <span x-text="direction === 'out' ? 'Unlisted Legacy Devices? Record Their Serials Manually.' : 'Record Incoming Device Serials'"></span>
-                                        <div class="mt-0.5 text-xs font-normal text-slate-500">
-                                            <span x-show="direction === 'out'">If a device is missing from the checkbox list above, type its serial here to transfer it out safely.</span>
-                                            <span x-show="direction !== 'out'">Enter one Serial Number per line.</span>
-                                        </div>
-                                    </label>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        {{-- New Serials --}}
-                                        <div x-show="direction === 'in' || stockType === 'new'">
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <label class="block text-sm font-bold text-slate-700">Incoming Serial Numbers
-                                                    <span class="text-rose-500">*</span>
-                                                </label>
-                                                <span class="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-widest text-teal-700 bg-teal-100 px-1.5 py-0.5 border border-teal-200">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clip-rule="evenodd" /></svg>
-                                                    NEW STOCK
-                                                </span>
-                                            </div>
-                                            <textarea name="new_serial_number" rows="4" @focus="initSerial" id="incoming_new_serial"
-                                                @keydown.enter.prevent="handleSerialEnter" @input="recalculateConditionQty"
-                                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors placeholder:text-slate-400"
-                                                placeholder="1. "
-                                                x-bind:disabled="direction !== 'in'">{{ old('new_serial_number') }}</textarea>
-                                            <p class="mt-1.5 text-[10px] font-mono text-[9px] text-slate-400">Lines typed here map to New Quantity.</p>
-                                        </div>
-
-                                        {{-- Used Serials --}}
-                                        <div x-show="direction === 'in' || stockType === 'used'">
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <label class="block text-sm font-bold text-slate-700">Serial Numbers
-                                                    <span class="text-rose-500">*</span>
-                                                </label>
-                                                <span class="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 border border-amber-200">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-2.5 h-2.5"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" /></svg>
-                                                    USED STOCK
-                                                </span>
-                                            </div>
-                                            <textarea name="used_serial_number" rows="4" @focus="initSerial" id="incoming_used_serial"
-                                                @keydown.enter.prevent="handleSerialEnter" @input="recalculateConditionQty"
-                                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors placeholder:text-slate-400"
-                                                placeholder="1. "></textarea>
-                                            <p class="mt-1.5 text-[10px] font-mono text-[9px] text-slate-400">Lines typed here map to Used Quantity.</p>
-                                        </div>
-                                    </div>
-                                    
-                                    @error('new_serial_number')
-                                    <p class="mt-2 text-[11px] font-mono font-bold text-rose-500">// {{ $message }}</p>
-                                    @enderror
-                                </div>
 
                                 {{-- Stock Type Selection (Non-Devices) --}}
                                 <div x-show="!isDevice() && (!isNewItem && selectedItem)" class="mb-4" x-cloak>
@@ -434,7 +380,7 @@
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="h-2 w-2 bg-slate-400 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
-                                    0<span x-text="(direction === 'out' && isDevice()) ? '5' : '4'"></span> // Party Details
+                                    Party Details
                                 </p>
                             </div>
 

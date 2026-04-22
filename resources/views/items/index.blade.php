@@ -14,8 +14,15 @@
             devices: false,
             consumables: false,
         },
+        get allSelected() {
+            const keys = Object.keys(this.presets).filter(k => k !== 'all');
+            return keys.every(k => this.presets[k]);
+        },
         get anySelected() { return Object.values(this.presets).some(v => v); },
-        get selectedList() { return Object.keys(this.presets).filter(k => this.presets[k]); },
+        get selectedList() {
+            if (this.allSelected || this.presets.all) return ['all'];
+            return Object.keys(this.presets).filter(k => k !== 'all' && this.presets[k]);
+        },
         toggleAll(val) {
             Object.keys(this.presets).forEach(k => this.presets[k] = val);
         },
