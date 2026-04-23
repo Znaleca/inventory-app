@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-3xl">
+    <div>
 
         {{-- Page Header --}}
         <div class="mb-5">
@@ -34,7 +34,7 @@
         <form action="{{ route('items.store') }}" method="POST"
             x-data="{
                 itemType: '{{ old('item_type', 'consumable') }}',
-                isExpirable: {{ old('is_expirable', '1') ? 'true' : 'false' }},
+                isExpirable: {{ old('is_expirable', '0') ? 'true' : 'false' }},
                 allCategories: {{ Js::from($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'item_type' => $c->item_type])) }},
                 get filteredCategories() { return this.allCategories.filter(c => c.item_type === this.itemType); },
                 selectedCategoryId: '{{ old('category_id') }}',
@@ -93,15 +93,6 @@
                     <div x-show="itemType === 'consumable'" class="mt-4 border-t border-dashed border-slate-100 pt-4">
                         <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-3">// Expiry Behaviour</p>
                         <div class="grid grid-cols-2 gap-3">
-                            <label @click="isExpirable = true"
-                                :class="isExpirable ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
-                                class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
-                                <input type="radio" name="_expiry_radio" class="accent-amber-500 w-4 h-4" :checked="isExpirable">
-                                <div>
-                                    <p class="text-sm font-bold text-slate-800">Has Expiry Date</p>
-                                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">Batches can be tracked and flagged near expiry.</p>
-                                </div>
-                            </label>
                             <label @click="isExpirable = false"
                                 :class="!isExpirable ? 'border-slate-500 bg-slate-100' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
                                 class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
@@ -109,6 +100,15 @@
                                 <div>
                                     <p class="text-sm font-bold text-slate-800">Does Not Expire</p>
                                     <p class="text-[10px] font-mono text-slate-500 mt-0.5">No expiry tracking, e.g. cables, clips.</p>
+                                </div>
+                            </label>
+                            <label @click="isExpirable = true"
+                                :class="isExpirable ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
+                                <input type="radio" name="_expiry_radio" class="accent-amber-500 w-4 h-4" :checked="isExpirable">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Has Expiry Date</p>
+                                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">Batches can be tracked and flagged near expiry.</p>
                                 </div>
                             </label>
                         </div>
@@ -168,7 +168,7 @@
                             <input type="hidden" name="category_id" :value="selectedCategoryId" required>
 
                             <div class="relative w-full">
-                                <button type="button" @click="catOpen = !catOpen"
+                                <button type="button" @click="catOpen = !catOpen; $nextTick(() => { if (catOpen) $refs.catSearchInput.focus(); })"
                                     class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors text-left flex justify-between items-center"
                                     :class="{'text-slate-400': !selectedCategoryId}">
                                     <span x-text="selectedCategoryName || 'Select category...'" class="truncate block"></span>
@@ -184,7 +184,7 @@
                                             x-text="itemType === 'device' ? '⚙ Device Categories' : '⚡ Consumable Categories'"></span>
                                     </div>
                                     <div class="px-2 py-1.5">
-                                        <input type="text" x-model="catSearch" @click.stop placeholder="Search categories..."
+                                        <input type="text" x-ref="catSearchInput" x-model="catSearch" @click.stop placeholder="Search categories..."
                                             class="block w-full border border-slate-200 bg-slate-50 focus:outline-none py-2 px-3 text-sm font-mono text-slate-800 transition-colors">
                                     </div>
                                     <ul class="max-h-52 overflow-y-auto p-1">
@@ -318,25 +318,23 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-1">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-1.5">Storage Location</label>
-                            <input type="text" name="storage_location" value="{{ old('storage_location') }}" list="storage-locations"
-                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
-                                placeholder="e.g. Storage 1, Supply Room A...">
-                            <datalist id="storage-locations">
+                            <select name="storage_location"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                                <option value="">— Select Location —</option>
                                 @foreach($storageLocations as $loc)
-                                    <option value="{{ $loc->name }}"></option>
+                                    <option value="{{ $loc->name }}" {{ old('storage_location') === $loc->name ? 'selected' : '' }}>{{ $loc->name }}</option>
                                 @endforeach
-                            </datalist>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-1.5">Section / Bin</label>
-                            <input type="text" name="storage_section" value="{{ old('storage_section') }}" list="storage-sections"
-                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
-                                placeholder="e.g. Section 1, Shelf B...">
-                            <datalist id="storage-sections">
+                            <select name="storage_section"
+                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                                <option value="">— Select Section —</option>
                                 @foreach($storageSections as $loc)
-                                    <option value="{{ $loc->name }}"></option>
+                                    <option value="{{ $loc->name }}" {{ old('storage_section') === $loc->name ? 'selected' : '' }}>{{ $loc->name }}</option>
                                 @endforeach
-                            </datalist>
+                            </select>
                         </div>
                     </div>
                 </div>

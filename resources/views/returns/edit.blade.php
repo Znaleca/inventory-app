@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-3xl">
+<div>
 
     <div class="mb-5">
         <p class="text-[10px] font-mono font-semibold text-teal-600 uppercase tracking-[0.25em] mb-1">Returns://Process</p>

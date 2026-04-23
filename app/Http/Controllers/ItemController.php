@@ -152,7 +152,7 @@ class ItemController extends Controller
         
         $item = Item::create($itemData);
 
-        return redirect()->route('items.index')
+        return redirect()->route('items.show', $item)
             ->with('success', 'Item created successfully.');
     }
 
@@ -233,7 +233,40 @@ class ItemController extends Controller
         $item->disposals()->delete();
         $item->delete();
 
+        // Check if request came from admin records page, if so redirect back there
+        if (request()->referrer && str_contains(request()->referrer, '/admin')) {
+            return redirect()->route('admin.index', ['tab' => 'items'])
+                ->with('success', 'Item and all related records deleted successfully.');
+        }
+
         return redirect()->route('items.index')
             ->with('success', 'Item and all related records deleted successfully.');
+    }
+
+    public function apiSearch(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (strlen($query) < 1) {
+            return response()->json([]);
+        }
+
+        $items = Item::with('category')
+            ->where('name', 'like', "%{$query}%")
+            ->orWhere('brand', 'like', "%{$query}%")
+            ->orderBy('name')
+            ->limit(10)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'category' => $item->category?->name ?? 'Uncategorized',
+                    'stock' => $item->total_stock,
+                    'unit' => $item->unit ?? 'units',
+                ];
+            });
+
+        return response()->json($items);
     }
 }

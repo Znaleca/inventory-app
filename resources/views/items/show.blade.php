@@ -54,7 +54,7 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-5xl">
+    <div>
 
         {{-- Page Header --}}
         <div class="mb-5 flex items-end justify-between">
@@ -71,6 +71,64 @@
                 @else
                     <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 border border-indigo-200">Consumable</span>
                 @endif
+            </div>
+        </div>
+
+        {{-- Item Search Bar --}}
+        <div x-data="{ 
+            search: '', 
+            results: [], 
+            open: false,
+            async fetchResults() {
+                if (this.search.length < 1) {
+                    this.results = [];
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/items/search?q=${encodeURIComponent(this.search)}`);
+                    this.results = await response.json();
+                } catch (error) {
+                    this.results = [];
+                }
+            }
+        }" class="relative mb-5 max-w-md">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 text-slate-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="search"
+                @input="fetchResults()"
+                @focus="open = true"
+                @blur="setTimeout(() => open = false, 200)"
+                placeholder="Jump to item..."
+                class="block w-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
+            />
+            
+            {{-- Suggestions Dropdown --}}
+            <div 
+                x-show="open && results.length > 0" 
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-2"
+                class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg z-50 max-h-96 overflow-y-auto"
+                style="display: none;">
+                <template x-for="item in results" :key="item.id">
+                    <a :href="`/items/${item.id}`" class="block px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition-colors group">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-slate-800 group-hover:text-blue-600" x-text="item.name"></p>
+                                <p class="text-xs text-slate-400 font-mono mt-0.5" x-text="item.category"></p>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-500 ml-2" x-text="`${item.stock}/${item.unit}`"></span>
+                        </div>
+                    </a>
+                </template>
             </div>
         </div>
 

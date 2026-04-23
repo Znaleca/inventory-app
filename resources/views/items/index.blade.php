@@ -180,124 +180,195 @@
 <div class="bg-white border border-slate-200 mb-5 relative">
     <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 to-indigo-400"></div>
     <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-    <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3 p-3 pl-4">
+    <div x-data="{ 
+        search: '',
+        results: [],
+        open: false,
+        async fetchResults() {
+            if (this.search.length < 1) {
+                this.results = [];
+                return;
+            }
+            try {
+                const response = await fetch(`/api/items/search?q=${encodeURIComponent(this.search)}`);
+                this.results = await response.json();
+            } catch (error) {
+                this.results = [];
+            }
+        }
+    }" class="relative">
+        <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3 p-3 pl-4">
 
-        {{-- Search Input --}}
-        <div class="relative flex-1 sm:min-w-[280px]">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 text-slate-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
+            {{-- Search Input --}}
+            <div class="relative flex-1 sm:min-w-[280px]">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 text-slate-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </div>
+                <input type="text" name="search"
+                    x-model="search"
+                    @input="fetchResults()"
+                    @focus="open = true"
+                    @blur="setTimeout(() => open = false, 200)"
+                    value="{{ request('search') }}"
+                    class="block w-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
+                    placeholder="Search items...">
+                
+                {{-- Live Suggestions --}}
+                <div 
+                    x-show="open && results.length > 0" 
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-2"
+                    class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg z-50 max-h-96 overflow-y-auto"
+                    style="display: none;">
+                    <template x-for="item in results" :key="item.id">
+                        <a :href="`/items/${item.id}`" class="block px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition-colors group">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-800 group-hover:text-blue-600" x-text="item.name"></p>
+                                    <p class="text-xs text-slate-400 font-mono mt-0.5" x-text="item.category"></p>
+                                </div>
+                                <span class="text-xs font-mono font-bold text-slate-500 ml-2" x-text="`${item.stock}/${item.unit}`"></span>
+                            </div>
+                        </a>
+                    </template>
+                </div>
             </div>
-            <input type="text" name="search" value="{{ request('search') }}"
-                class="block w-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
-                placeholder="Search items...">
-        </div>
 
-        {{-- Category Filter --}}
-        <select name="category"
-            class="block w-full sm:w-44 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
-            <option value="">All Categories</option>
-            @foreach($categories as $cat)
-            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-            @endforeach
-        </select>
+            {{-- Category Filter --}}
+            <select name="category"
+                class="block w-full sm:w-44 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
+                <option value="">All Categories</option>
+                @foreach($categories as $cat)
+                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                @endforeach
+            </select>
 
-        {{-- Type Filter --}}
-        <select name="type"
-            class="block w-full sm:w-40 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
-            <option value="">All Types</option>
-            <option value="device"     {{ request('type') === 'device'     ? 'selected' : '' }}>Device</option>
-            <option value="consumable" {{ request('type') === 'consumable' ? 'selected' : '' }}>Consumable</option>
-        </select>
+            {{-- Type Filter --}}
+            <select name="type"
+                class="block w-full sm:w-40 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
+                <option value="">All Types</option>
+                <option value="device" {{ request('type') === 'device' ? 'selected' : '' }}>Device</option>
+                <option value="consumable" {{ request('type') === 'consumable' ? 'selected' : '' }}>Consumable</option>
+            </select>
 
-        {{-- Actions --}}
-        <div class="flex gap-2">
-            <button type="submit"
-                class="flex items-center gap-2 bg-slate-800 hover:bg-blue-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-slate-700 hover:border-blue-700">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-                Search
-            </button>
+            {{-- Actions --}}
+            <div class="flex gap-2">
+                <button type="submit"
+                    class="flex items-center gap-2 bg-slate-800 hover:bg-blue-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-slate-700 hover:border-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    Search
+                </button>
 
-            @if(request('search') || request('category') || request('type'))
-            <a href="{{ route('items.index') }}"
-                class="flex items-center gap-2 border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-300 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors">
-                Clear
-            </a>
-            @endif
-        </div>
-    </form>
+                @if(request('search') || request('category') || request('type'))
+                <a href="{{ route('items.index') }}"
+                    class="flex items-center gap-2 border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-300 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors">
+                    Clear
+                </a>
+                @endif
+            </div>
+        </form>
+    </div>
 </div>
 
 {{-- Main Table --}}
-<div class="bg-white border border-slate-200 relative overflow-hidden">
+<div class="bg-white border border-slate-200 relative overflow-hidden" x-data="{
+    search: '{{ request('search') }}',
+    category: '{{ request('category') }}',
+    type: '{{ request('type') }}',
+    items: {{ Js::from($items->map(fn($item) => [
+        'id' => $item->id,
+        'name' => $item->name,
+        'brand' => $item->brand,
+        'model' => $item->model,
+        'description' => $item->description,
+        'category_id' => $item->category_id,
+        'category_name' => $item->category->name,
+        'item_type' => $item->item_type,
+        'storage_location' => $item->storage_location,
+        'storage_section' => $item->storage_section,
+        'unit' => $item->unit,
+        'total_stock' => $item->total_stock,
+        'effective_stock_used' => $item->effective_stock_used,
+        'reorder_level' => $item->reorder_level,
+    ])) }},
+    get filteredItems() {
+        return this.items.filter(item => {
+            const matchesSearch = this.search === '' || 
+                item.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                (item.brand && item.brand.toLowerCase().includes(this.search.toLowerCase()));
+            const matchesCategory = this.category === '' || item.category_id.toString() === this.category;
+            const matchesType = this.type === '' || item.item_type === this.type;
+            return matchesSearch && matchesCategory && matchesType;
+        });
+    }
+}">
     <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
 
-    @if($items->count() > 0)
+    <template x-if="filteredItems.length > 0">
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead>
                 <tr class="border-b border-slate-100 bg-slate-50/80">
                     <th scope="col" class="whitespace-nowrap pl-5 pr-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Item</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Category</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Location</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Unit</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Stock / Expiry</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Status</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-right pr-5 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
-                @foreach($items as $item)
-                @php
-                    $newStock  = max(0, $item->total_stock);
-                    $usedStock = max(0, $item->effective_stock_used);
-                    $totalQty  = $newStock + $usedStock;
-                    
-                    $level = $totalQty <= 0 ? 'low' : ($totalQty <= 5 ? 'medium' : 'high');
-                    $barWidth = $totalQty <= 0 ? 0 : min(100, ($totalQty / 20) * 100);
-                    $barColor = match ($level) {
-                        'high'   => 'bg-emerald-400',
-                        'medium' => 'bg-amber-400',
-                        'low'    => 'bg-rose-400',
-                    };
-                    $today = now()->startOfDay();
-                    $expiredCount = 0;
-                    $nearExpiryCount = 0;
-                    foreach ($item->stockEntries as $entry) {
-                        if (!$entry->expiry_date) continue;
-                        $exp = \Carbon\Carbon::parse($entry->expiry_date)->startOfDay();
-                        if ($exp->isBefore($today)) $expiredCount++;
-                        elseif ($today->diffInDays($exp) <= 30) $nearExpiryCount++;
-                    }
-                @endphp
+                <template x-for="item in filteredItems" :key="item.id">
                 <tr class="group hover:bg-slate-50 transition-colors">
 
                     {{-- Item Name --}}
                     <td class="pl-5 pr-3 py-3">
                         <div class="flex flex-col gap-0.5">
-                            <span class="text-sm font-bold text-slate-800">{{ $item->name }}</span>
+                            <span class="text-sm font-bold text-slate-800" x-text="item.name"></span>
                             <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                @if($item->item_type === 'device')
-                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-1.5 py-0.5 border border-violet-200">Device</span>
-                                @else
-                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-1.5 py-0.5 border border-indigo-200">Consumable</span>
-                                @endif
-
-                                @if($item->brand)
-                                <span class="text-[10px] font-mono text-slate-400">{{ $item->brand }}{{ $item->model ? ' · '.$item->model : '' }}</span>
-                                @elseif($item->description)
-                                <span class="text-[10px] font-mono text-slate-400 line-clamp-1 max-w-[150px]">{{ $item->description }}</span>
-                                @endif
+                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 border" :class="item.item_type === 'device' ? 'text-violet-600 bg-violet-50 border-violet-200' : 'text-indigo-600 bg-indigo-50 border-indigo-200'" x-text="item.item_type === 'device' ? 'Device' : 'Consumable'"></span>
+                                <template x-if="item.brand">
+                                    <span class="text-[10px] font-mono text-slate-400" x-text="item.brand + (item.model ? ' · ' + item.model : '')"></span>
+                                </template>
+                                <template x-if="!item.brand && item.description">
+                                    <span class="text-[10px] font-mono text-slate-400 line-clamp-1 max-w-[150px]" x-text="item.description"></span>
+                                </template>
                             </div>
                         </div>
                     </td>
 
                     {{-- Category --}}
                     <td class="whitespace-nowrap px-3 py-3">
-                        <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5">
-                            {{ $item->category->name }}
-                        </span>
+                        <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.category_name"></span>
+                    </td>
+
+                    {{-- Location --}}
+                    <td class="whitespace-nowrap px-3 py-3">
+                        <template x-if="item.storage_location">
+                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.storage_location + (item.storage_section ? ' / ' + item.storage_section : '')"></span>
+                        </template>
+                        <template x-if="!item.storage_location">
+                            <span class="font-mono text-[11px] text-slate-400">—</span>
+                        </template>
+                    </td>
+
+                    {{-- Unit --}}
+                    <td class="whitespace-nowrap px-3 py-3">
+                        <template x-if="item.unit">
+                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.unit"></span>
+                        </template>
+                        <template x-if="!item.unit">
+                            <span class="font-mono text-[11px] text-slate-400">—</span>
+                        </template>
                     </td>
 
                     {{-- Stock & Expiry --}}
@@ -305,51 +376,44 @@
                         <div class="flex flex-wrap gap-1.5">
                             <span class="flex items-center gap-1.5 bg-teal-50 border border-teal-200 px-2 py-1 text-xs font-bold font-mono text-teal-700">
                                 <span class="h-1.5 w-1.5 bg-teal-400 inline-block"></span>
-                                {{ $item->total_stock }} New
+                                <span x-text="item.total_stock"></span> New
                             </span>
-                            @if($item->effective_stock_used > 0)
-                            <span class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-bold font-mono text-amber-700">
-                                {{ $item->effective_stock_used }} Used
-                            </span>
-                            @endif
-                            @if($item->active_lent_out > 0)
-                            <span class="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 px-2 py-1 text-xs font-bold font-mono text-indigo-700" title="Actively Lent Out">
-                                ↑ {{ $item->active_lent_out }} Lent Out
-                            </span>
-                            @endif
-
-
+                            <template x-if="item.effective_stock_used > 0">
+                                <span class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-bold font-mono text-amber-700" x-text="item.effective_stock_used + ' Used'"></span>
+                            </template>
                         </div>
                         {{-- Stock bar --}}
                         <div class="mt-2 h-1 w-28 bg-slate-100 border border-slate-200">
-                            <div class="h-full {{ $barColor }} transition-all duration-500" style="width: {{ $barWidth }}%"></div>
+                            <div class="h-full transition-all duration-500" :style="`width: ${Math.min(100, (item.total_stock / 20) * 100)}%`" :class="item.total_stock > 5 ? 'bg-emerald-400' : (item.total_stock > 0 ? 'bg-amber-400' : 'bg-rose-400')"></div>
                         </div>
                     </td>
 
                     {{-- Status --}}
                     <td class="px-3 py-3">
-                        @if($totalQty <= 0)
-                        <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1.5">
-                            <span class="h-1.5 w-1.5 bg-rose-500 animate-pulse inline-block"></span>
-                            Out_of_Stock
-                        </span>
-                        @elseif($item->total_stock <= $item->reorder_level)
-                        <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1.5">
-                            <span class="h-1.5 w-1.5 bg-amber-400 inline-block"></span>
-                            Reorder
-                        </span>
-                        @else
-                        <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5">
-                            <span class="h-1.5 w-1.5 bg-emerald-400 inline-block"></span>
-                            In_Stock
-                        </span>
-                        @endif
+                        <template x-if="item.total_stock <= 0">
+                            <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1.5">
+                                <span class="h-1.5 w-1.5 bg-rose-500 animate-pulse inline-block"></span>
+                                Out_of_Stock
+                            </span>
+                        </template>
+                        <template x-if="item.total_stock > 0 && item.total_stock <= item.reorder_level">
+                            <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1.5">
+                                <span class="h-1.5 w-1.5 bg-amber-400 inline-block"></span>
+                                Reorder
+                            </span>
+                        </template>
+                        <template x-if="item.total_stock > item.reorder_level">
+                            <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5">
+                                <span class="h-1.5 w-1.5 bg-emerald-400 inline-block"></span>
+                                In_Stock
+                            </span>
+                        </template>
                     </td>
 
                     {{-- Actions --}}
                     <td class="whitespace-nowrap px-3 pr-5 py-3 text-right">
                         <div class="flex items-center justify-end gap-1.5">
-                            <a href="{{ route('items.show', $item) }}"
+                            <a :href="`/items/${item.id}`"
                                 class="inline-flex items-center gap-1 border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3">
                                     <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
@@ -357,35 +421,46 @@
                                 </svg>
                                 View
                             </a>
-                            <a href="{{ route('usage.create', ['item_id' => $item->id]) }}"
-                                class="inline-flex items-center gap-1 border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
-                                    <path fill-rule="evenodd" d="M8 2a.75.75 0 01.75.75v8.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06L7.25 11.44V2.75A.75.75 0 018 2z" clip-rule="evenodd" />
-                                </svg>
-                                Use
-                            </a>
-                            <a href="{{ route('stock.create', $item) }}"
+                            <template x-if="item.total_stock <= 0">
+                                <button disabled
+                                    class="inline-flex items-center gap-1 border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-400 cursor-not-allowed opacity-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
+                                        <path fill-rule="evenodd" d="M8 2a.75.75 0 01.75.75v8.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06L7.25 11.44V2.75A.75.75 0 018 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Use
+                                </button>
+                            </template>
+                            <template x-if="item.total_stock > 0">
+                                <a :href="`/usage/create?item_id=${item.id}`"
+                                    class="inline-flex items-center gap-1 border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
+                                        <path fill-rule="evenodd" d="M8 2a.75.75 0 01.75.75v8.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06L7.25 11.44V2.75A.75.75 0 018 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Use
+                                </a>
+                            </template>
+                            <a :href="`/items/${item.id}/stock/create`"
                                 class="inline-flex items-center gap-1 border border-indigo-200 bg-indigo-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
                                     <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
                                 </svg>
                                 Stock
                             </a>
-                            <a href="{{ route('items.edit', $item) }}"
+                            <a :href="`/items/${item.id}/edit`"
                                 class="inline-flex items-center border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-colors">
                                 Edit
                             </a>
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                </template>
             </tbody>
         </table>
     </div>
+    </template>
 
-
-    @else
     {{-- Empty State --}}
+    <template x-if="filteredItems.length === 0">
     <div class="flex flex-col items-center justify-center py-20 text-center ml-1">
         <div class="h-14 w-14 border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
@@ -394,16 +469,17 @@
         </div>
         <p class="font-mono text-[10px] text-slate-400 uppercase tracking-widest mb-1">// No records found</p>
         <p class="text-sm font-semibold text-slate-500 mt-1">
-            {{ request('search') || request('category') || request('type') ? 'Try adjusting your filters.' : 'No items in inventory yet.' }}
+            <template x-if="search || category || type">Try adjusting your filters.</template>
+            <template x-if="!search && !category && !type">No items in inventory yet.</template>
         </p>
-        @unless(request('search') || request('category') || request('type'))
-        <a href="{{ route('items.create') }}"
-            class="mt-6 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-blue-700">
-            + Add First Item
-        </a>
-        @endunless
+        <template x-if="!search && !category && !type">
+            <a href="{{ route('items.create') }}"
+                class="mt-6 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-blue-700">
+                + Add First Item
+            </a>
+        </template>
     </div>
-    @endif
+    </template>
 </div>
 
 @endsection

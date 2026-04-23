@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-2xl">
+<div>
 
     <div class="mb-5">
         <p class="text-[10px] font-mono font-semibold text-emerald-600 uppercase tracking-[0.25em] mb-1">Admin://Stock-Entries//Edit</p>

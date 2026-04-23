@@ -471,6 +471,7 @@
                         <thead><tr class="bg-slate-50/50 border-b border-slate-200">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Name</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Category</th>
+                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Location</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Stock</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
@@ -483,6 +484,15 @@
                                 <span class="inline-flex items-center border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
                                     {{ $item->category->name ?? 'Uncategorized' }}
                                 </span>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                @if($item->storage_location)
+                                <span class="inline-flex items-center border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
+                                    {{ $item->storage_location }}{{ $item->storage_section ? ' / ' . $item->storage_section : '' }}
+                                </span>
+                                @else
+                                <span class="text-slate-400 text-[9px] font-mono">—</span>
+                                @endif
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">
                                 <span class="font-mono font-black text-slate-700">{{ $item->stock_quantity }}</span>

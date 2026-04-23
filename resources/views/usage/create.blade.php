@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-3xl">
+    <div>
 
         {{-- Page Header --}}
         <div class="mb-5">

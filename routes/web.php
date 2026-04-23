@@ -107,4 +107,7 @@ Route::middleware('auth')->group(function () {
     // Disposal Routes
     Route::get('/disposals/create', [DisposalController::class, 'create'])->name('disposals.create');
     Route::post('/disposals', [DisposalController::class, 'store'])->name('disposals.store');
+
+    // API Routes
+    Route::get('/api/items/search', [ItemController::class, 'apiSearch'])->name('api.items.search');
 });

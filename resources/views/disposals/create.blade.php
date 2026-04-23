@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-2xl" x-data="{
+<div x-data="{
     selectedEntry: '{{ old('stock_entry_id', '') }}',
     manualQty: {{ old('quantity', 1) }},
     get selectedBatch() {
