@@ -4,11 +4,11 @@
 
 @section('actions')
     <a href="{{ route('items.index') }}"
-        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
         ← Back to Items
     </a>
     <a href="{{ route('items.edit', $item) }}"
-        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
         Edit
     </a>
     <a href="{{ route('usage.create', ['item_id' => $item->id]) }}"
@@ -31,7 +31,7 @@
             </svg>
         </button>
         <div x-show="open" x-cloak x-transition
-            class="absolute right-0 mt-1 w-44 bg-white border border-slate-200 shadow-lg z-50 overflow-hidden" style="display:none">
+            class="absolute right-0 mt-1 w-44 bg-white border border-sky-100 shadow-lg z-50 overflow-hidden" style="display:none">
             @if($item->stock_used > 0)
             <a href="{{ route('disposals.create', ['item_id' => $item->id, 'disposal_type' => 'used']) }}"
                 class="flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition-colors">
@@ -48,31 +48,33 @@
     </div>
     @endif
     <a href="{{ route('stock.create', $item) }}"
-        class="inline-flex items-center gap-2 border border-indigo-200 bg-indigo-50 px-4 py-2 text-[11px] font-mono font-bold text-indigo-600 uppercase tracking-widest hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-200 bg-sky-50 px-4 py-2 text-[11px] font-mono font-bold text-sky-600 uppercase tracking-widest hover:bg-sky-600 hover:text-white hover:border-sky-600 transition-colors">
         + Receive Stock
     </a>
 @endsection
 
 @section('content')
-    <div>
+    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
 
         {{-- Page Header --}}
-        <div class="mb-5 flex items-end justify-between">
+        <div class="p-6 border-b border-sky-100 bg-white flex items-center justify-between shrink-0 mb-6">
             <div>
-                <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Items://{{ $item->id }}</p>
-                <h1 class="text-xl font-bold text-slate-800 tracking-tight">{{ $item->name }}</h1>
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Items://{{ $item->id }}</p>
+                <h3 class="text-xl font-black text-[#0f172a] tracking-tight">{{ $item->name }}</h3>
                 @if($item->brand)
-                    <p class="text-xs text-slate-400 font-mono mt-0.5">{{ $item->brand }}{{ $item->model ? ' · ' . $item->model : '' }}</p>
+                    <p class="text-xs text-slate-400 font-mono mt-1">{{ $item->brand }}{{ $item->model ? ' · ' . $item->model : '' }}</p>
                 @endif
             </div>
             <div class="flex items-center gap-2">
                 @if($item->item_type === 'device')
                     <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2 py-1 border border-violet-200">Device</span>
                 @else
-                    <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 border border-indigo-200">Consumable</span>
+                    <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-1 border border-sky-200">Consumable</span>
                 @endif
             </div>
         </div>
+
+        <div class="p-6 pt-0">
 
         {{-- Item Search Bar --}}
         <div x-data="{ 
@@ -104,7 +106,7 @@
                 @focus="open = true"
                 @blur="setTimeout(() => open = false, 200)"
                 placeholder="Jump to item..."
-                class="block w-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
+                class="block w-full border border-sky-100 bg-sky-50 py-2 pl-9 pr-4 text-sm font-mono text-[#0f172a] placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
             />
             
             {{-- Suggestions Dropdown --}}
@@ -116,13 +118,13 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100 translate-y-0"
                 x-transition:leave-end="opacity-0 translate-y-2"
-                class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg z-50 max-h-96 overflow-y-auto"
+                class="absolute top-full left-0 right-0 mt-1 bg-white border border-sky-100 shadow-lg z-50 max-h-96 overflow-y-auto"
                 style="display: none;">
                 <template x-for="item in results" :key="item.id">
-                    <a :href="`/items/${item.id}`" class="block px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition-colors group">
+                    <a :href="`/items/${item.id}`" class="block px-4 py-3 border-b border-sky-100 hover:bg-blue-50 transition-colors group">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <p class="text-sm font-bold text-slate-800 group-hover:text-blue-600" x-text="item.name"></p>
+                                <p class="text-sm font-bold text-[#0f172a] group-hover:text-sky-500" x-text="item.name"></p>
                                 <p class="text-xs text-slate-400 font-mono mt-0.5" x-text="item.category"></p>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-500 ml-2" x-text="`${item.stock}/${item.unit}`"></span>
@@ -133,54 +135,71 @@
         </div>
 
         {{-- Stock Summary Cards --}}
-        <div class="grid grid-cols-2 gap-3 mb-5 lg:grid-cols-5">
+        <div class="grid grid-cols-2 lg:grid-cols-5 border-y border-x border-sky-100 mb-6 bg-white overflow-hidden rounded-xl">
+            
             {{-- New Stock --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-400"></div>
-                <div class="p-4 pl-5">
-                    <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">New Stock</p>
-                    <p class="text-2xl font-black font-mono text-emerald-600">{{ $item->total_stock }}</p>
-                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+                <div class="flex flex-col h-full justify-between gap-2">
+                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">New Stock</p>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->total_stock }}</p>
+                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+                    </div>
                 </div>
             </div>
+            
             {{-- Used Stock --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-amber-400"></div>
-                <div class="p-4 pl-5">
-                    <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">Used Stock</p>
-                    <p class="text-2xl font-black font-mono text-amber-500">{{ $item->effective_stock_used }}</p>
-                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
+                <div class="flex flex-col h-full justify-between gap-2">
+                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Used Stock</p>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->effective_stock_used }}</p>
+                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+                    </div>
                 </div>
             </div>
+            
             {{-- Lent Out --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-400"></div>
-                <div class="p-4 pl-5">
-                    <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">Lent Out</p>
-                    <p class="text-2xl font-black font-mono text-indigo-600">{{ $item->active_lent_out }}</p>
-                    <p class="text-[10px] font-mono text-slate-500 mt-0.5">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
+                <div class="flex flex-col h-full justify-between gap-2">
+                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Lent Out</p>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->active_lent_out }}</p>
+                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+                    </div>
                 </div>
             </div>
 
             {{-- Category --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-fuchsia-400"></div>
-                <div class="p-4 pl-5">
-                    <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">Category</p>
-                    <p class="text-sm font-bold font-mono text-fuchsia-600 truncate">{{ $item->category?->name ?? 'Uncategorized' }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-fuchsia-400 to-fuchsia-600"></div>
+                <div class="flex flex-col h-full justify-between gap-2">
+                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Category</p>
+                    <p class="text-base font-black tracking-tight text-[#0f172a] truncate mt-1">{{ $item->category?->name ?? 'Uncategorized' }}</p>
                 </div>
             </div>
+
             {{-- Status --}}
-            <div class="bg-white border border-slate-200 relative">
-                @php
-                    $newStock  = max(0, $item->total_stock);
-                    $usedStock = max(0, $item->effective_stock_used);
-                    $totalQty  = $newStock + $usedStock;
-                @endphp
-                <div class="absolute top-0 left-0 w-1 h-full
-                    @if($totalQty <= 0) bg-rose-500 @elseif($item->is_low_stock && $totalQty <= $item->reorder_level) bg-amber-400 @else bg-emerald-400 @endif"></div>
-                <div class="p-4 pl-5">
-                    <p class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
+            @php
+                $newStock  = max(0, $item->total_stock);
+                $usedStock = max(0, $item->effective_stock_used);
+                $totalQty  = $newStock + $usedStock;
+                if ($totalQty <= 0) {
+                    $statusTone = 'from-rose-500 to-rose-700';
+                } elseif ($item->is_low_stock && $totalQty <= $item->reorder_level) {
+                    $statusTone = 'from-amber-400 to-amber-600';
+                } else {
+                    $statusTone = 'from-emerald-400 to-emerald-600';
+                }
+            @endphp
+            <div class="group relative overflow-hidden bg-white p-5 transition-colors duration-300 hover:bg-sky-50/30">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r {{ $statusTone }}"></div>
+                <div class="flex flex-col h-full justify-between gap-2 items-start">
+                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Status</p>
+                    <div class="mt-1">
                     @if($totalQty <= 0)
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-1 border border-rose-200">Out_of_Stock</span>
                     @elseif($item->total_stock <= $item->reorder_level)
@@ -188,8 +207,10 @@
                     @else
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 border border-emerald-200">In_Stock</span>
                     @endif
+                    </div>
                 </div>
             </div>
+            
         </div>
 
         {{-- Analytics Charts --}}
@@ -220,13 +241,13 @@
 
         <div class="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-2">
             {{-- Line Trend --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                <div class="ml-1">
-                    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 to-blue-600"></div>
+                <div>
+                    <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
-                            <p class="text-sm font-bold text-slate-800">14-Day Movement Trend</p>
+                            <p class="text-[10px] font-mono text-sky-500 uppercase tracking-widest mb-0.5">Chart.01</p>
+                            <p class="text-sm font-bold text-[#0f172a]">14-Day Movement Trend</p>
                         </div>
                         <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
                             <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
@@ -242,12 +263,12 @@
             </div>
 
             {{-- Bar Summary --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                <div class="ml-1">
-                    <div class="px-5 py-4 border-b border-slate-100">
-                        <p class="text-[10px] font-mono text-indigo-600 uppercase tracking-widest mb-0.5">Chart.02</p>
-                        <p class="text-sm font-bold text-slate-800">Stock Analytics Summary</p>
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                <div>
+                    <div class="px-5 py-4 border-b border-sky-100">
+                        <p class="text-[10px] font-mono text-sky-600 uppercase tracking-widest mb-0.5">Chart.02</p>
+                        <p class="text-sm font-bold text-[#0f172a]">Stock Analytics Summary</p>
                     </div>
                     <div class="p-5">
                         <div class="h-[240px]">
@@ -262,10 +283,10 @@
         <div class="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-2">
 
             {{-- Item Specifications --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-                <div class="ml-1">
-                    <div class="px-4 py-3 border-b border-slate-100">
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                <div>
+                    <div class="px-4 py-3 border-b border-sky-100">
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 bg-sky-500 inline-block"></span>
                             <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">Item Specifications</p>
@@ -273,31 +294,31 @@
                     </div>
                     <table class="w-full text-sm">
                         <tbody class="divide-y divide-slate-50">
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="w-36 px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Type</td>
                                 <td class="px-4 py-2.5">
                                     @if($item->item_type === 'device')
                                         <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2 py-1 border border-violet-200">Device</span>
                                     @else
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 border border-indigo-200">Consumable</span>
+                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-1 border border-sky-200">Consumable</span>
                                     @endif
                                 </td>
                             </tr>
                             @if($item->item_type === 'device')
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Brand</td>
                                 <td class="px-4 py-2.5 text-sm font-mono font-bold text-slate-700">{{ $item->brand ?? '—' }}</td>
                             </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Model</td>
                                 <td class="px-4 py-2.5 text-sm font-mono font-bold text-slate-700">{{ $item->model ?? '—' }}</td>
                             </tr>
                             @endif
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Unit</td>
                                 <td class="px-4 py-2.5 text-sm font-mono text-slate-600">{{ $item->unit }}</td>
                             </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Location</td>
                                 <td class="px-4 py-2.5 text-sm font-mono text-slate-600">
                                     @if($item->storage_location || $item->storage_section)
@@ -307,7 +328,7 @@
                                     @endif
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Reorder Level</td>
                                 <td class="px-4 py-2.5">
                                     <span class="text-sm font-mono font-bold text-amber-600">{{ $item->reorder_level ?? 10 }}</span>
@@ -315,23 +336,23 @@
                                 </td>
                             </tr>
 
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry Tracking</td>
                                 <td class="px-4 py-2.5">
                                     @if($item->is_expirable)
                                         <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">Tracked</span>
                                     @else
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-1 border border-slate-200">None</span>
+                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 bg-sky-50 px-2 py-1 border border-sky-100">None</span>
                                     @endif
                                 </td>
                             </tr>
                             @if($item->description)
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap align-top">Notes</td>
                                 <td class="px-4 py-2.5 text-xs font-mono text-slate-600">{{ $item->description }}</td>
                             </tr>
                             @endif
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="hover:bg-sky-50 transition-colors">
                                 <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Created</td>
                                 <td class="px-4 py-2.5 text-xs font-mono text-slate-500">{{ $item->created_at->format('M d, Y') }}</td>
                             </tr>
@@ -352,13 +373,13 @@
                 $pctUsed = $chartTotal > 0 ? round(($chartUsed / $chartTotal) * 100) : 0;
                 $pctLent = $chartTotal > 0 ? round(($chartLent / $chartTotal) * 100) : 0;
             @endphp
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                <div class="ml-1">
-                    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                <div>
+                    <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono text-indigo-600 uppercase tracking-widest mb-0.5">Chart.00</p>
-                            <p class="text-sm font-bold text-slate-800">Stock Overview</p>
+                            <p class="text-[10px] font-mono text-sky-600 uppercase tracking-widest mb-0.5">Chart.00</p>
+                            <p class="text-sm font-bold text-[#0f172a]">Stock Overview</p>
                         </div>
                         <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
                             <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
@@ -374,7 +395,7 @@
                             <div class="relative w-44 h-44">
                                 <canvas id="stockDonut" width="160" height="160"></canvas>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-2xl font-black font-mono text-slate-800">{{ $chartTotal }}</span>
+                                    <span class="text-2xl font-black font-mono text-[#0f172a]">{{ $chartTotal }}</span>
                                     <span class="text-[9px] font-mono text-slate-400 uppercase tracking-widest">{{ $item->unit }}</span>
                                 </div>
                             </div>
@@ -414,13 +435,13 @@
                         @endif
 
                         {{-- Throughput bars --}}
-                        <div class="space-y-3 border-t border-slate-100 pt-4">
+                        <div class="space-y-3 border-t border-sky-100 pt-4">
                             <div>
                                 <div class="flex justify-between mb-1">
                                     <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Received</span>
                                     <span class="text-[10px] font-mono font-bold text-teal-600">{{ $totalReceived }} {{ $item->unit }}</span>
                                 </div>
-                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                <div class="h-1.5 bg-slate-100 border border-sky-100">
                                     <div class="h-full bg-teal-400" style="width: 100%"></div>
                                 </div>
                             </div>
@@ -429,7 +450,7 @@
                                     <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Used</span>
                                     <span class="text-[10px] font-mono font-bold text-rose-600">{{ $totalUsedLogs }} {{ $item->unit }}</span>
                                 </div>
-                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                <div class="h-1.5 bg-slate-100 border border-sky-100">
                                     @php $usedPct = $totalReceived > 0 ? min(100, round(($totalUsedLogs / $totalReceived) * 100)) : 0; @endphp
                                     <div class="h-full bg-rose-400" style="width: {{ $usedPct }}%"></div>
                                 </div>
@@ -439,7 +460,7 @@
                                     <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Available</span>
                                     <span class="text-[10px] font-mono font-bold text-emerald-600">{{ $chartNew }} {{ $item->unit }}</span>
                                 </div>
-                                <div class="h-1.5 bg-slate-100 border border-slate-200">
+                                <div class="h-1.5 bg-slate-100 border border-sky-100">
                                     @php $availPct = $totalReceived > 0 ? min(100, round(($chartNew / $totalReceived) * 100)) : 0; @endphp
                                     <div class="h-full bg-emerald-400" style="width: {{ $availPct }}%"></div>
                                 </div>
@@ -455,10 +476,10 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
             {{-- Usage History --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                <div class="ml-1">
-                    <div class="px-4 py-3 border-b border-slate-100">
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+                <div>
+                    <div class="px-4 py-3 border-b border-sky-100">
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 bg-rose-500 inline-block"></span>
                             <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest">Usage History</p>
@@ -468,7 +489,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
-                                <tr class="border-b border-slate-100 bg-slate-50/50">
+                                <tr class="border-b border-sky-100 bg-sky-50/50">
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Qty</th>
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Used By</th>
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Date</th>
@@ -476,7 +497,7 @@
                             </thead>
                             <tbody class="divide-y divide-slate-50">
                                 @foreach($item->usageLogs as $log)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr class="hover:bg-sky-50 transition-colors">
                                     <td class="px-4 py-2.5 font-black font-mono text-rose-600 whitespace-nowrap">{{ $log->quantity_used }}</td>
                                     <td class="px-4 py-2.5 text-xs font-mono text-slate-600 whitespace-nowrap">{{ $log->used_by ?? '—' }}</td>
                                     <td class="px-4 py-2.5 text-[10px] font-mono text-slate-400 whitespace-nowrap">{{ $log->used_at->format('M d, Y') }}<br><span class="text-[9px]">{{ $log->used_at->format('h:i A') }}</span></td>
@@ -494,10 +515,10 @@
             </div>
 
             {{-- Stock Received History --}}
-            <div class="bg-white border border-slate-200 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-                <div class="ml-1">
-                    <div class="px-4 py-3 border-b border-slate-100">
+            <div class="bg-white border border-sky-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                <div>
+                    <div class="px-4 py-3 border-b border-sky-100">
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                             <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">Stock Received</p>
@@ -507,7 +528,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
-                                <tr class="border-b border-slate-100 bg-slate-50/50">
+                                <tr class="border-b border-sky-100 bg-sky-50/50">
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Qty</th>
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">SN / Lot</th>
                                     <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry</th>
@@ -516,7 +537,7 @@
                             </thead>
                             <tbody class="divide-y divide-slate-50">
                                 @foreach($item->stockEntries as $entry)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr class="hover:bg-sky-50 transition-colors">
                                     <td class="px-4 py-2.5 font-black font-mono text-teal-600 whitespace-nowrap">{{ $entry->quantity }}</td>
                                     <td class="px-4 py-2.5 font-mono text-xs text-slate-600 whitespace-nowrap">{{ $entry->serial_number ?? ($entry->lot_number ?? '—') }}</td>
                                     <td class="px-4 py-2.5 whitespace-nowrap">
@@ -730,4 +751,6 @@
         });
     })();
     </script>
+        </div>
+    </div>
 @endsection

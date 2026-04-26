@@ -4,7 +4,7 @@
 
 @section('actions')
 <a href="{{ route('items.show', $item) }}"
-    class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+    class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
     ← Back to Item
 </a>
 @endsection
@@ -19,27 +19,32 @@
     batches: @json($batches)
 }">
 
-    {{-- Page Header --}}
-    <div class="mb-5">
-        <p class="text-[10px] font-mono font-semibold uppercase tracking-[0.25em] mb-1
-            {{ $disposalType === 'new' ? 'text-rose-600' : 'text-amber-600' }}">
-            Inventory://{{ $item->name }}//Dispose
-        </p>
-        <h1 class="text-xl font-bold text-slate-800 tracking-tight">
-            {{ $disposalType === 'new' ? 'Dispose Expired Stock' : 'Dispose Used Items' }}
-        </h1>
-        <p class="text-xs text-slate-400 font-mono mt-0.5">
-            {{ $disposalType === 'new'
-                ? 'Select expired batch to remove from stock.'
-                : 'Select used item batch to permanently remove.' }}
-        </p>
-    </div>
+    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
+        {{-- Page Header --}}
+        <div class="p-6 border-b border-sky-100 flex items-center justify-between shrink-0 mb-6">
+            <div>
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest mb-1
+                    {{ $disposalType === 'new' ? 'text-rose-500' : 'text-amber-500' }}">
+                    Inventory://{{ $item->name }}//Dispose
+                </p>
+                <h3 class="text-xl font-black text-[#0f172a] tracking-tight">
+                    {{ $disposalType === 'new' ? 'Dispose Expired Stock' : 'Dispose Used Items' }}
+                </h3>
+                <p class="text-xs text-slate-400 font-mono mt-1">
+                    {{ $disposalType === 'new'
+                        ? 'Select expired batch to remove from stock.'
+                        : 'Select used item batch to permanently remove.' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="p-6 pt-0">
 
     @if($errors->any())
     <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-        <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-        <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest mb-2 ml-1">// Validation Errors</p>
-        <ul class="ml-1 space-y-1">
+        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+        <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest mb-2">// Validation Errors</p>
+        <ul class="space-y-1">
             @foreach($errors->all() as $error)
                 <li class="text-sm text-rose-700 font-mono">— {{ $error }}</li>
             @endforeach
@@ -53,9 +58,9 @@
         <input type="hidden" name="disposal_type" value="{{ $disposalType }}">
 
         {{-- Summary Banner --}}
-        <div class="bg-white border border-slate-200 relative mb-4">
-            <div class="absolute top-0 left-0 w-1 h-full {{ $disposalType === 'new' ? 'bg-rose-500' : 'bg-amber-500' }}"></div>
-            <div class="ml-1 px-5 py-4 flex items-center gap-4">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r {{ $disposalType === 'new' ? 'from-rose-400 to-rose-600' : 'from-amber-400 to-amber-600' }}"></div>
+            <div class="px-5 py-4 flex items-center gap-4">
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center
                     {{ $disposalType === 'new' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
@@ -67,7 +72,7 @@
                         {{ $disposalType === 'new' ? 'text-rose-600' : 'text-amber-600' }}">
                         {{ $disposalType === 'new' ? '// Expired Stock Disposal' : '// Used Item Disposal' }}
                     </p>
-                    <p class="text-sm font-bold text-slate-800 mt-0.5">{{ $item->name }}</p>
+                    <p class="text-sm font-bold text-[#0f172a] mt-0.5">{{ $item->name }}</p>
                     <p class="text-xs font-mono text-slate-500 mt-0.5">
                         {{ $disposalType === 'new' ? 'Total expired:' : 'Total used stock:' }}
                         <span class="font-bold {{ $disposalType === 'new' ? 'text-rose-600' : 'text-amber-600' }}">
@@ -79,10 +84,10 @@
         </div>
 
         {{-- Batch / Serial / Lot Picker --}}
-        <div class="bg-white border border-slate-200 relative mb-4">
-            <div class="absolute top-0 left-0 w-1 h-full {{ $disposalType === 'new' ? 'bg-rose-400' : 'bg-amber-400' }}"></div>
-            <div class="ml-1">
-                <div class="px-5 py-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div>
+                <div class="px-5 py-4 border-b border-sky-100">
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 {{ $disposalType === 'new' ? 'bg-rose-400' : 'bg-amber-400' }} inline-block"></span>
                         <p class="text-[10px] font-mono font-bold uppercase tracking-widest
@@ -90,7 +95,7 @@
                             {{ $item->item_type === 'device' ? '// Select Serial Number' : '// Select Batch / Lot' }}
                         </p>
                     </div>
-                    <p class="text-xs font-mono text-slate-400 mt-1 ml-4">
+                    <p class="text-xs font-mono text-slate-400 mt-1">
                         Choose the specific {{ $item->item_type === 'device' ? 'device (serial number)' : 'batch (lot number)' }} to dispose.
                         Leave unselected to dispose without batch tracking.
                     </p>
@@ -99,8 +104,8 @@
                     @if(!empty($batches))
                     <div class="space-y-2">
                         {{-- None / unspecified option --}}
-                        <label class="flex items-start gap-3 p-3 border border-slate-200 cursor-pointer transition-colors hover:bg-slate-50"
-                            :class="selectedEntry === '' ? 'border-slate-400 bg-slate-50' : 'border-slate-200'">
+                        <label class="flex items-start gap-3 p-3 border border-sky-100 cursor-pointer transition-colors hover:bg-sky-50"
+                            :class="selectedEntry === '' ? 'border-slate-400 bg-sky-50' : 'border-sky-100'">
                             <input type="radio" name="stock_entry_id" value=""
                                 x-model="selectedEntry"
                                 class="mt-0.5 accent-slate-600">
@@ -112,21 +117,21 @@
 
                         {{-- Per-batch options --}}
                         @foreach($batches as $batch)
-                        <label class="flex items-start gap-3 p-3 border cursor-pointer transition-colors hover:bg-slate-50"
+                        <label class="flex items-start gap-3 p-3 border cursor-pointer transition-colors hover:bg-sky-50"
                             :class="selectedEntry === '{{ $batch['id'] }}' ?
                                 '{{ $disposalType === 'new' ? 'border-rose-400 bg-rose-50' : 'border-amber-400 bg-amber-50' }}' :
-                                'border-slate-200'">
+                                'border-sky-100'">
                             <input type="radio" name="stock_entry_id" value="{{ $batch['id'] }}"
                                 x-model="selectedEntry"
                                 class="mt-0.5 {{ $disposalType === 'new' ? 'accent-rose-600' : 'accent-amber-600' }}">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     @if($item->item_type === 'device')
-                                        <span class="text-xs font-mono font-bold text-slate-800">
+                                        <span class="text-xs font-mono font-bold text-[#0f172a]">
                                             SN: {{ $batch['serial_number'] ?? 'N/A' }}
                                         </span>
                                     @else
-                                        <span class="text-xs font-mono font-bold text-slate-800">
+                                        <span class="text-xs font-mono font-bold text-[#0f172a]">
                                             Lot: {{ $batch['lot_number'] ?? 'No Lot #' }}
                                         </span>
                                     @endif
@@ -155,10 +160,10 @@
         </div>
 
         {{-- Amount & Time --}}
-        <div class="bg-white border border-slate-200 relative mb-4">
-            <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-            <div class="ml-1">
-                <div class="px-5 py-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+            <div>
+                <div class="px-5 py-4 border-b border-sky-100">
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">// Amount &amp; Time</p>
@@ -178,7 +183,7 @@
                                     :readonly="selectedEntry !== ''"
                                     min="1" max="{{ $maxQty }}"
                                     x-model="manualQty"
-                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-slate-800 transition-colors"
+                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-[#0f172a] transition-colors"
                                     :class="selectedEntry !== '' ? 'opacity-60 cursor-not-allowed' : ''"
                                     required>
                                 @else
@@ -187,7 +192,7 @@
                                     min="1" max="{{ $maxQty }}"
                                     value="{{ old('quantity', 1) }}"
                                     x-model="manualQty"
-                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-slate-800 transition-colors"
+                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-[#0f172a] transition-colors"
                                     required>
                                 @endif
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -207,7 +212,7 @@
                             </label>
                             <input type="datetime-local" name="disposed_at" id="disposed_at"
                                 value="{{ old('disposed_at', now()->format('Y-m-d\TH:i')) }}"
-                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                 required>
                             @error('disposed_at') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                         </div>
@@ -217,10 +222,10 @@
         </div>
 
         {{-- Documentation --}}
-        <div class="bg-white border border-slate-200 relative mb-4">
-            <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-            <div class="ml-1">
-                <div class="px-5 py-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+            <div>
+                <div class="px-5 py-4 border-b border-sky-100">
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">// Documentation</p>
@@ -232,7 +237,7 @@
                             Disposed By <span class="text-rose-500">*</span>
                         </label>
                         <select name="disposed_by" id="disposed_by" required
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                             <option value="" disabled {{ old('disposed_by') ? '' : 'selected' }}>— Select staff member —</option>
                             @foreach($staffList as $staff)
                             <option value="{{ $staff->display_name }}"
@@ -248,7 +253,7 @@
                             Reason for Disposal <span class="text-rose-500">*</span>
                         </label>
                         <textarea id="reason" name="reason" rows="3"
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 transition-colors"
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] placeholder:text-slate-400 transition-colors"
                             placeholder="{{ $disposalType === 'new' ? 'e.g. Expired stock, past safe use date...' : 'e.g. End of procedure, damage, contamination...' }}"
                             required>{{ old('reason', $disposalType === 'new' ? 'Expired stock' : '') }}</textarea>
                         @error('reason') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
@@ -260,7 +265,7 @@
         {{-- Actions --}}
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('items.show', $item) }}"
-                class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-300 transition-colors">
+                class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-[#0f172a] border border-sky-100 hover:border-slate-300 transition-colors">
                 Cancel
             </a>
             <button type="submit"

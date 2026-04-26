@@ -4,26 +4,30 @@
 
 @section('actions')
     <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
-        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
         ← Back to Borrows
     </a>
 @endsection
 
 @section('content')
-    <div>
+<div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
 
-        {{-- Page Header --}}
-        <div class="mb-5">
-            <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Borrows://Record</p>
-            <h1 class="text-xl font-bold text-slate-800 tracking-tight">Record Borrow</h1>
-            <p class="text-xs text-slate-400 font-mono mt-0.5">Track items lent to or returned from staff.</p>
+    {{-- Page Header --}}
+    <div class="p-6 border-b border-sky-100 flex items-center justify-between shrink-0 mb-6">
+        <div>
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Borrows://Record</p>
+            <h3 class="text-xl font-black text-[#0f172a] tracking-tight">Record Borrow</h3>
+            <p class="text-xs text-slate-400 font-mono mt-1">Track items lent to or returned from staff.</p>
         </div>
+    </div>
+
+    <div class="p-6 pt-0">
 
         @if ($errors->any())
             <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
-                <ul class="ml-1 space-y-1">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2">// Errors</p>
+                <ul class="space-y-1">
                     @foreach ($errors->all() as $error)
                         <li class="text-sm text-rose-700">— {{ $error }}</li>
                     @endforeach
@@ -42,9 +46,9 @@
                     {{-- ======================== --}}
                     {{-- SECTION 1: Item Select  --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-slate-200 relative">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-                        <div class="px-5 py-4 ml-1">
+                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                        <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="h-2 w-2 bg-sky-500 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">01 // Item Selection</p>
@@ -70,7 +74,7 @@
                                             });
                                         });
                                     "
-                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors">
+                                    class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] font-mono transition-colors">
                                     <option value="">-- Choose an item --</option>
                                     @foreach($items as $i)
                                         <option value="{{ $i->id }}">
@@ -83,24 +87,24 @@
                             <div x-show="selectedItem" class="mt-4 pt-4 border-t border-slate-100" x-cloak>
                                 <label class="block text-sm font-bold text-slate-700 mb-1.5">Stock to Borrow <span class="text-rose-500">*</span></label>
                                 <div class="grid grid-cols-2 gap-3 sm:w-2/3">
-                                    <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                    <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                         class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                         <input type="radio" name="stock_type" value="new" x-model="stockType"
                                             @change="selectedEntries = []" class="accent-blue-600">
                                         <div>
-                                            <p class="text-sm font-bold text-slate-800">New Stock</p>
+                                            <p class="text-sm font-bold text-[#0f172a]">New Stock</p>
                                             <p class="text-xs font-mono text-slate-500"
                                                 x-text="(items[selectedItem] ? items[selectedItem].new : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
                                             </p>
                                         </div>
                                     </label>
                                     <label x-show="items[selectedItem] && items[selectedItem].used > 0"
-                                        :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                         class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                         <input type="radio" name="stock_type" value="used" x-model="stockType"
                                             @change="selectedEntries = []" class="accent-amber-500">
                                         <div>
-                                            <p class="text-sm font-bold text-slate-800">Used Stock</p>
+                                            <p class="text-sm font-bold text-[#0f172a]">Used Stock</p>
                                             <p class="text-xs font-mono text-slate-500"
                                                 x-text="(items[selectedItem] ? items[selectedItem].used : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
                                             </p>
@@ -117,7 +121,7 @@
                     {{-- SECTION 3A: Device Selection (OUT ONLY) --}}
                     {{-- ======================================== --}}
                     <div class="bg-white border border-indigo-300 relative" x-show="isDevice() && getBatches().length > 0" x-cloak x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
                         <div class="ml-1">
                             <div class="px-5 py-4 border-b border-dashed border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                 <div>
@@ -141,7 +145,7 @@
                                     <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                     </svg>
-                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-slate-800 outline-none">
+                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-[#0f172a] outline-none">
                                 </div>
                             </div>
                             <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
@@ -153,7 +157,7 @@
                                             :value="String(batch.id)" x-model="selectedEntries"
                                             class="h-4 w-4 accent-indigo-600 shrink-0">
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-bold font-mono text-slate-800"
+                                            <p class="text-sm font-bold font-mono text-[#0f172a]"
                                                 x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')"></p>
                                             <div class="flex items-center gap-2 mt-0.5">
                                                 <span x-show="!batch.is_used" class="flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-widest text-teal-700 bg-teal-100 px-1.5 py-0.5 border border-teal-200">
@@ -179,9 +183,9 @@
                     {{-- ============================================= --}}
                     {{-- SECTION 3B: Quantity & Specifics            --}}
                     {{-- ============================================= --}}
-                    <div class="bg-white border border-slate-200 relative" x-show="selectedItem" x-cloak x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-                        <div class="px-5 py-4 ml-1">
+                    <div class="bg-white border border-sky-100 relative" x-show="selectedItem" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                        <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
@@ -198,7 +202,7 @@
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrow Quantity <span class="text-rose-500">*</span></label>
                                     <div class="relative">
                                         <input type="number" name="quantity_borrowed" x-model="manualQty" min="1" value="{{ old('quantity_borrowed', 1) }}"
-                                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors">
+                                            class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                             <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
                                         </div>
@@ -210,14 +214,14 @@
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrow Date &amp; Time <span class="text-rose-500">*</span></label>
                                     <input type="datetime-local" name="borrowed_at" value="{{ old('borrowed_at', now()->format('Y-m-d\TH:i')) }}"
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                         required>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Expected Return Date <span class="text-slate-400 font-normal">(Optional)</span></label>
                                     <input type="date" name="return_date" value="{{ old('return_date') }}"
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors">
                                 </div>
                                 
                             </div>
@@ -227,9 +231,9 @@
                     {{-- ======================== --}}
                     {{-- SECTION 4: Party Info   --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-slate-200 relative" x-show="selectedItem" x-cloak x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-                        <div class="px-5 py-4 ml-1 space-y-4">
+                    <div class="bg-white border border-sky-100 relative" x-show="selectedItem" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+                        <div class="px-5 py-4 space-y-4">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="h-2 w-2 bg-slate-400 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
@@ -243,14 +247,14 @@
                                         Name of Borrower <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="text" name="borrower_name" value="{{ old('borrower_name') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                     @error('borrower_name') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrower Bio ID <span class="text-rose-500">*</span></label>
                                     <input type="text" name="bio_id" value="{{ old('bio_id') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                 </div>
 
                                 <div>
@@ -258,13 +262,13 @@
                                         Borrower Department <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="text" name="department" value="{{ old('department') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                 </div>
 
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span class="font-normal text-slate-400">(Optional)</span></label>
                                     <textarea name="notes" rows="3"
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors placeholder:text-slate-400"
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors placeholder:text-slate-400"
                                         placeholder="Condition of item, context...">{{ old('notes') }}</textarea>
                                 </div>
                             </div>
@@ -278,7 +282,7 @@
             {{-- Submit --}}
             <div class="flex items-center justify-end gap-3 pt-4">
                 <a href="{{ route('in-out.index', ['tab' => 'borrow']) }}"
-                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-[#0f172a] transition-colors border border-sky-100 hover:border-slate-300">
                     Cancel
                 </a>
                 
@@ -292,7 +296,7 @@
                     } 
                 }">
                     <button type="submit" :disabled="!canSubmit()"
-                        :class="!canSubmit() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
+                        :class="!canSubmit() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-sky-500 hover:bg-sky-600 border-sky-600'"
                         class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
                         <span>Record Borrow</span>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">

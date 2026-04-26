@@ -35,7 +35,7 @@
         }
     }" class="relative" @click.outside="open = false">
         <button @click="open = !open"
-            class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-slate-200"
+            class="inline-flex items-center gap-2 bg-white hover:bg-sky-50 text-slate-700 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-sky-100"
             :class="anySelected ? 'border-emerald-400 text-emerald-700 bg-emerald-50' : ''">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5 text-emerald-600">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -58,7 +58,7 @@
             <div class="relative z-10 bg-white flex flex-col">
 
                 {{-- Header --}}
-                <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div class="px-4 py-3 border-b border-sky-100 flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -68,12 +68,12 @@
                 </div>
 
                 {{-- Select All --}}
-                <label @click.prevent="toggleAll(!allSelected)" class="flex items-center gap-3 px-4 py-3 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors group">
+                <label @click.prevent="toggleAll(!allSelected)" class="flex items-center gap-3 px-4 py-3 border-b border-sky-100 cursor-pointer hover:bg-sky-50 transition-colors group">
                     <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
                         :class="allSelected ? 'bg-blue-500 border-blue-500' : 'border-slate-300 group-hover:border-blue-400'">
                         <svg x-show="allSelected" class="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                     </div>
-                    <span class="text-[11px] font-mono font-bold text-slate-700 group-hover:text-blue-600 transition-colors">Select All</span>
+                    <span class="text-[11px] font-mono font-bold text-slate-700 group-hover:text-sky-500 transition-colors">Select All</span>
                     <span class="ml-auto text-[9px] font-mono text-slate-400">ALL</span>
                 </label>
 
@@ -81,7 +81,7 @@
                 <div class="py-1">
                     <p class="px-4 pt-2 pb-1 text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">Status</p>
 
-                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors group" @click.stop>
+                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-sky-50 transition-colors group" @click.stop>
                         <input type="checkbox" x-model="presets.low_stock" class="sr-only">
                         <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
                             :class="presets.low_stock ? 'bg-amber-500 border-amber-500' : 'border-slate-300 group-hover:border-amber-400'">
@@ -91,7 +91,7 @@
                         <span class="ml-auto h-1.5 w-1.5 bg-amber-400 block flex-shrink-0"></span>
                     </label>
 
-                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors group" @click.stop>
+                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-sky-50 transition-colors group" @click.stop>
                         <input type="checkbox" x-model="presets.out_of_stock" class="sr-only">
                         <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
                             :class="presets.out_of_stock ? 'bg-rose-500 border-rose-500' : 'border-slate-300 group-hover:border-rose-400'">
@@ -101,7 +101,7 @@
                         <span class="ml-auto h-1.5 w-1.5 bg-rose-500 block flex-shrink-0"></span>
                     </label>
 
-                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors group" @click.stop>
+                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-sky-50 transition-colors group" @click.stop>
                         <input type="checkbox" x-model="presets.expired" class="sr-only">
                         <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
                             :class="presets.expired ? 'bg-orange-500 border-orange-500' : 'border-slate-300 group-hover:border-orange-400'">
@@ -113,17 +113,17 @@
 
                     <p class="px-4 pt-3 pb-1 text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest border-t border-slate-50 mt-1">Item Type</p>
 
-                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors group" @click.stop>
+                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-sky-50 transition-colors group" @click.stop>
                         <input type="checkbox" x-model="presets.devices" class="sr-only">
                         <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                            :class="presets.devices ? 'bg-indigo-500 border-indigo-500' : 'border-slate-300 group-hover:border-indigo-400'">
+                            :class="presets.devices ? 'bg-sky-500 border-indigo-500' : 'border-slate-300 group-hover:border-indigo-400'">
                             <svg x-show="presets.devices" class="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                         </div>
-                        <span class="text-[11px] font-mono font-bold text-slate-600 group-hover:text-indigo-600 transition-colors">Devices Only</span>
-                        <span class="ml-auto h-1.5 w-1.5 bg-indigo-500 block flex-shrink-0"></span>
+                        <span class="text-[11px] font-mono font-bold text-slate-600 group-hover:text-sky-600 transition-colors">Devices Only</span>
+                        <span class="ml-auto h-1.5 w-1.5 bg-sky-500 block flex-shrink-0"></span>
                     </label>
 
-                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors group" @click.stop>
+                    <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-sky-50 transition-colors group" @click.stop>
                         <input type="checkbox" x-model="presets.consumables" class="sr-only">
                         <div class="h-4 w-4 border-2 flex items-center justify-center flex-shrink-0 transition-colors"
                             :class="presets.consumables ? 'bg-teal-500 border-teal-500' : 'border-slate-300 group-hover:border-teal-400'">
@@ -135,7 +135,7 @@
                 </div>
 
                 {{-- Single Combined Download --}}
-                <div class="px-4 py-3 border-t border-slate-100">
+                <div class="px-4 py-3 border-t border-sky-100">
                     <template x-if="anySelected">
                         <a :href="'{{ route('items.export') }}?presets=' + selectedList.join(',') "
                             class="flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-mono font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
@@ -156,7 +156,7 @@
         </div>
     </div>
     <a href="{{ route('items.create') }}"
-        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+        class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-sky-600">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5">
             <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
         </svg>
@@ -167,37 +167,80 @@
 
 @section('content')
 
-{{-- Page Header --}}
-<div class="mb-5 flex items-end justify-between">
-    <div>
-        <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Inventory://Items</p>
-        <h1 class="text-xl font-bold text-slate-800 tracking-tight">Item Registry</h1>
+<div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
+
+@php
+    $totalCount = $items->count();
+    $deviceCount = $items->where('item_type', 'device')->count();
+    $consumableCount = $items->where('item_type', 'consumable')->count();
+    
+    $outOfStockCount = $items->filter(fn($i) => $i->total_stock <= 0)->count();
+    $reorderCount = $items->filter(fn($i) => $i->total_stock > 0 && $i->total_stock <= $i->reorder_level)->count();
+    $healthyCount = $items->filter(fn($i) => $i->total_stock > $i->reorder_level)->count();
+
+    $devicePct = $totalCount > 0 ? round(($deviceCount / $totalCount) * 100) : 0;
+    $consumablePct = $totalCount > 0 ? round(($consumableCount / $totalCount) * 100) : 0;
+
+    $healthyPct = $totalCount > 0 ? round(($healthyCount / $totalCount) * 100) : 0;
+    $reorderPct = $totalCount > 0 ? round(($reorderCount / $totalCount) * 100) : 0;
+    $outOfStockPct = $totalCount > 0 ? round(($outOfStockCount / $totalCount) * 100) : 0;
+@endphp
+
+{{-- Analytics Overview (Maximizing Space) --}}
+<div class="border-b border-sky-100 bg-white grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-sky-100 shrink-0">
+    
+    {{-- Metric: Total --}}
+    <div class="p-4 flex items-center justify-between">
+        <div>
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Registry Overview</p>
+            <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-black text-[#0f172a] tracking-tight">{{ $totalCount }}</h3>
+                <span class="text-xs font-mono text-slate-400 font-bold uppercase tracking-widest">Items</span>
+            </div>
+        </div>
+        <div class="h-10 w-10 rounded-full bg-sky-50 flex items-center justify-center border border-sky-100">
+            <svg class="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+        </div>
     </div>
-    <span class="text-[10px] font-mono text-slate-400">{{ $items->count() }} records</span>
+
+    {{-- Chart: Stock Health --}}
+    <div class="p-4 flex flex-col justify-center">
+        <div class="flex justify-between items-end mb-2">
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Stock Health Tracker</p>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-sm border border-slate-200">
+            <div style="width: {{ $healthyPct }}%" class="bg-emerald-400" title="Healthy: {{ $healthyCount }}"></div>
+            <div style="width: {{ $reorderPct }}%" class="bg-amber-400" title="Reorder: {{ $reorderCount }}"></div>
+            <div style="width: {{ $outOfStockPct }}%" class="bg-rose-500" title="Out of Stock: {{ $outOfStockCount }}"></div>
+        </div>
+        <div class="flex justify-between mt-2">
+            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-emerald-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $healthyCount }} OK</span></div>
+            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-amber-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $reorderCount }} Low</span></div>
+            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[9px] font-mono font-black text-rose-600">{{ $outOfStockCount }} Empty</span></div>
+        </div>
+    </div>
+
+    {{-- Chart: Category Distribution --}}
+    <div class="p-4 flex flex-col justify-center bg-slate-50/50">
+        <div class="flex justify-between items-end mb-2">
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Type Distribution</p>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-sm border border-slate-200">
+            <div style="width: {{ $consumablePct }}%" class="bg-sky-400" title="Consumables: {{ $consumableCount }}"></div>
+            <div style="width: {{ $devicePct }}%" class="bg-violet-400" title="Devices: {{ $deviceCount }}"></div>
+        </div>
+        <div class="flex justify-between mt-2">
+            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-sky-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $consumableCount }} Consumable</span></div>
+            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-violet-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $deviceCount }} Device</span></div>
+        </div>
+    </div>
 </div>
 
 {{-- Search & Filter Bar --}}
-<div class="bg-white border border-slate-200 mb-5 relative">
-    <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 to-indigo-400"></div>
-    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-    <div x-data="{ 
-        search: '',
-        results: [],
-        open: false,
-        async fetchResults() {
-            if (this.search.length < 1) {
-                this.results = [];
-                return;
-            }
-            try {
-                const response = await fetch(`/api/items/search?q=${encodeURIComponent(this.search)}`);
-                this.results = await response.json();
-            } catch (error) {
-                this.results = [];
-            }
-        }
-    }" class="relative">
-        <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3 p-3 pl-4">
+<div class="bg-sky-50/50 border-b border-sky-100 p-4 relative">
+    <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+    <div>
+        <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3 pl-2">
 
             {{-- Search Input --}}
             <div class="relative flex-1 sm:min-w-[280px]">
@@ -207,42 +250,14 @@
                     </svg>
                 </div>
                 <input type="text" name="search"
-                    x-model="search"
-                    @input="fetchResults()"
-                    @focus="open = true"
-                    @blur="setTimeout(() => open = false, 200)"
                     value="{{ request('search') }}"
-                    class="block w-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
+                    class="block w-full border border-sky-100 bg-white py-2 pl-9 pr-4 text-sm font-mono text-[#0f172a] placeholder:text-slate-400 focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition-colors rounded-none"
                     placeholder="Search items...">
-                
-                {{-- Live Suggestions --}}
-                <div 
-                    x-show="open && results.length > 0" 
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-2"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 translate-y-0"
-                    x-transition:leave-end="opacity-0 translate-y-2"
-                    class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg z-50 max-h-96 overflow-y-auto"
-                    style="display: none;">
-                    <template x-for="item in results" :key="item.id">
-                        <a :href="`/items/${item.id}`" class="block px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition-colors group">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <p class="text-sm font-bold text-slate-800 group-hover:text-blue-600" x-text="item.name"></p>
-                                    <p class="text-xs text-slate-400 font-mono mt-0.5" x-text="item.category"></p>
-                                </div>
-                                <span class="text-xs font-mono font-bold text-slate-500 ml-2" x-text="`${item.stock}/${item.unit}`"></span>
-                            </div>
-                        </a>
-                    </template>
-                </div>
             </div>
 
             {{-- Category Filter --}}
             <select name="category"
-                class="block w-full sm:w-44 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
+                class="block w-full sm:w-44 border border-sky-100 bg-white px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition-colors rounded-none">
                 <option value="">All Categories</option>
                 @foreach($categories as $cat)
                 <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
@@ -251,7 +266,7 @@
 
             {{-- Type Filter --}}
             <select name="type"
-                class="block w-full sm:w-40 border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-blue-500 focus:outline-none transition-colors">
+                class="block w-full sm:w-40 border border-sky-100 bg-white px-3 py-2 text-sm font-mono text-slate-700 focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition-colors rounded-none">
                 <option value="">All Types</option>
                 <option value="device" {{ request('type') === 'device' ? 'selected' : '' }}>Device</option>
                 <option value="consumable" {{ request('type') === 'consumable' ? 'selected' : '' }}>Consumable</option>
@@ -260,7 +275,7 @@
             {{-- Actions --}}
             <div class="flex gap-2">
                 <button type="submit"
-                    class="flex items-center gap-2 bg-slate-800 hover:bg-blue-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-slate-700 hover:border-blue-700">
+                    class="flex items-center gap-2 bg-[#0f172a] hover:bg-sky-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-transparent rounded-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
@@ -269,7 +284,7 @@
 
                 @if(request('search') || request('category') || request('type'))
                 <a href="{{ route('items.index') }}"
-                    class="flex items-center gap-2 border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:border-slate-300 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors">
+                    class="flex items-center gap-2 border border-sky-200 bg-sky-50 text-sky-600 hover:text-sky-800 hover:bg-sky-100 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors rounded-none">
                     Clear
                 </a>
                 @endif
@@ -279,7 +294,7 @@
 </div>
 
 {{-- Main Table --}}
-<div class="bg-white border border-slate-200 relative overflow-hidden" x-data="{
+<div class="bg-white border border-sky-100 relative overflow-hidden" x-data="{
     search: '{{ request('search') }}',
     category: '{{ request('category') }}',
     type: '{{ request('type') }}',
@@ -310,32 +325,32 @@
         });
     }
 }">
-    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+    <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
 
     <template x-if="filteredItems.length > 0">
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead>
-                <tr class="border-b border-slate-100 bg-slate-50/80">
+                <tr class="border-b border-sky-100 bg-sky-50/80">
                     <th scope="col" class="whitespace-nowrap pl-5 pr-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Item</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Category</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Location</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Unit</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Stock / Expiry</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Unit</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Status</th>
                     <th scope="col" class="whitespace-nowrap px-3 py-3 text-right pr-5 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
                 <template x-for="item in filteredItems" :key="item.id">
-                <tr class="group hover:bg-slate-50 transition-colors">
+                <tr class="group hover:bg-sky-50 transition-colors">
 
                     {{-- Item Name --}}
                     <td class="pl-5 pr-3 py-3">
                         <div class="flex flex-col gap-0.5">
-                            <span class="text-sm font-bold text-slate-800" x-text="item.name"></span>
+                            <span class="text-sm font-bold text-[#0f172a]" x-text="item.name"></span>
                             <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 border" :class="item.item_type === 'device' ? 'text-violet-600 bg-violet-50 border-violet-200' : 'text-indigo-600 bg-indigo-50 border-indigo-200'" x-text="item.item_type === 'device' ? 'Device' : 'Consumable'"></span>
+                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 border" :class="item.item_type === 'device' ? 'text-violet-600 bg-violet-50 border-violet-200' : 'text-sky-600 bg-sky-50 border-sky-200'" x-text="item.item_type === 'device' ? 'Device' : 'Consumable'"></span>
                                 <template x-if="item.brand">
                                     <span class="text-[10px] font-mono text-slate-400" x-text="item.brand + (item.model ? ' · ' + item.model : '')"></span>
                                 </template>
@@ -348,25 +363,15 @@
 
                     {{-- Category --}}
                     <td class="whitespace-nowrap px-3 py-3">
-                        <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.category_name"></span>
+                        <span class="font-mono text-[11px] font-bold text-slate-600 bg-sky-50 border border-sky-100 px-2.5 py-1.5" x-text="item.category_name"></span>
                     </td>
 
                     {{-- Location --}}
                     <td class="whitespace-nowrap px-3 py-3">
                         <template x-if="item.storage_location">
-                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.storage_location + (item.storage_section ? ' / ' + item.storage_section : '')"></span>
+                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-sky-50 border border-sky-100 px-2.5 py-1.5" x-text="item.storage_location + (item.storage_section ? ' / ' + item.storage_section : '')"></span>
                         </template>
                         <template x-if="!item.storage_location">
-                            <span class="font-mono text-[11px] text-slate-400">—</span>
-                        </template>
-                    </td>
-
-                    {{-- Unit --}}
-                    <td class="whitespace-nowrap px-3 py-3">
-                        <template x-if="item.unit">
-                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1.5" x-text="item.unit"></span>
-                        </template>
-                        <template x-if="!item.unit">
                             <span class="font-mono text-[11px] text-slate-400">—</span>
                         </template>
                     </td>
@@ -383,9 +388,19 @@
                             </template>
                         </div>
                         {{-- Stock bar --}}
-                        <div class="mt-2 h-1 w-28 bg-slate-100 border border-slate-200">
+                        <div class="mt-2 h-1 w-28 bg-slate-100 border border-sky-100">
                             <div class="h-full transition-all duration-500" :style="`width: ${Math.min(100, (item.total_stock / 20) * 100)}%`" :class="item.total_stock > 5 ? 'bg-emerald-400' : (item.total_stock > 0 ? 'bg-amber-400' : 'bg-rose-400')"></div>
                         </div>
+                    </td>
+
+                    {{-- Unit --}}
+                    <td class="whitespace-nowrap px-3 py-3">
+                        <template x-if="item.unit">
+                            <span class="font-mono text-[11px] font-bold text-slate-600 bg-sky-50 border border-sky-100 px-2.5 py-1.5" x-text="item.unit"></span>
+                        </template>
+                        <template x-if="!item.unit">
+                            <span class="font-mono text-[11px] text-slate-400">—</span>
+                        </template>
                     </td>
 
                     {{-- Status --}}
@@ -414,7 +429,7 @@
                     <td class="whitespace-nowrap px-3 pr-5 py-3 text-right">
                         <div class="flex items-center justify-end gap-1.5">
                             <a :href="`/items/${item.id}`"
-                                class="inline-flex items-center gap-1 border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">
+                                class="inline-flex items-center gap-1 border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3">
                                     <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
                                     <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
@@ -423,7 +438,7 @@
                             </a>
                             <template x-if="item.total_stock <= 0">
                                 <button disabled
-                                    class="inline-flex items-center gap-1 border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-400 cursor-not-allowed opacity-50">
+                                    class="inline-flex items-center gap-1 border border-sky-100 bg-slate-100 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-400 cursor-not-allowed opacity-50">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
                                         <path fill-rule="evenodd" d="M8 2a.75.75 0 01.75.75v8.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06L7.25 11.44V2.75A.75.75 0 018 2z" clip-rule="evenodd" />
                                     </svg>
@@ -440,14 +455,14 @@
                                 </a>
                             </template>
                             <a :href="`/items/${item.id}/stock/create`"
-                                class="inline-flex items-center gap-1 border border-indigo-200 bg-indigo-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
+                                class="inline-flex items-center gap-1 border border-sky-200 bg-sky-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-sky-600 hover:bg-sky-600 hover:text-white hover:border-sky-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3 w-3">
                                     <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" />
                                 </svg>
                                 Stock
                             </a>
                             <a :href="`/items/${item.id}/edit`"
-                                class="inline-flex items-center border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-colors">
+                                class="inline-flex items-center border border-sky-100 bg-sky-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-colors">
                                 Edit
                             </a>
                         </div>
@@ -462,7 +477,7 @@
     {{-- Empty State --}}
     <template x-if="filteredItems.length === 0">
     <div class="flex flex-col items-center justify-center py-20 text-center ml-1">
-        <div class="h-14 w-14 border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-400 mb-4">
+        <div class="h-14 w-14 border border-sky-100 bg-sky-50 flex items-center justify-center text-slate-400 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
             </svg>
@@ -474,12 +489,20 @@
         </p>
         <template x-if="!search && !category && !type">
             <a href="{{ route('items.create') }}"
-                class="mt-6 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-blue-700">
+                class="mt-6 inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border border-sky-600">
                 + Add First Item
             </a>
         </template>
     </div>
     </template>
 </div>
+
+</div>
+
+<style>
+    .items-theme [class*="border-sky-100"] { border-color: #dbeafe !important; }
+    .items-theme [class*="bg-sky-50"] { background-color: #f8fbff !important; }
+    .items-theme [class*="text-sky-500"] { color: #0284c7 !important; }
+</style>
 
 @endsection

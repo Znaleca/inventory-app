@@ -371,38 +371,24 @@
 
         /* ==================== 3D PAPER BOX ==================== */
         .paper-box-container {
-            perspective: 1200px;
+            
         }
 
         .paper-box {
             background: white;
-            border-radius: 8px;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.12),
-                0 0 0 1px rgba(59, 130, 246, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            border-radius: 1rem;
+            border: 1px solid #e0f2fe;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             position: relative;
+            overflow: hidden;
         }
 
         .paper-box-top {
-            position: absolute;
-            top: -12px;
-            left: 0;
-            right: 0;
-            height: 24px;
-            background: linear-gradient(180deg, white 0%, #f8fafc 100%);
-            border-radius: 8px 8px 0 0;
-            border: 1px solid #e2e8f0;
-            border-bottom: none;
-            z-index: 2;
+            display: none;
         }
 
         .paper-box-top::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
-            border-radius: 8px 8px 0 0;
+            display: none;
         }
 
         .paper-box-accent {
@@ -411,8 +397,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #3b82f6, #6366f1);
-            border-radius: 8px 8px 0 0;
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
             z-index: 3;
         }
 
@@ -450,7 +435,7 @@
             margin: 0;
             font-size: 10px;
             font-family: 'Fira Code', monospace;
-            color: var(--primary);
+            color: #0ea5e9;
             text-transform: uppercase;
             letter-spacing: 0.25em;
             margin-bottom: 0.5rem;
@@ -547,9 +532,8 @@
         .form-input {
             width: 100%;
             padding: 0.875rem 1rem 0.875rem 2.75rem;
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 6px;
+            background: #f0f9ff;
+            border: 1px solid #e0f2fe;
             font-size: 0.875rem;
             font-weight: 500;
             color: #0f172a;
@@ -558,24 +542,22 @@
         }
 
         .form-input::placeholder {
-            color: #cbd5e1;
+            color: #94a3b8;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .form-input:focus {
             outline: none;
             background: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #0ea5e9;
         }
 
         .form-submit {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: #0f172a;
             color: white;
-            border: none;
-            border-radius: 6px;
+            border: 1px solid #0f172a;
             font-weight: 700;
             font-size: 11px;
             text-transform: uppercase;
@@ -592,24 +574,9 @@
             margin-top: 1rem;
         }
 
-        .form-submit::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: left 0.3s ease;
-        }
-
-        .form-submit:hover::before {
-            left: 100%;
-        }
-
         .form-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            background: #334155;
+            border-color: #334155;
         }
 
         .form-submit svg {
@@ -783,7 +750,7 @@
 
             .form-input:focus {
                 background: rgba(30, 41, 59, 0.7);
-                border-color: var(--primary);
+                border-color: #0ea5e9;
             }
 
             .form-label,
@@ -914,7 +881,7 @@
             </div>
 
             <div class="form-wrapper">
-                <div class="paper-box-container">
+                <div>
                     <div class="paper-box">
                         <div class="paper-box-top"></div>
                         <div class="paper-box-accent"></div>
@@ -932,7 +899,7 @@
                             <!-- Title Section -->
                             <div class="form-title-section">
                                 <h1>Sign In</h1>
-                                <p class="form-subtitle">// Authenticate to continue</p>
+                                <p class="form-subtitle" style="color: #64748b;">// Authenticate to continue</p>
                             </div>
 
                             <!-- Error Alert -->

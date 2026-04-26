@@ -6,10 +6,14 @@
 <div x-data="{ activeTab: '{{ $tab }}', search: '' }">
 
     {{-- Page Header --}}
-    <div class="mb-5">
-        <p class="text-[10px] font-mono font-semibold text-rose-600 uppercase tracking-[0.25em] mb-1">Admin://Records</p>
-        <h1 class="text-xl font-bold text-slate-800 tracking-tight">Record Management</h1>
-        <p class="text-xs text-slate-400 font-mono mt-0.5">Edit or delete raw transaction and item records.</p>
+    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 mb-6">
+        <div class="p-6 flex items-center justify-between">
+            <div>
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Admin://Records</p>
+                <h3 class="text-xl font-black text-[#0f172a] tracking-tight">Record Management</h3>
+                <p class="text-xs text-slate-400 font-mono mt-1">Edit or delete raw transaction and item records.</p>
+            </div>
+        </div>
     </div>
 
     {{-- Chart Data Calculation --}}
@@ -23,7 +27,7 @@
             ['id' => 'borrows',      'label' => 'Borrows',        'count' => $borrows->count(),      'bar' => 'bg-blue-500',    'active' => 'border-blue-500 text-blue-700 bg-blue-50'],
             ['id' => 'returns',      'label' => 'Returns',        'count' => $returns->count(),      'bar' => 'bg-teal-500',    'active' => 'border-teal-500 text-teal-700 bg-teal-50'],
             ['id' => 'transfers',    'label' => 'Transfers',      'count' => $transfers->count(),    'bar' => 'bg-amber-500',   'active' => 'border-amber-500 text-amber-700 bg-amber-50'],
-            ['id' => 'disposals',    'label' => 'Disposals',      'count' => $disposals->count(),    'bar' => 'bg-slate-600',   'active' => 'border-slate-600 text-slate-700 bg-slate-100'],
+            ['id' => 'disposals',    'label' => 'Disposals',      'count' => $disposals->count(),    'bar' => 'bg-slate-600',   'active' => 'border-slate-600 text-slate-700 bg-sky-50'],
             ['id' => 'items',        'label' => 'Items',          'count' => $items->count(),        'bar' => 'bg-violet-500',  'active' => 'border-violet-500 text-violet-700 bg-violet-50'],
         ];
     @endphp
@@ -31,19 +35,19 @@
     {{-- Charts Top Row --}}
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
         {{-- Doughnut Chart: Flow Types --}}
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between ml-1">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
-                    <p class="text-sm font-bold text-slate-800">Directional Flow Volume</p>
+                    <p class="text-sm font-bold text-[#0f172a]">Directional Flow Volume</p>
                 </div>
                 <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
                     <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
                     LIVE
                 </span>
             </div>
-            <div class="p-5 ml-1">
+            <div class="p-5">
                 <div class="h-[240px]">
                     <canvas id="flowDoughnutChart"></canvas>
                 </div>
@@ -51,13 +55,13 @@
         </div>
 
         {{-- Bar Chart: Categories --}}
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-            <div class="px-5 py-4 border-b border-slate-100 ml-1">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
+            <div class="px-5 py-4 border-b border-sky-100">
                 <p class="text-[10px] font-mono text-indigo-600 uppercase tracking-widest mb-0.5">Chart.02</p>
-                <p class="text-sm font-bold text-slate-800">Records Breakdown By Category</p>
+                <p class="text-sm font-bold text-[#0f172a]">Records Breakdown By Category</p>
             </div>
-            <div class="p-5 ml-1">
+            <div class="p-5">
                 <div class="h-[240px]">
                     <canvas id="categoryBarChart"></canvas>
                 </div>
@@ -88,18 +92,17 @@
                 type="text"
                 x-model="search"
                 placeholder="Search by item name…"
-                class="w-full border border-slate-200 bg-white pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-slate-400 transition-colors"
+                class="w-full border border-sky-100 bg-white pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-slate-400 transition-colors"
             />
         </div>
-        <button @click="search = ''" x-show="search.length > 0" class="border border-slate-200 bg-white px-3 py-2 text-[10px] font-mono font-bold text-slate-500 hover:bg-slate-100 transition-colors">Clear</button>
+        <button @click="search = ''" x-show="search.length > 0" class="border border-sky-100 bg-white px-3 py-2 text-[10px] font-mono font-bold text-slate-500 hover:bg-sky-50 transition-colors">Clear</button>
     </div>
 
     {{-- ══ STOCK ENTRIES TAB ══ --}}
     <div x-show="activeTab === 'stock-entries'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-emerald-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-widest">// Stock Entries</p>
                     </div>
@@ -107,7 +110,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Lot / SN #</th>
@@ -115,11 +118,11 @@
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Received</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($stockEntries as $entry)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($entry->item->name ?? '') }}'.includes(search.toLowerCase())">
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $entry->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $entry->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-slate-700">{{ $entry->quantity }}</span></td>
                             <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">
                                 @if(($entry->item->item_type ?? '') === 'device')
@@ -132,7 +135,7 @@
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-500">{{ $entry->received_date?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('admin.stock-entries.edit', $entry) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('admin.stock-entries.edit', $entry) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('admin.stock-entries.destroy', $entry) }}" method="POST" class="m-0 inline" onsubmit="return confirm('Delete this record?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">Delete</button>
@@ -150,14 +153,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ USAGE LOGS TAB ══ --}}
     <div x-show="activeTab === 'usage-logs'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-rose-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest">// Usage Logs</p>
                     </div>
@@ -165,24 +166,24 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty Used</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Used By</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($usageLogs as $log)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($log->item->name ?? '') }}'.includes(search.toLowerCase())">
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $log->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $log->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-rose-600">-{{ $log->quantity_used }}</span></td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-600">{{ $log->used_by ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-500">{{ $log->used_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('admin.usage-logs.edit', $log) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('admin.usage-logs.edit', $log) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('admin.usage-logs.destroy', $log) }}" method="POST" class="m-0 inline" onsubmit="return confirm('Delete this record?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">Delete</button>
@@ -200,14 +201,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ BORROWS TAB ══ --}}
     <div x-show="activeTab === 'borrows'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-blue-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">// Borrow Records</p>
                     </div>
@@ -215,7 +214,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Borrower</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Borrowed</th>
@@ -225,13 +224,13 @@
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($borrows as $borrow)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($borrow->item->name ?? '') }}'.includes(search.toLowerCase())">
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $borrow->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $borrow->item->name ?? '—' }}</td>
                             <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800 text-xs">{{ $borrow->borrower_name ?? $borrow->staff?->display_name ?? 'Unknown' }}</div>
+                                <div class="font-bold text-[#0f172a] text-xs">{{ $borrow->borrower_name ?? $borrow->staff?->display_name ?? 'Unknown' }}</div>
                                 @if($borrow->department)<div class="font-mono text-[10px] text-slate-400">{{ $borrow->department }}</div>@endif
                                 @if($borrow->bio_id)<div class="font-mono text-[10px] text-slate-400">Bio: {{ $borrow->bio_id }}</div>@endif
                             </td>
@@ -250,7 +249,7 @@
                             <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">{{ $borrow->borrowed_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('admin.borrows.edit', $borrow) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('admin.borrows.edit', $borrow) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('admin.borrows.destroy', $borrow) }}" method="POST" class="m-0 inline" onsubmit="return confirm('Delete this record?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">Delete</button>
@@ -268,14 +267,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ RETURNS TAB ══ --}}
     <div x-show="activeTab === 'returns'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-teal-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">// Return Records</p>
                     </div>
@@ -283,7 +280,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Returned On</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Staff</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
@@ -291,23 +288,23 @@
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Returned / Used</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($returns as $returnRecord)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($returnRecord->item->name ?? '') }}'.includes(search.toLowerCase())">
                             <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">{{ $returnRecord->returned_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800 text-xs">{{ $returnRecord->borrower_name ?? $returnRecord->staff?->display_name ?? 'Unknown' }}</div>
+                                <div class="font-bold text-[#0f172a] text-xs">{{ $returnRecord->borrower_name ?? $returnRecord->staff?->display_name ?? 'Unknown' }}</div>
                                 @if($returnRecord->department)<div class="font-mono text-[10px] text-slate-400">{{ $returnRecord->department }}</div>@endif
                             </td>
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $returnRecord->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $returnRecord->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-slate-600">{{ $returnRecord->quantity_borrowed }}</span></td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs font-semibold">
                                 <span class="text-teal-600 font-mono font-black">{{ $returnRecord->quantity_returned }}</span> ret /
                                 <span class="text-rose-500 font-mono font-black">{{ $returnRecord->quantity_used }}</span> used
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
-                                <a href="{{ route('admin.borrows.edit', $returnRecord) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                <a href="{{ route('admin.borrows.edit', $returnRecord) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                             </td>
                         </tr>
                         @empty
@@ -320,14 +317,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ TRANSFERS TAB ══ --}}
     <div x-show="activeTab === 'transfers'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-amber-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">// Transfer Records</p>
                     </div>
@@ -335,7 +330,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Dir</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
@@ -344,9 +339,9 @@
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Party</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($transfers as $transfer)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($transfer->item->name ?? '') }}'.includes(search.toLowerCase())">
                             <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">{{ $transfer->transferred_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4">
@@ -356,7 +351,7 @@
                                 <span class="inline-flex items-center border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-amber-700">↑ OUT</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $transfer->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $transfer->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4">
                                 @php
                                     $prefix = $transfer->type === 'in' ? '+' : '-';
@@ -377,13 +372,13 @@
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-600">{{ $transfer->destination ?? '—' }}</td>
                             <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800 text-xs">{{ $transfer->transferred_to ?? 'Unknown' }}</div>
+                                <div class="font-bold text-[#0f172a] text-xs">{{ $transfer->transferred_to ?? 'Unknown' }}</div>
                                 @if($transfer->department)<div class="font-mono text-[10px] text-slate-400">{{ $transfer->department }}</div>@endif
                                 @if($transfer->bio_id)<div class="font-mono text-[10px] text-slate-400">Bio: {{ $transfer->bio_id }}</div>@endif
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('admin.transfers.edit', $transfer) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('admin.transfers.edit', $transfer) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('admin.transfers.destroy', $transfer) }}" method="POST" class="m-0 inline" onsubmit="return confirm('Delete this record?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">Delete</button>
@@ -401,14 +396,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ DISPOSALS TAB ══ --}}
     <div x-show="activeTab === 'disposals'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-slate-600"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-slate-600 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">// Disposal Records</p>
                     </div>
@@ -416,7 +409,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Reason</th>
@@ -424,18 +417,18 @@
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($disposals as $disposal)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($disposal->item->name ?? '') }}'.includes(search.toLowerCase())">
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $disposal->item->name ?? '—' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $disposal->item->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><span class="font-mono font-black text-slate-600">{{ $disposal->quantity }}</span></td>
                             <td class="px-6 py-4 text-xs text-slate-600 max-w-xs truncate">{{ $disposal->reason ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-xs text-slate-600">{{ $disposal->disposed_by ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 font-mono text-xs text-slate-500">{{ $disposal->disposed_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('admin.disposals.edit', $disposal) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('admin.disposals.edit', $disposal) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('admin.disposals.destroy', $disposal) }}" method="POST" class="m-0 inline" onsubmit="return confirm('Delete this record?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-[10px] font-mono font-bold text-rose-600 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-colors">Delete</button>
@@ -453,14 +446,12 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ══ ITEMS TAB ══ --}}
     <div x-show="activeTab === 'items'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white border border-slate-200 relative">
-            <div class="absolute top-0 left-0 w-1 h-full bg-violet-500"></div>
-            <div class="ml-1">
-                <div class="px-6 py-5 border-b border-slate-100">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
+            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-400 to-violet-600"></div>
+            <div class="px-6 py-5 border-b border-sky-100">
                     <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-violet-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">// Master Item List</p>
                     </div>
@@ -468,26 +459,26 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-200">
+                        <thead><tr class="bg-sky-50/80 border-b border-sky-100">
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Name</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Category</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Location</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Stock</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-sky-50">
                         @forelse($items as $item)
-                        <tr class="hover:bg-slate-50 transition-colors"
+                        <tr class="hover:bg-sky-50 transition-colors"
                             x-show="search === '' || '{{ strtolower($item->name) }}'.includes(search.toLowerCase())">
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $item->name }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0f172a]">{{ $item->name }}</td>
                             <td class="whitespace-nowrap px-6 py-4">
-                                <span class="inline-flex items-center border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
+                                <span class="inline-flex items-center border border-sky-100 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
                                     {{ $item->category->name ?? 'Uncategorized' }}
                                 </span>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">
                                 @if($item->storage_location)
-                                <span class="inline-flex items-center border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
+                                <span class="inline-flex items-center border border-sky-100 bg-slate-50 px-2 py-0.5 text-[9px] font-mono font-bold tracking-widest uppercase text-slate-600">
                                     {{ $item->storage_location }}{{ $item->storage_section ? ' / ' . $item->storage_section : '' }}
                                 </span>
                                 @else
@@ -500,7 +491,7 @@
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('items.edit', $item) }}" class="inline-flex items-center border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-slate-100 transition-colors">Edit</a>
+                                    <a href="{{ route('items.edit', $item) }}" class="inline-flex items-center border border-sky-100 bg-white px-2.5 py-1.5 text-[10px] font-mono font-bold text-slate-700 hover:bg-sky-50 transition-colors">Edit</a>
                                     <form action="{{ route('items.destroy', $item) }}" method="POST" class="m-0 inline"
                                         onsubmit="return confirm('Delete \'{{ addslashes($item->name) }}\' and ALL its records (stock entries, usage logs, borrows, transfers, disposals)? This cannot be undone.')">
                                         @csrf @method('DELETE')
@@ -519,7 +510,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
 </div>
 

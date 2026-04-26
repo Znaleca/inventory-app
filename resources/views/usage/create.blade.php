@@ -4,7 +4,7 @@
 
 @section('actions')
     <a href="{{ route('items.index') }}"
-        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
         ← Back to Items
     </a>
 @endsection
@@ -15,16 +15,16 @@
         {{-- Page Header --}}
         <div class="mb-5">
             <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Usage://Log</p>
-            <h1 class="text-xl font-bold text-slate-800 tracking-tight">Log Item Usage</h1>
+            <h1 class="text-xl font-bold text-[#0f172a] tracking-tight">Log Item Usage</h1>
             <p class="text-xs text-slate-400 font-mono mt-0.5">Record inventory items consumed or used during a procedure.
             </p>
         </div>
 
         @if ($errors->any())
             <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
-                <ul class="ml-1 space-y-1">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2">// Errors</p>
+                <ul class="space-y-1">
                     @foreach ($errors->all() as $error)
                         <li class="text-sm text-rose-700">— {{ $error }}</li>
                     @endforeach
@@ -38,9 +38,9 @@
             {{-- ======================== --}}
             {{-- SECTION 1: Item Select --}}
             {{-- ======================== --}}
-            <div class="bg-white border border-slate-200 mb-4 relative">
-                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                <div class="px-5 py-4 ml-1">
+            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                <div class="px-5 py-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-blue-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">01 // Select Item
@@ -66,7 +66,7 @@
                                 });
                             });
                         "
-                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors">
+                        class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] font-mono transition-colors">
                         <option value="">-- Choose an item --</option>
                         @foreach($items as $i)
                             @php $total = $i->total_stock + $i->effective_stock_used; @endphp
@@ -84,9 +84,9 @@
             {{-- ========================== --}}
             {{-- SECTION 2: Stock Type --}}
             {{-- ========================== --}}
-            <div class="bg-white border border-slate-200 mb-4 relative" x-show="selectedItem" x-cloak x-transition>
-                <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-                <div class="px-5 py-4 ml-1">
+            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="selectedItem" x-cloak x-transition>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                <div class="px-5 py-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-sky-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">02 // Stock Source
@@ -94,24 +94,24 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <label x-show="items[selectedItem] && items[selectedItem].new > 0"
-                            :class="stockType === 'new' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                            :class="stockType === 'new' ? 'border-blue-500 bg-blue-50' : 'border-sky-100 bg-sky-50 hover:bg-sky-50'"
                             class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                             <input type="radio" name="stock_type" value="new" x-model="stockType"
                                 @change="selectedEntries = []" class="accent-blue-600">
                             <div>
-                                <p class="text-sm font-bold text-slate-800">New Stock</p>
+                                <p class="text-sm font-bold text-[#0f172a]">New Stock</p>
                                 <p class="text-xs font-mono text-slate-500"
                                     x-text="(items[selectedItem] ? items[selectedItem].new : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
                                 </p>
                             </div>
                         </label>
                         <label x-show="items[selectedItem] && items[selectedItem].used > 0"
-                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-sky-50 hover:bg-sky-50'"
                             class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                             <input type="radio" name="stock_type" value="used" x-model="stockType"
                                 @change="selectedEntries = []" class="accent-amber-500">
                             <div>
-                                <p class="text-sm font-bold text-slate-800">Used Stock</p>
+                                <p class="text-sm font-bold text-[#0f172a]">Used Stock</p>
                                 <p class="text-xs font-mono text-slate-500"
                                     x-text="(items[selectedItem] ? items[selectedItem].used : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
                                 </p>
@@ -128,7 +128,7 @@
             {{-- ======================================== --}}
             <div class="bg-white border border-indigo-300 mb-4 relative" x-show="isDevice() && stockType === 'new'" x-cloak
                 x-transition>
-                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
                 <div class="ml-1">
                     {{-- Header --}}
                     <div class="px-5 py-4 border-b border-dashed border-slate-100">
@@ -173,13 +173,13 @@
                     <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
                         <template x-for="batch in filteredBatches()" :key="batch.id">
                             <label :for="'entry_' + batch.id"
-                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'hover:bg-slate-50'"
+                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'hover:bg-sky-50'"
                                 class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
                                 <input type="checkbox" :id="'entry_' + batch.id" name="selected_entries[]"
                                     :value="String(batch.id)" x-model="selectedEntries"
                                     class="h-4 w-4 accent-indigo-600 shrink-0">
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold font-mono text-slate-800"
+                                    <p class="text-sm font-bold font-mono text-[#0f172a]"
                                         x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
                                     </p>
                                     <p class="text-[10px] font-mono text-slate-400 mt-0.5"
@@ -212,7 +212,7 @@
             {{-- ======================================== --}}
             <div class="bg-white border border-amber-300 mb-4 relative" x-show="isDevice() && stockType === 'used'" x-cloak
                 x-transition>
-                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
                 <div class="ml-1">
                     <div class="px-5 py-4 border-b border-dashed border-slate-100">
                         <div class="flex items-center justify-between">
@@ -255,13 +255,13 @@
                     <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
                         <template x-for="batch in filteredBatches()" :key="'used_' + batch.id">
                             <label :for="'used_entry_' + batch.id"
-                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-slate-50'"
+                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-sky-50'"
                                 class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
                                 <input type="checkbox" :id="'used_entry_' + batch.id" name="selected_entries[]"
                                     :value="String(batch.id)" x-model="selectedEntries"
                                     class="h-4 w-4 accent-amber-500 shrink-0">
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold font-mono text-slate-800"
+                                    <p class="text-sm font-bold font-mono text-[#0f172a]"
                                         x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
                                     </p>
                                     <p class="text-[10px] font-mono text-slate-400 mt-0.5"
@@ -293,7 +293,7 @@
             {{-- ============================================== --}}
             <div class="bg-white border border-amber-300 mb-4 relative"
                 x-show="selectedItem && isExpirableConsumable() && stockType === 'new'" x-cloak x-transition>
-                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
                 <div class="ml-1">
                     <div class="px-5 py-4 border-b border-dashed border-slate-100 flex items-center justify-between">
                         <div>
@@ -311,14 +311,14 @@
                     <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
                         <template x-for="(batch, index) in getExpirableBatches()" :key="batch.id">
                             <label :for="'lot_' + batch.id"
-                                :class="selectedLot === batch.lot_number ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-slate-50'"
+                                :class="selectedLot === batch.lot_number ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-sky-50'"
                                 class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
                                 <input type="radio" :id="'lot_' + batch.id" name="lot_number"
                                     :value="batch.lot_number" x-model="selectedLot"
                                     class="h-4 w-4 accent-amber-500 shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
-                                        <p class="text-sm font-bold font-mono text-slate-800"
+                                        <p class="text-sm font-bold font-mono text-[#0f172a]"
                                             x-text="'LOT: ' + (batch.lot_number || 'N/A')"></p>
                                         <span x-show="index === 0"
                                             class="text-[8px] font-mono font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-1.5 py-0.5 border border-amber-300">⚡ Recommended</span>
@@ -344,10 +344,10 @@
             {{-- ============================================= --}}
             {{-- SECTION 3B: Quantity (consumables / used) --}}
             {{-- ============================================= --}}
-            <div class="bg-white border border-slate-200 mb-4 relative"
+            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl"
                 x-show="selectedItem && !isDevice()" x-cloak x-transition>
-                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-                <div class="px-5 py-4 ml-1">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                <div class="px-5 py-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">03 // Quantity
@@ -359,7 +359,7 @@
                                     class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <input type="number" name="quantity_used" value="{{ old('quantity_used', 1) }}"
-                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors"
+                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors"
                                     min="1">
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                     <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
@@ -374,7 +374,7 @@
                                     class="text-rose-500">*</span></label>
                             <input type="datetime-local" name="used_at"
                                 value="{{ old('used_at', now()->format('Y-m-d\TH:i')) }}"
-                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                 required>
                         </div>
                     </div>
@@ -382,9 +382,9 @@
             </div>
 
             {{-- Date for device/new mode (shown separately) --}}
-            <div class="bg-white border border-slate-200 mb-4 relative" x-show="isDevice()" x-cloak>
-                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-                <div class="px-5 py-4 ml-1">
+            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="isDevice()" x-cloak>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                <div class="px-5 py-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                         <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">04 // Date &amp;
@@ -393,7 +393,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Date &amp; Time <span
                             class="text-rose-500">*</span></label>
                     <input type="datetime-local" name="used_at" value="{{ old('used_at', now()->format('Y-m-d\TH:i')) }}"
-                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                        class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                         required>
                 </div>
             </div>
@@ -401,8 +401,8 @@
             {{-- ======================== --}}
             {{-- SECTION: Clinical Info --}}
             {{-- ======================== --}}
-            <div class="bg-white border border-slate-200 mb-4 relative" x-show="selectedItem" x-cloak>
-                <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="selectedItem" x-cloak>
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
                 <div class="px-5 py-4 ml-1 space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
@@ -415,7 +415,7 @@
                         <label class="block text-sm font-bold text-slate-700 mb-1.5">Used By</label>
                         <select
                             @change="isOther = ($event.target.value === '__other__'); if (!isOther) staffValue = $event.target.value"
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                             <option value="">— Select staff member —</option>
                             @php 
                                 $grouped = $staffList->groupBy('type'); 
@@ -433,7 +433,7 @@
                         </select>
                         <div x-show="isOther" x-cloak class="mt-2">
                             <input type="text" x-model="otherValue" placeholder="Enter full name..."
-                                class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                         </div>
                         <input type="hidden" name="used_by" x-bind:value="isOther ? otherValue : staffValue">
                         <input type="hidden" name="_used_by_other" x-bind:value="isOther ? '1' : ''">
@@ -445,7 +445,7 @@
                         <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span
                                 class="font-normal text-slate-400">(Optional)</span></label>
                         <textarea name="notes" rows="3"
-                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors placeholder:text-slate-400"
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors placeholder:text-slate-400"
                             placeholder="Procedure, anomalies, or context...">{{ old('notes') }}</textarea>
                     </div>
                 </div>
@@ -454,11 +454,11 @@
             {{-- Submit --}}
             <div class="flex items-center justify-end gap-3 pt-2">
                 <a href="{{ request('item_id') ? route('items.show', request('item_id')) : route('items.index') }}"
-                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-[#0f172a] transition-colors border border-sky-100 hover:border-slate-300">
                     Cancel
                 </a>
                 <button type="submit" :disabled="isDevice() && selectedEntries.length === 0"
-                    :class="(isDevice() && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
+                    :class="(isDevice() && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-[#0f172a] hover:bg-slate-700 border-[#0f172a]'"
                     class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
                     <span
                         x-text="isDevice() ? 'Log ' + selectedEntries.length + ' Device(s)' : 'Log Usage'">Log

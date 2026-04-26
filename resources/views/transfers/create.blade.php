@@ -4,27 +4,30 @@
 
 @section('actions')
     <a href="{{ route('in-out.index', ['tab' => 'transfer']) }}"
-        class="inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-colors">
+        class="inline-flex items-center gap-2 border border-sky-100 bg-white px-4 py-2 text-[11px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-50 transition-colors">
         ← Back to Transfers
     </a>
 @endsection
 
 @section('content')
-    <div>
+<div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
 
-        {{-- Page Header --}}
-        <div class="mb-5">
-            <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Transfers://Record
-            </p>
-            <h1 class="text-xl font-bold text-slate-800 tracking-tight">Record Transfer</h1>
-            <p class="text-xs text-slate-400 font-mono mt-0.5">Move items between departments securely.</p>
+    {{-- Page Header --}}
+    <div class="p-6 border-b border-sky-100 flex items-center justify-between shrink-0 mb-6">
+        <div>
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Transfers://New</p>
+            <h3 class="text-xl font-black text-[#0f172a] tracking-tight">New Transfer</h3>
+            <p class="text-xs text-slate-400 font-mono mt-1">Record an inward or outward movement of items.</p>
         </div>
+    </div>
+
+    <div class="p-6 pt-0">
 
         @if ($errors->any())
             <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
-                <ul class="ml-1 space-y-1">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2">// Errors</p>
+                <ul class="space-y-1">
                     @foreach ($errors->all() as $error)
                         <li class="text-sm text-rose-700">— {{ $error }}</li>
                     @endforeach
@@ -43,33 +46,33 @@
                     {{-- ======================== --}}
                     {{-- SECTION 1: Direction --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-slate-200 relative">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                        <div class="px-5 py-4 ml-1">
+                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                        <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
-                                <span class="h-2 w-2 bg-blue-500 inline-block"></span>
-                                <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">01 //
+                                <span class="h-2 w-2 bg-sky-500 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-sky-500 uppercase tracking-widest">01 //
                                     Transfer Type</p>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <label @click="direction = 'out'; isNewItem = false;"
-                                    :class="direction === 'out' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                    :class="direction === 'out' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                     class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                     <input type="radio" name="type" value="out" class="accent-amber-600 w-4 h-4"
                                         :checked="direction === 'out'">
                                     <div>
-                                        <p class="text-sm font-bold text-slate-800">Transfer Out</p>
+                                        <p class="text-sm font-bold text-[#0f172a]">Transfer Out</p>
                                         <p class="text-[10px] font-mono text-slate-500 mt-0.5">Send stock to another
                                             facility/department.</p>
                                     </div>
                                 </label>
                                 <label @click="direction = 'in'; selectedEntries = [];"
-                                    :class="direction === 'in' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                    :class="direction === 'in' ? 'border-emerald-500 bg-emerald-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                     class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                     <input type="radio" name="type" value="in" class="accent-emerald-600 w-4 h-4"
                                         :checked="direction === 'in'">
                                     <div>
-                                        <p class="text-sm font-bold text-slate-800">Transfer In</p>
+                                        <p class="text-sm font-bold text-[#0f172a]">Transfer In</p>
                                         <p class="text-[10px] font-mono text-slate-500 mt-0.5">Receive stock from another
                                             source.</p>
                                     </div>
@@ -81,9 +84,9 @@
                     {{-- ======================== --}}
                     {{-- SECTION 2: Item Select --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-slate-200 relative">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-                        <div class="px-5 py-4 ml-1">
+                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+                        <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="h-2 w-2 bg-sky-500 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">02 // Item
@@ -123,7 +126,7 @@
                                             });
                                         });
                                     "
-                                    class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors">
+                                    class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] font-mono transition-colors">
                                     <option value="">-- Choose an item --</option>
                                     @foreach($items as $i)
                                         <option value="{{ $i->id }}">
@@ -136,7 +139,7 @@
 
                             {{-- Option B: Register New Item --}}
                             <div x-show="isNewItem" x-cloak x-collapse
-                                class="pt-2 border-t border-dashed border-slate-200 mt-2">
+                                class="pt-2 border-t border-dashed border-sky-100 mt-2">
                                 <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-4">// New Item
                                     Registration Fields</p>
 
@@ -145,21 +148,21 @@
                                         class="text-rose-500">*</span></label>
                                 <div class="grid grid-cols-2 gap-3 mb-4">
                                     <label @click="newItemType = 'consumable'"
-                                        :class="newItemType === 'consumable' ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        :class="newItemType === 'consumable' ? 'border-indigo-500 bg-indigo-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                         class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                         <input type="radio" name="new_item_type" value="consumable"
                                             class="accent-indigo-600 w-4 h-4" :checked="newItemType === 'consumable'">
                                         <div>
-                                            <p class="text-sm font-bold text-slate-800">Consumable</p>
+                                            <p class="text-sm font-bold text-[#0f172a]">Consumable</p>
                                         </div>
                                     </label>
                                     <label @click="newItemType = 'device'"
-                                        :class="newItemType === 'device' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        :class="newItemType === 'device' ? 'border-violet-500 bg-violet-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                         class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                         <input type="radio" name="new_item_type" value="device"
                                             class="accent-violet-600 w-4 h-4" :checked="newItemType === 'device'">
                                         <div>
-                                            <p class="text-sm font-bold text-slate-800">Device / Eqpt</p>
+                                            <p class="text-sm font-bold text-[#0f172a]">Device / Eqpt</p>
                                         </div>
                                     </label>
                                 </div>
@@ -169,7 +172,7 @@
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Item Name <span
                                             class="text-rose-500">*</span></label>
                                     <input type="text" name="new_item_name" value="{{ old('new_item_name') }}"
-                                        class="block w-full border border-slate-200 bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        class="block w-full border border-sky-100 bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                         :required="isNewItem && newItemType === 'consumable'"
                                         placeholder="e.g. Printer Paper">
                                 </div>
@@ -180,14 +183,14 @@
                                             <label class="block text-sm font-bold text-slate-700 mb-1.5">Brand <span
                                                     class="text-rose-500">*</span></label>
                                             <input type="text" name="new_item_brand" value="{{ old('new_item_brand') }}"
-                                                class="block w-full border border-slate-200 bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                                class="block w-full border border-sky-100 bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                                 placeholder="e.g. Epson" :required="isNewItem && newItemType === 'device'">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-bold text-slate-700 mb-1.5">Model <span
                                                     class="text-rose-500">*</span></label>
                                             <input type="text" name="new_item_model" value="{{ old('new_item_model') }}"
-                                                class="block w-full border border-slate-200 bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                                class="block w-full border border-sky-100 bg-white focus:border-indigo-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                                 placeholder="e.g. L3210" :required="isNewItem && newItemType === 'device'">
                                         </div>
                                     </div>
@@ -199,7 +202,7 @@
                                         <label class="block text-sm font-bold text-slate-700 mb-1.5">Category <span
                                                 class="text-rose-500">*</span></label>
                                         <select name="new_item_category_id"
-                                            class="block w-full border border-slate-200 bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors"
+                                            class="block w-full border border-sky-100 bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] font-mono transition-colors"
                                             :required="isNewItem">
                                             <option value="">-- Choose Category --</option>
                                             @foreach($categories as $category)
@@ -211,7 +214,7 @@
                                         <label class="block text-sm font-bold text-slate-700 mb-1.5">Tracking Unit <span
                                                 class="text-rose-500">*</span></label>
                                         <select name="new_item_unit_id"
-                                            class="block w-full border border-slate-200 bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 font-mono transition-colors"
+                                            class="block w-full border border-sky-100 bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] font-mono transition-colors"
                                             :required="isNewItem" x-model="newUnitLabel">
                                             <option value="">-- Choose Unit --</option>
                                             @foreach($units as $unit)
@@ -232,7 +235,7 @@
                     {{-- ======================================== --}}
                     <div class="bg-white border border-indigo-300 relative" x-show="direction === 'out' && isDevice() && getBatches().length > 0"
                         x-cloak x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
                         <div class="ml-1">
                             <div
                                 class="px-5 py-4 border-b border-dashed border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -261,7 +264,7 @@
                                     <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                     </svg>
-                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-slate-800 outline-none">
+                                    <input type="text" x-model="searchQuery" placeholder="Search serial numbers..." class="block w-full pl-8 pr-3 py-1.5 text-xs font-mono border-0 bg-white ring-1 ring-inset ring-slate-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600 transition-all placeholder:text-slate-400 text-[#0f172a] outline-none">
                                 </div>
                             </div>
                             <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
@@ -273,7 +276,7 @@
                                             :value="String(batch.id)" x-model="selectedEntries"
                                             class="h-4 w-4 accent-indigo-600 shrink-0">
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-bold font-mono text-slate-800"
+                                            <p class="text-sm font-bold font-mono text-[#0f172a]"
                                                 x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
                                             </p>
                                             <div class="flex items-center gap-2 mt-0.5">
@@ -301,10 +304,10 @@
                     {{-- ============================================= --}}
                     {{-- SECTION 3B: Quantity & Specifics --}}
                     {{-- ============================================= --}}
-                    <div class="bg-white border border-slate-200 relative" x-show="isNewItem || selectedItem" x-cloak
+                    <div class="bg-white border border-sky-100 relative" x-show="isNewItem || selectedItem" x-cloak
                         x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
-                        <div class="px-5 py-4 ml-1">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                        <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="h-2 w-2 bg-teal-500 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
@@ -320,20 +323,20 @@
                                         <span>Stock to Transfer <span class="text-rose-500">*</span></span>
                                     </label>
                                     <div class="grid grid-cols-2 gap-3 sm:w-2/3">
-                                        <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                        <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                             class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                             <input type="radio" name="stock_type_selected" value="new" x-model="stockType" class="accent-blue-600 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
                                             <div>
-                                                <p class="text-sm font-bold text-slate-800">New Stock</p>
+                                                <p class="text-sm font-bold text-[#0f172a]">New Stock</p>
                                                 <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].new + ' avail.' : 'Transfer In'"></p>
                                             </div>
                                         </label>
                                         <label x-show="direction === 'in' || hasUsedStock()"
-                                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
                                             class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                                             <input type="radio" name="stock_type_selected" value="used" x-model="stockType" class="accent-amber-500 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
                                             <div>
-                                                <p class="text-sm font-bold text-slate-800">Used Stock</p>
+                                                <p class="text-sm font-bold text-[#0f172a]">Used Stock</p>
                                                 <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].used + ' avail.' : 'Transfer In'"></p>
                                             </div>
                                         </label>
@@ -349,7 +352,7 @@
                                         <input type="number" :name="stockType === 'new' ? 'new_quantity' : 'used_quantity'" 
                                             :x-model="stockType === 'new' ? 'manualNewQty' : 'manualUsedQty'" 
                                             min="0"
-                                            class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-slate-800 transition-colors">
+                                            class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                             <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
                                                 x-text="getUnit()"></span>
@@ -362,7 +365,7 @@
                                         <span class="text-rose-500">*</span></label>
                                     <input type="datetime-local" name="transferred_at"
                                         value="{{ old('transferred_at', now()->format('Y-m-d\TH:i')) }}"
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-slate-800 transition-colors"
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                         required>
                                 </div>
 
@@ -373,10 +376,10 @@
                     {{-- ======================== --}}
                     {{-- SECTION 4: Party Info --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-slate-200 relative" x-show="isNewItem || selectedItem" x-cloak
+                    <div class="bg-white border border-sky-100 relative" x-show="isNewItem || selectedItem" x-cloak
                         x-transition>
-                        <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
-                        <div class="px-5 py-4 ml-1 space-y-4">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+                        <div class="px-5 py-4 space-y-4">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="h-2 w-2 bg-slate-400 inline-block"></span>
                                 <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
@@ -392,7 +395,7 @@
                                         <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="text" name="transferred_to" value="{{ old('transferred_to') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                 </div>
 
                                 <div>
@@ -402,21 +405,21 @@
                                         <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="text" name="department" value="{{ old('department') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Bio ID <span
                                             class="text-rose-500">*</span></label>
                                     <input type="text" name="bio_id" value="{{ old('bio_id') }}" required
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors">
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
                                 </div>
 
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span
                                             class="font-normal text-slate-400">(Optional)</span></label>
                                     <textarea name="notes" rows="3"
-                                        class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm text-slate-800 transition-colors placeholder:text-slate-400"
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors placeholder:text-slate-400"
                                         placeholder="Reason for transfer, conditions...">{{ old('notes') }}</textarea>
                                 </div>
                             </div>
@@ -428,9 +431,9 @@
             </div>
 
             {{-- Submit --}}
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 mt-4">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-sky-100 mt-4">
                 <a href="{{ route('in-out.index', ['tab' => 'transfer']) }}"
-                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300">
+                    class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-[#0f172a] transition-colors border border-sky-100 hover:border-slate-300">
                     Cancel
                 </a>
 
@@ -447,7 +450,7 @@
                                 } 
                             }">
                     <button type="submit" :disabled="!canSubmit()"
-                        :class="!canSubmit() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-blue-600 hover:bg-blue-700 border-blue-700'"
+                        :class="!canSubmit() ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-sky-500 hover:bg-sky-600 border-sky-600'"
                         class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
                         <span x-text="direction === 'out' ? 'Log Transfer Out' : 'Log Transfer In'">Record Transfer</span>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
