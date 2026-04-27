@@ -135,50 +135,92 @@
         </div>
 
         {{-- Stock Summary Cards --}}
-        <div class="grid grid-cols-2 lg:grid-cols-5 border-y border-x border-sky-100 mb-6 bg-white overflow-hidden rounded-xl">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-6 bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
             
             {{-- New Stock --}}
-            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
-                <div class="flex flex-col h-full justify-between gap-2">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">New Stock</p>
-                    <div class="flex items-baseline gap-1.5 mt-1">
-                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->total_stock }}</p>
-                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b sm:border-b lg:border-b-0 border-sky-100 transition-all hover:bg-sky-50/50 lg:[&:nth-child(5n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-sky-600 uppercase tracking-wider">New Stock</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500 transition-colors group-hover:bg-emerald-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <p class="text-2xl font-black tracking-tight text-slate-800">{{ $item->total_stock }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $item->unit }}</p>
+                    </div>
+                    <div class="w-16 h-8 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
+                        <svg viewBox="0 0 100 30" class="w-full h-full stroke-emerald-400">
+                            <path d="M0,20 L15,10 L30,15 L45,5 L60,18 L75,8 L90,12 L100,0" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                        </svg>
                     </div>
                 </div>
             </div>
             
             {{-- Used Stock --}}
-            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
-                <div class="flex flex-col h-full justify-between gap-2">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Used Stock</p>
-                    <div class="flex items-baseline gap-1.5 mt-1">
-                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->effective_stock_used }}</p>
-                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b sm:border-b lg:border-b-0 border-sky-100 transition-all hover:bg-sky-50/50 lg:[&:nth-child(5n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-amber-600 uppercase tracking-wider">Used Stock</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-500 transition-colors group-hover:bg-amber-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <p class="text-2xl font-black tracking-tight text-slate-800">{{ $item->effective_stock_used }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $item->unit }}</p>
+                    </div>
+                    <div class="w-16 h-8 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
+                        <svg viewBox="0 0 100 30" class="w-full h-full stroke-amber-400">
+                            <path d="M0,5 L15,15 L30,8 L45,18 L60,10 L75,20 L90,15 L100,25" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                        </svg>
                     </div>
                 </div>
             </div>
             
             {{-- Lent Out --}}
-            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
-                <div class="flex flex-col h-full justify-between gap-2">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Lent Out</p>
-                    <div class="flex items-baseline gap-1.5 mt-1">
-                        <p class="text-3xl font-black tracking-tight text-[#0f172a]">{{ $item->active_lent_out }}</p>
-                        <p class="text-[10px] font-mono text-slate-400">{{ $item->unit }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b sm:border-b lg:border-b-0 border-sky-100 transition-all hover:bg-sky-50/50 lg:[&:nth-child(5n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-indigo-600 uppercase tracking-wider">Lent Out</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-500 transition-colors group-hover:bg-indigo-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <p class="text-2xl font-black tracking-tight text-slate-800">{{ $item->active_lent_out }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $item->unit }}</p>
+                    </div>
+                    <div class="w-16 h-8 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
+                        <svg viewBox="0 0 100 30" class="w-full h-full stroke-indigo-400">
+                            <path d="M0,20 Q15,5 30,15 T60,5 T90,15 L100,10" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                        </svg>
                     </div>
                 </div>
             </div>
 
             {{-- Category --}}
-            <div class="group relative overflow-hidden bg-white p-5 border-r border-b lg:border-b-0 border-sky-100 transition-colors duration-300 hover:bg-sky-50/30">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-fuchsia-400 to-fuchsia-600"></div>
-                <div class="flex flex-col h-full justify-between gap-2">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Category</p>
-                    <p class="text-base font-black tracking-tight text-[#0f172a] truncate mt-1">{{ $item->category?->name ?? 'Uncategorized' }}</p>
+            <div class="group relative overflow-hidden bg-white p-5 border-r border-b sm:border-b lg:border-b-0 border-sky-100 transition-all hover:bg-sky-50/50 lg:[&:nth-child(5n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-fuchsia-600 uppercase tracking-wider">Category</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-fuchsia-50 text-fuchsia-500 transition-colors group-hover:bg-fuchsia-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3v3m-6-6v6a2 2 0 002 2h10a2 2 0 002-2v-6m-8-3a2 2 0 00-2 2v3H7a2 2 0 01-2-2v-3a2 2 0 012-2h10a2 2 0 012 2v3" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <p class="text-base font-black tracking-tight text-slate-800 truncate">{{ $item->category?->name ?? 'Uncategorized' }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">Classification</p>
+                    </div>
                 </div>
             </div>
 
@@ -188,25 +230,32 @@
                 $usedStock = max(0, $item->effective_stock_used);
                 $totalQty  = $newStock + $usedStock;
                 if ($totalQty <= 0) {
-                    $statusTone = 'from-rose-500 to-rose-700';
+                    $statusTone = 'text-rose-500';
+                    $statusBg = 'bg-rose-50';
+                    $statusLabel = 'Out_of_Stock';
                 } elseif ($item->is_low_stock && $totalQty <= $item->reorder_level) {
-                    $statusTone = 'from-amber-400 to-amber-600';
+                    $statusTone = 'text-amber-500';
+                    $statusBg = 'bg-amber-50';
+                    $statusLabel = 'Reorder';
                 } else {
-                    $statusTone = 'from-emerald-400 to-emerald-600';
+                    $statusTone = 'text-emerald-500';
+                    $statusBg = 'bg-emerald-50';
+                    $statusLabel = 'In_Stock';
                 }
             @endphp
-            <div class="group relative overflow-hidden bg-white p-5 transition-colors duration-300 hover:bg-sky-50/30">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r {{ $statusTone }}"></div>
-                <div class="flex flex-col h-full justify-between gap-2 items-start">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">Status</p>
-                    <div class="mt-1">
-                    @if($totalQty <= 0)
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-1 border border-rose-200">Out_of_Stock</span>
-                    @elseif($item->total_stock <= $item->reorder_level)
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">Reorder</span>
-                    @else
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 border border-emerald-200">In_Stock</span>
-                    @endif
+            <div class="group relative overflow-hidden bg-white p-5 transition-all hover:bg-sky-50/50">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg {{ $statusBg }} {{ $statusTone }} transition-colors group-hover:bg-slate-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider {{ $statusTone }} {{ $statusBg }} px-2 py-1 border border-current rounded-sm">{{ $statusLabel }}</span>
+                        <p class="mt-1 text-[10px] font-medium text-slate-400">Overall</p>
                     </div>
                 </div>
             </div>
@@ -241,39 +290,43 @@
 
         <div class="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-2">
             {{-- Line Trend --}}
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 to-blue-600"></div>
-                <div>
-                    <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono text-sky-500 uppercase tracking-widest mb-0.5">Chart.01</p>
-                            <p class="text-sm font-bold text-[#0f172a]">14-Day Movement Trend</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-widest text-teal-600 mb-0.5">Chart.01</p>
+                            <h3 class="text-sm font-bold text-slate-800">14-Day Movement Trend</h3>
                         </div>
-                        <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+                        <span class="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
                             <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
                             LIVE
                         </span>
                     </div>
-                    <div class="p-5">
-                        <div class="h-[240px]">
-                            <canvas id="itemTrendLineChart"></canvas>
-                        </div>
+                </div>
+                <div class="p-5">
+                    <div class="h-[240px]">
+                        <canvas id="itemTrendLineChart"></canvas>
                     </div>
                 </div>
             </div>
 
             {{-- Bar Summary --}}
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div>
-                    <div class="px-5 py-4 border-b border-sky-100">
-                        <p class="text-[10px] font-mono text-sky-600 uppercase tracking-widest mb-0.5">Chart.02</p>
-                        <p class="text-sm font-bold text-[#0f172a]">Stock Analytics Summary</p>
-                    </div>
-                    <div class="p-5">
-                        <div class="h-[240px]">
-                            <canvas id="itemMetricsBarChart"></canvas>
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-widest text-sky-600 mb-0.5">Chart.02</p>
+                            <h3 class="text-sm font-bold text-slate-800">Stock Analytics Summary</h3>
                         </div>
+                        <span class="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
+                            <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
+                            LIVE
+                        </span>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="h-[240px]">
+                        <canvas id="itemMetricsBarChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -283,44 +336,43 @@
         <div class="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-2">
 
             {{-- Item Specifications --}}
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div>
-                    <div class="px-4 py-3 border-b border-sky-100">
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 bg-sky-500 inline-block"></span>
-                            <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">Item Specifications</p>
-                        </div>
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 bg-sky-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest">Item Specifications</p>
                     </div>
+                </div>
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <tbody class="divide-y divide-slate-50">
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="w-36 px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Type</td>
+                                <td class="w-36 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Type</td>
                                 <td class="px-4 py-2.5">
                                     @if($item->item_type === 'device')
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-violet-600 bg-violet-50 px-2 py-1 border border-violet-200">Device</span>
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-violet-600 bg-violet-50 px-2 py-1 border border-violet-200 rounded">Device</span>
                                     @else
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-1 border border-sky-200">Consumable</span>
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-1 border border-sky-200 rounded">Consumable</span>
                                     @endif
                                 </td>
                             </tr>
                             @if($item->item_type === 'device')
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Brand</td>
-                                <td class="px-4 py-2.5 text-sm font-mono font-bold text-slate-700">{{ $item->brand ?? '—' }}</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Brand</td>
+                                <td class="px-4 py-2.5 text-sm font-semibold text-slate-700">{{ $item->brand ?? '—' }}</td>
                             </tr>
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Model</td>
-                                <td class="px-4 py-2.5 text-sm font-mono font-bold text-slate-700">{{ $item->model ?? '—' }}</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Model</td>
+                                <td class="px-4 py-2.5 text-sm font-semibold text-slate-700">{{ $item->model ?? '—' }}</td>
                             </tr>
                             @endif
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Unit</td>
-                                <td class="px-4 py-2.5 text-sm font-mono text-slate-600">{{ $item->unit }}</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Unit</td>
+                                <td class="px-4 py-2.5 text-sm text-slate-600">{{ $item->unit }}</td>
                             </tr>
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Location</td>
-                                <td class="px-4 py-2.5 text-sm font-mono text-slate-600">
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Location</td>
+                                <td class="px-4 py-2.5 text-sm text-slate-600">
                                     @if($item->storage_location || $item->storage_section)
                                         {{ $item->storage_location ?? 'Any' }}@if($item->storage_section) · {{ $item->storage_section }}@endif
                                     @else
@@ -329,32 +381,32 @@
                                 </td>
                             </tr>
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Reorder Level</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Reorder Level</td>
                                 <td class="px-4 py-2.5">
-                                    <span class="text-sm font-mono font-bold text-amber-600">{{ $item->reorder_level ?? 10 }}</span>
-                                    <span class="text-[10px] font-mono text-slate-400 ml-1">{{ $item->unit }} threshold</span>
+                                    <span class="text-sm font-semibold text-amber-600">{{ $item->reorder_level ?? 10 }}</span>
+                                    <span class="text-[10px] text-slate-400 ml-1">{{ $item->unit }} threshold</span>
                                 </td>
                             </tr>
 
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry Tracking</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry Tracking</td>
                                 <td class="px-4 py-2.5">
                                     @if($item->is_expirable)
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200">Tracked</span>
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 border border-amber-200 rounded">Tracked</span>
                                     @else
-                                        <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 bg-sky-50 px-2 py-1 border border-sky-100">None</span>
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-slate-400 bg-sky-50 px-2 py-1 border border-sky-100 rounded">None</span>
                                     @endif
                                 </td>
                             </tr>
                             @if($item->description)
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap align-top">Notes</td>
-                                <td class="px-4 py-2.5 text-xs font-mono text-slate-600">{{ $item->description }}</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap align-top">Notes</td>
+                                <td class="px-4 py-2.5 text-xs text-slate-600">{{ $item->description }}</td>
                             </tr>
                             @endif
                             <tr class="hover:bg-sky-50 transition-colors">
-                                <td class="px-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Created</td>
-                                <td class="px-4 py-2.5 text-xs font-mono text-slate-500">{{ $item->created_at->format('M d, Y') }}</td>
+                                <td class="px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">Created</td>
+                                <td class="px-4 py-2.5 text-xs text-slate-500">{{ $item->created_at->format('M d, Y') }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -373,201 +425,179 @@
                 $pctUsed = $chartTotal > 0 ? round(($chartUsed / $chartTotal) * 100) : 0;
                 $pctLent = $chartTotal > 0 ? round(($chartLent / $chartTotal) * 100) : 0;
             @endphp
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div>
-                    <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono text-sky-600 uppercase tracking-widest mb-0.5">Chart.00</p>
-                            <p class="text-sm font-bold text-[#0f172a]">Stock Overview</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-widest text-sky-600 mb-0.5">Chart.00</p>
+                            <h3 class="text-sm font-bold text-slate-800">Stock Overview</h3>
                         </div>
-                        <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
+                        <span class="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
                             <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
                             LIVE
                         </span>
                     </div>
+                </div>
 
-                    <div class="px-5 py-5">
+                <div class="p-5">
 
-                        @if($chartTotal > 0)
-                        {{-- Donut Chart --}}
-                        <div class="flex items-center justify-center mb-6">
-                            <div class="relative w-44 h-44">
-                                <canvas id="stockDonut" width="160" height="160"></canvas>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-2xl font-black font-mono text-[#0f172a]">{{ $chartTotal }}</span>
-                                    <span class="text-[9px] font-mono text-slate-400 uppercase tracking-widest">{{ $item->unit }}</span>
-                                </div>
+                    @if($chartTotal > 0)
+                    {{-- Donut Chart --}}
+                    <div class="flex items-center justify-center mb-6">
+                        <div class="relative w-44 h-44">
+                            <canvas id="stockDonut" width="160" height="160"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span class="text-2xl font-black text-slate-800">{{ $chartTotal }}</span>
+                                <span class="text-[9px] text-slate-400 uppercase tracking-widest">{{ $item->unit }}</span>
                             </div>
                         </div>
-
-                        {{-- Legend --}}
-                        <div class="grid grid-cols-3 gap-2 mb-5">
-                            <div class="text-center">
-                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
-                                    <span class="h-2 w-2 bg-emerald-400 inline-block"></span>
-                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">New</span>
-                                </div>
-                                <p class="text-xl font-black font-mono text-emerald-600">{{ $chartNew }}</p>
-                                <p class="text-[9px] font-mono text-slate-400">{{ $pctNew }}%</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
-                                    <span class="h-2 w-2 bg-amber-400 inline-block"></span>
-                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">Used</span>
-                                </div>
-                                <p class="text-xl font-black font-mono text-amber-500">{{ $chartUsed }}</p>
-                                <p class="text-[9px] font-mono text-slate-400">{{ $pctUsed }}%</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="flex items-center justify-center gap-1.5 mb-0.5">
-                                    <span class="h-2 w-2 bg-indigo-400 inline-block"></span>
-                                    <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">Lent</span>
-                                </div>
-                                <p class="text-xl font-black font-mono text-indigo-500">{{ $chartLent }}</p>
-                                <p class="text-[9px] font-mono text-slate-400">{{ $pctLent }}%</p>
-                            </div>
-                        </div>
-                        @else
-                        <div class="flex flex-col items-center justify-center py-10">
-                            <p class="text-[11px] font-mono text-slate-400">// No stock recorded yet</p>
-                        </div>
-                        @endif
-
-                        {{-- Throughput bars --}}
-                        <div class="space-y-3 border-t border-sky-100 pt-4">
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Received</span>
-                                    <span class="text-[10px] font-mono font-bold text-teal-600">{{ $totalReceived }} {{ $item->unit }}</span>
-                                </div>
-                                <div class="h-1.5 bg-slate-100 border border-sky-100">
-                                    <div class="h-full bg-teal-400" style="width: 100%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Total Used</span>
-                                    <span class="text-[10px] font-mono font-bold text-rose-600">{{ $totalUsedLogs }} {{ $item->unit }}</span>
-                                </div>
-                                <div class="h-1.5 bg-slate-100 border border-sky-100">
-                                    @php $usedPct = $totalReceived > 0 ? min(100, round(($totalUsedLogs / $totalReceived) * 100)) : 0; @endphp
-                                    <div class="h-full bg-rose-400" style="width: {{ $usedPct }}%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Available</span>
-                                    <span class="text-[10px] font-mono font-bold text-emerald-600">{{ $chartNew }} {{ $item->unit }}</span>
-                                </div>
-                                <div class="h-1.5 bg-slate-100 border border-sky-100">
-                                    @php $availPct = $totalReceived > 0 ? min(100, round(($chartNew / $totalReceived) * 100)) : 0; @endphp
-                                    <div class="h-full bg-emerald-400" style="width: {{ $availPct }}%"></div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
+
+                    {{-- Legend --}}
+                    <div class="grid grid-cols-3 gap-2 mb-5">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                <span class="h-2 w-2 bg-emerald-400 rounded-full inline-block"></span>
+                                <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">New</span>
+                            </div>
+                            <p class="text-xl font-black text-emerald-600">{{ $chartNew }}</p>
+                            <p class="text-[9px] text-slate-400">{{ $pctNew }}%</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                <span class="h-2 w-2 bg-amber-400 rounded-full inline-block"></span>
+                                <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Used</span>
+                            </div>
+                            <p class="text-xl font-black text-amber-500">{{ $chartUsed }}</p>
+                            <p class="text-[9px] text-slate-400">{{ $pctUsed }}%</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center gap-1.5 mb-0.5">
+                                <span class="h-2 w-2 bg-indigo-400 rounded-full inline-block"></span>
+                                <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Lent</span>
+                            </div>
+                            <p class="text-xl font-black text-indigo-500">{{ $chartLent }}</p>
+                            <p class="text-[9px] text-slate-400">{{ $pctLent }}%</p>
+                        </div>
+                    </div>
+                    @else
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <p class="text-[11px] text-slate-400">// No stock recorded yet</p>
+                    </div>
+                    @endif
+
+                    {{-- Throughput bars --}}
+                    <div class="space-y-3 border-t border-sky-100 pt-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Total Received</span>
+                                <span class="text-[10px] font-semibold text-teal-600">{{ $totalReceived }} {{ $item->unit }}</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 border border-sky-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-teal-400" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Total Used</span>
+                                <span class="text-[10px] font-semibold text-rose-600">{{ $totalUsedLogs }} {{ $item->unit }}</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 border border-sky-100 rounded-full overflow-hidden">
+                                @php $usedPct = $totalReceived > 0 ? min(100, round(($totalUsedLogs / $totalReceived) * 100)) : 0; @endphp
+                                <div class="h-full bg-rose-400" style="width: {{ $usedPct }}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Available</span>
+                                <span class="text-[10px] font-semibold text-emerald-600">{{ $chartNew }} {{ $item->unit }}</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 border border-sky-100 rounded-full overflow-hidden">
+                                @php $availPct = $totalReceived > 0 ? min(100, round(($chartNew / $totalReceived) * 100)) : 0; @endphp
+                                <div class="h-full bg-emerald-400" style="width: {{ $availPct }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        {{-- History: Usage + Stock Received --}}
+        {{-- History Tables --}}
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-
-            {{-- Usage History --}}
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
-                <div>
-                    <div class="px-4 py-3 border-b border-sky-100">
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 bg-rose-500 inline-block"></span>
-                            <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest">Usage History</p>
-                        </div>
+            {{-- Usage Logs --}}
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 bg-rose-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-rose-600 uppercase tracking-widest">Usage Logs (Recent 10)</p>
                     </div>
-                    @if($item->usageLogs->count() > 0)
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-sky-100 bg-sky-50/50">
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Qty</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Used By</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
-                                @foreach($item->usageLogs as $log)
+                </div>
+                <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-sky-50 border-b border-sky-100 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Date</th>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Qty</th>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Person</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            @forelse($item->usageLogs->sortByDesc('created_at')->take(10) as $log)
                                 <tr class="hover:bg-sky-50 transition-colors">
-                                    <td class="px-4 py-2.5 font-black font-mono text-rose-600 whitespace-nowrap">{{ $log->quantity_used }}</td>
-                                    <td class="px-4 py-2.5 text-xs font-mono text-slate-600 whitespace-nowrap">{{ $log->used_by ?? '—' }}</td>
-                                    <td class="px-4 py-2.5 text-[10px] font-mono text-slate-400 whitespace-nowrap">{{ $log->used_at->format('M d, Y') }}<br><span class="text-[9px]">{{ $log->used_at->format('h:i A') }}</span></td>
+                                    <td class="px-4 py-2 text-slate-600">{{ $log->created_at->format('M d, H:i') }}</td>
+                                    <td class="px-4 py-2 font-semibold text-rose-500">{{ $log->quantity_used }}</td>
+                                    <td class="px-4 py-2">
+                                        <div class="font-bold text-[#0f172a] text-xs">{{ $log->used_by ?? 'System' }}</div>
+                                    </td>
                                 </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div class="py-10 text-center">
-                        <p class="text-[11px] font-mono text-slate-400">// No usage logged yet</p>
-                    </div>
-                    @endif
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-8 text-center text-[10px] text-slate-400">// No usage records</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            {{-- Stock Received History --}}
-            <div class="bg-white border border-sky-100 relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
-                <div>
-                    <div class="px-4 py-3 border-b border-sky-100">
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 bg-teal-500 inline-block"></span>
-                            <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">Stock Received</p>
-                        </div>
+            {{-- Stock Received --}}
+            <div class="bg-white border border-sky-100 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 bg-teal-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-widest">Stock Received (Recent 10)</p>
                     </div>
-                    @if($item->stockEntries->count() > 0)
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-sky-100 bg-sky-50/50">
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Qty</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">SN / Lot</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Expiry</th>
-                                    <th class="px-4 py-2 text-left text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">Received</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
-                                @foreach($item->stockEntries as $entry)
+                </div>
+                <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-sky-50 border-b border-sky-100 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Date</th>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Qty</th>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-widest">Exp. Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            @forelse($item->stockEntries->sortByDesc('created_at')->take(10) as $entry)
                                 <tr class="hover:bg-sky-50 transition-colors">
-                                    <td class="px-4 py-2.5 font-black font-mono text-teal-600 whitespace-nowrap">{{ $entry->quantity }}</td>
-                                    <td class="px-4 py-2.5 font-mono text-xs text-slate-600 whitespace-nowrap">{{ $entry->serial_number ?? ($entry->lot_number ?? '—') }}</td>
-                                    <td class="px-4 py-2.5 whitespace-nowrap">
-                                        @if($entry->expiry_date)
-                                            @php
-                                                $entryExpiry = \Carbon\Carbon::parse($entry->expiry_date)->startOfDay();
-                                                $today = now()->startOfDay();
-                                            @endphp
-                                            @if($entryExpiry->isBefore($today))
-                                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-1.5 py-0.5 border border-rose-200">EXPIRED</span>
-                                            @elseif($today->diffInDays($entryExpiry) <= 30)
-                                                <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-200">{{ $entryExpiry->format('M d') }}</span>
-                                            @else
-                                                <span class="text-[9px] font-mono text-slate-500">{{ $entryExpiry->format('M d, Y') }}</span>
-                                            @endif
+                                    <td class="px-4 py-2 text-slate-600">{{ $entry->created_at->format('M d, Y') }}</td>
+                                    <td class="px-4 py-2 font-semibold text-teal-500">+{{ $entry->quantity }}</td>
+                                    <td class="px-4 py-2 text-slate-600">
+                                        @if($entry->expiration_date)
+                                            {{ \Carbon\Carbon::parse($entry->expiration_date)->format('M d, Y') }}
                                         @else
-                                            <span class="text-slate-300 text-xs font-mono">N/A</span>
+                                            <span class="text-slate-400">—</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-2.5 text-[10px] font-mono text-slate-400 whitespace-nowrap">{{ $entry->received_date->format('M d, Y') }}</td>
                                 </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div class="py-10 text-center">
-                        <p class="text-[11px] font-mono text-slate-400">// No stock received yet</p>
-                    </div>
-                    @endif
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-8 text-center text-[10px] text-slate-400">// No stock entries</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

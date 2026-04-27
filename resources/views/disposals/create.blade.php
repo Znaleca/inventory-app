@@ -11,10 +11,13 @@
 
 @section('content')
 <div x-data="{
-    selectedEntry: '{{ old('stock_entry_id', '') }}',
-    manualQty: {{ old('quantity', 1) }},
-    get selectedBatch() {
-        return batches.find(b => String(b.id) === String(this.selectedEntry)) ?? null;
+    selectedEntries: [],
+    get totalSelectedQuantity() {
+        if (this.selectedEntries.length === 0) return 0;
+        return this.selectedEntries.reduce((sum, id) => {
+            const batch = this.batches.find(b => String(b.id) === String(id));
+            return sum + (batch ? Number(batch.remaining) : 0);
+        }, 0);
     },
     batches: @json($batches)
 }">
@@ -42,9 +45,9 @@
 
     @if($errors->any())
     <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
-        <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest mb-2">// Validation Errors</p>
-        <ul class="space-y-1">
+        <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+        <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest mb-2 ml-1">// Validation Errors</p>
+        <ul class="ml-1 space-y-1">
             @foreach($errors->all() as $error)
                 <li class="text-sm text-rose-700 font-mono">— {{ $error }}</li>
             @endforeach
@@ -56,11 +59,12 @@
         @csrf
         <input type="hidden" name="item_id" value="{{ $item->id }}">
         <input type="hidden" name="disposal_type" value="{{ $disposalType }}">
+        <input type="hidden" name="quantity" :value="totalSelectedQuantity">
 
         {{-- Summary Banner --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r {{ $disposalType === 'new' ? 'from-rose-400 to-rose-600' : 'from-amber-400 to-amber-600' }}"></div>
-            <div class="px-5 py-4 flex items-center gap-4">
+        <div class="bg-white border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 w-1 h-full {{ $disposalType === 'new' ? 'bg-rose-500' : 'bg-amber-500' }}"></div>
+            <div class="px-5 py-4 ml-1 flex items-center gap-4">
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center
                     {{ $disposalType === 'new' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
@@ -84,46 +88,33 @@
         </div>
 
         {{-- Batch / Serial / Lot Picker --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
+        <div class="bg-white border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 w-1 h-full {{ $disposalType === 'new' ? 'bg-rose-500' : 'bg-amber-500' }}"></div>
             <div>
-                <div class="px-5 py-4 border-b border-sky-100">
-                    <div class="flex items-center gap-2">
-                        <span class="h-2 w-2 {{ $disposalType === 'new' ? 'bg-rose-400' : 'bg-amber-400' }} inline-block"></span>
+                <div class="px-5 py-4 ml-1 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="h-2 w-2 {{ $disposalType === 'new' ? 'bg-rose-500' : 'bg-amber-500' }} inline-block"></span>
                         <p class="text-[10px] font-mono font-bold uppercase tracking-widest
                             {{ $disposalType === 'new' ? 'text-rose-600' : 'text-amber-600' }}">
-                            {{ $item->item_type === 'device' ? '// Select Serial Number' : '// Select Batch / Lot' }}
+                            {{ $item->item_type === 'device' ? '01 // Select Serial Numbers' : '01 // Select Batch / Lots' }}
                         </p>
                     </div>
                     <p class="text-xs font-mono text-slate-400 mt-1">
-                        Choose the specific {{ $item->item_type === 'device' ? 'device (serial number)' : 'batch (lot number)' }} to dispose.
-                        Leave unselected to dispose without batch tracking.
+                        Select the specific items you want to dispose. The quantity will be calculated automatically.
                     </p>
                 </div>
-                <div class="px-5 py-5">
+                <div class="px-5 py-4 ml-1">
                     @if(!empty($batches))
                     <div class="space-y-2">
-                        {{-- None / unspecified option --}}
-                        <label class="flex items-start gap-3 p-3 border border-sky-100 cursor-pointer transition-colors hover:bg-sky-50"
-                            :class="selectedEntry === '' ? 'border-slate-400 bg-sky-50' : 'border-sky-100'">
-                            <input type="radio" name="stock_entry_id" value=""
-                                x-model="selectedEntry"
-                                class="mt-0.5 accent-slate-600">
-                            <div>
-                                <p class="text-xs font-mono font-bold text-slate-600">— No specific batch</p>
-                                <p class="text-[10px] font-mono text-slate-400 mt-0.5">Dispose without linking to a specific batch</p>
-                            </div>
-                        </label>
-
                         {{-- Per-batch options --}}
                         @foreach($batches as $batch)
                         <label class="flex items-start gap-3 p-3 border cursor-pointer transition-colors hover:bg-sky-50"
-                            :class="selectedEntry === '{{ $batch['id'] }}' ?
+                            :class="selectedEntries.includes('{{ $batch['id'] }}') ?
                                 '{{ $disposalType === 'new' ? 'border-rose-400 bg-rose-50' : 'border-amber-400 bg-amber-50' }}' :
                                 'border-sky-100'">
-                            <input type="radio" name="stock_entry_id" value="{{ $batch['id'] }}"
-                                x-model="selectedEntry"
-                                class="mt-0.5 {{ $disposalType === 'new' ? 'accent-rose-600' : 'accent-amber-600' }}">
+                            <input type="checkbox" name="stock_entry_id[]" value="{{ $batch['id'] }}"
+                                x-model="selectedEntries"
+                                class="mt-0.5 w-4 h-4 rounded border-sky-200 text-slate-600 focus:ring-slate-500 {{ $disposalType === 'new' ? 'accent-rose-600' : 'accent-amber-600' }}">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     @if($item->item_type === 'device')
@@ -153,68 +144,44 @@
                         @endforeach
                     </div>
                     @else
-                    <p class="text-xs font-mono text-slate-400">// No specific batches found. You can still proceed with a general disposal.</p>
+                    <p class="text-xs font-mono text-slate-400">// No specific batches found.</p>
                     @endif
+                </div>
+                
+                <div class="px-5 py-3 ml-1 border-t border-sky-100 bg-slate-50 flex justify-between items-center" x-show="selectedEntries.length > 0" x-cloak>
+                    <span class="text-xs font-bold text-slate-600">Total Quantity Selected:</span>
+                    <span class="text-sm font-black" :class="'{{ $disposalType === 'new' ? 'text-rose-600' : 'text-amber-600' }}'" x-text="totalSelectedQuantity + ' {{ $item->unit }}'"></span>
                 </div>
             </div>
         </div>
 
-        {{-- Amount & Time --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+        {{-- Time & Documentation --}}
+        <div class="bg-white border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
             <div>
-                <div class="px-5 py-4 border-b border-sky-100">
+                <div class="px-5 py-4 ml-1 border-b border-sky-100">
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">// Amount &amp; Time</p>
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">02 // Time &amp; Documentation</p>
                     </div>
                 </div>
-                <div class="px-5 py-5">
+                <div class="px-5 py-4 ml-1">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="quantity" class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-1.5">
-                                Quantity to Dispose <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                {{-- For devices: auto-set to 1 when a batch is selected; otherwise manual --}}
-                                @if($item->item_type === 'device')
-                                <input type="number" name="quantity" id="quantity"
-                                    :value="selectedEntry !== '' ? 1 : manualQty"
-                                    :readonly="selectedEntry !== ''"
-                                    min="1" max="{{ $maxQty }}"
-                                    x-model="manualQty"
-                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-[#0f172a] transition-colors"
-                                    :class="selectedEntry !== '' ? 'opacity-60 cursor-not-allowed' : ''"
-                                    required>
-                                @else
-                                <input type="number" name="quantity" id="quantity"
-                                    :max="selectedEntry !== '' ? (selectedBatch ? selectedBatch.remaining : {{ $maxQty }}) : {{ $maxQty }}"
-                                    min="1" max="{{ $maxQty }}"
-                                    value="{{ old('quantity', 1) }}"
-                                    x-model="manualQty"
-                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 pr-14 text-sm font-mono text-[#0f172a] transition-colors"
-                                    required>
-                                @endif
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <span class="text-slate-400 text-[10px] font-mono font-bold uppercase">{{ $item->unit }}</span>
-                                </div>
-                            </div>
-                            @if($item->item_type === 'device')
-                            <p class="mt-1 text-[10px] font-mono text-slate-400" x-show="selectedEntry !== ''">
-                                // Devices: quantity auto-locked to 1 per batch
+                        <div x-show="selectedEntries.length === 0" x-cloak class="sm:col-span-2">
+                            <p class="text-xs font-mono text-amber-600">
+                                // Select at least one batch or serial number. Quantity is auto-calculated from your checked items.
                             </p>
-                            @endif
-                            @error('quantity') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                            @error('stock_entry_id') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label for="disposed_at" class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                            <label for="disposed_at" class="block text-sm font-bold text-slate-700 mb-1.5">
                                 Date &amp; Time <span class="text-rose-500">*</span>
                             </label>
                             <input type="datetime-local" name="disposed_at" id="disposed_at"
                                 value="{{ old('disposed_at', now()->format('Y-m-d\TH:i')) }}"
-                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                 required>
-                            @error('disposed_at') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                            @error('disposed_at') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>
@@ -222,22 +189,22 @@
         </div>
 
         {{-- Documentation --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-4">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
+        <div class="bg-white border border-sky-100 relative mb-4">
+            <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
             <div>
-                <div class="px-5 py-4 border-b border-sky-100">
+                <div class="px-5 py-4 ml-1 border-b border-sky-100">
                     <div class="flex items-center gap-2">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">// Documentation</p>
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">03 // Documentation</p>
                     </div>
                 </div>
-                <div class="px-5 py-5 space-y-4">
+                <div class="px-5 py-4 ml-1 space-y-4">
                     <div>
-                        <label for="disposed_by" class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                        <label for="disposed_by" class="block text-sm font-bold text-slate-700 mb-1.5">
                             Disposed By <span class="text-rose-500">*</span>
                         </label>
                         <select name="disposed_by" id="disposed_by" required
-                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors">
                             <option value="" disabled {{ old('disposed_by') ? '' : 'selected' }}>— Select staff member —</option>
                             @foreach($staffList as $staff)
                             <option value="{{ $staff->display_name }}"
@@ -246,24 +213,24 @@
                             </option>
                             @endforeach
                         </select>
-                        @error('disposed_by') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                        @error('disposed_by') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label for="reason" class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                        <label for="reason" class="block text-sm font-bold text-slate-700 mb-1.5">
                             Reason for Disposal <span class="text-rose-500">*</span>
                         </label>
-                        <textarea id="reason" name="reason" rows="3"
-                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-slate-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] placeholder:text-slate-400 transition-colors"
+                        <textarea id="reason" name="reason" rows="4"
+                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] placeholder:text-slate-400 transition-colors"
                             placeholder="{{ $disposalType === 'new' ? 'e.g. Expired stock, past safe use date...' : 'e.g. End of procedure, damage, contamination...' }}"
                             required>{{ old('reason', $disposalType === 'new' ? 'Expired stock' : '') }}</textarea>
-                        @error('reason') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                        @error('reason') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- Actions --}}
-        <div class="flex items-center justify-end gap-3">
+        <div class="flex items-center justify-end gap-3 pt-2">
             <a href="{{ route('items.show', $item) }}"
                 class="px-5 py-2.5 text-sm font-mono font-bold text-slate-500 hover:text-[#0f172a] border border-sky-100 hover:border-slate-300 transition-colors">
                 Cancel

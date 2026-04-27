@@ -28,8 +28,34 @@ class AdminController extends Controller
 
         $items = Item::with('category')->latest()->get();
 
+        // Prepare 7-day trend data for the chart
+        $sevenDayTrend = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = \Carbon\Carbon::today()->subDays($i);
+            $dateStr = $date->toDateString();
+            $sevenDayTrend[$dateStr] = [
+                'date' => $date->format('M d'),
+                'in' => $stockEntries->filter(fn($s) => ($s->received_date instanceof \Carbon\Carbon ? $s->received_date : \Carbon\Carbon::parse($s->received_date))->toDateString() === $dateStr)->sum('quantity') +
+                        $returns->filter(fn($r) => ($r->returned_at ? ($r->returned_at instanceof \Carbon\Carbon ? $r->returned_at : \Carbon\Carbon::parse($r->returned_at)) : $r->updated_at)->toDateString() === $dateStr)->sum(fn($r) => $r->quantity_returned + ($r->item->item_type === 'consumable' ? 0 : $r->quantity_used)),
+                'out' => $usageLogs->filter(fn($u) => ($u->used_at instanceof \Carbon\Carbon ? $u->used_at : \Carbon\Carbon::parse($u->used_at))->toDateString() === $dateStr)->sum('quantity_used') +
+                         $transfers->filter(fn($t) => ($t->transferred_at instanceof \Carbon\Carbon ? $t->transferred_at : \Carbon\Carbon::parse($t->transferred_at))->toDateString() === $dateStr)->sum('quantity') +
+                         $disposals->filter(fn($d) => ($d->disposed_at instanceof \Carbon\Carbon ? $d->disposed_at : \Carbon\Carbon::parse($d->disposed_at))->toDateString() === $dateStr)->sum('quantity') +
+                         $borrows->filter(fn($b) => ($b->borrowed_at instanceof \Carbon\Carbon ? $b->borrowed_at : \Carbon\Carbon::parse($b->borrowed_at))->toDateString() === $dateStr)->sum('quantity_borrowed'),
+            ];
+        }
+
+        // Calculate totals for each category
+        $totalStock = $stockEntries->sum('quantity');
+        $totalUsage = $usageLogs->sum('quantity_used');
+        $totalBorrow = $borrows->sum('quantity_borrowed');
+        $totalReturn = $returns->sum(fn($r) => $r->quantity_returned + ($r->item->item_type === 'consumable' ? 0 : $r->quantity_used));
+        $totalTransfer = $transfers->sum('quantity');
+        $totalDisposal = $disposals->sum('quantity');
+        $totalItems = $items->count();
+
         return view('admin.index', compact(
-            'tab', 'stockEntries', 'usageLogs', 'borrows', 'returns', 'transfers', 'disposals', 'items'
+            'tab', 'stockEntries', 'usageLogs', 'borrows', 'returns', 'transfers', 'disposals', 'items', 'sevenDayTrend',
+            'totalStock', 'totalUsage', 'totalBorrow', 'totalReturn', 'totalTransfer', 'totalDisposal', 'totalItems'
         ));
     }
 

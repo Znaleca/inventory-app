@@ -6,15 +6,7 @@
 <div x-data="{ activeTab: '{{ $tab }}', search: '' }">
 
     {{-- Page Header --}}
-    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 mb-6">
-        <div class="p-6 flex items-center justify-between">
-            <div>
-                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Admin://Records</p>
-                <h3 class="text-xl font-black text-[#0f172a] tracking-tight">Record Management</h3>
-                <p class="text-xs text-slate-400 font-mono mt-1">Edit or delete raw transaction and item records.</p>
-            </div>
-        </div>
-    </div>
+    
 
     {{-- Chart Data Calculation --}}
     @php
@@ -30,36 +22,98 @@
             ['id' => 'disposals',    'label' => 'Disposals',      'count' => $disposals->count(),    'bar' => 'bg-slate-600',   'active' => 'border-slate-600 text-slate-700 bg-sky-50'],
             ['id' => 'items',        'label' => 'Items',          'count' => $items->count(),        'bar' => 'bg-violet-500',  'active' => 'border-violet-500 text-violet-700 bg-violet-50'],
         ];
+
+        // Detailed category cards
+        $categoryCards = [
+            [
+                'label' => 'Total Stock', 'value' => number_format($totalStock), 'sub' => 'Units received',
+                'icon' => 'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375M3.75 16.125v4.125C3.75 22.653 7.444 24.75 12 24.75s8.25-2.097 8.25-4.625v-4.125',
+                'trend_color' => 'text-emerald-600', 'bgColor' => 'bg-emerald-50', 'borderColor' => 'border-emerald-200'
+            ],
+            [
+                'label' => 'Total Usage', 'value' => number_format($totalUsage), 'sub' => 'Units consumed',
+                'icon' => 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 9.75h6M9 12h6m-6 2.25h6',
+                'trend_color' => 'text-rose-600', 'bgColor' => 'bg-rose-50', 'borderColor' => 'border-rose-200'
+            ],
+            [
+                'label' => 'Total Borrow', 'value' => number_format($totalBorrow), 'sub' => 'Units borrowed',
+                'icon' => 'M12 3v2.25m6.364.386l-1.591 1.591M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-6 0a3 3 0 11-6 0 3 3 0 016 0z',
+                'trend_color' => 'text-blue-600', 'bgColor' => 'bg-blue-50', 'borderColor' => 'border-blue-200'
+            ],
+            [
+                'label' => 'Total Return', 'value' => number_format($totalReturn), 'sub' => 'Units returned',
+                'icon' => 'M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3',
+                'trend_color' => 'text-teal-600', 'bgColor' => 'bg-teal-50', 'borderColor' => 'border-teal-200'
+            ],
+            [
+                'label' => 'Total Transfer', 'value' => number_format($totalTransfer), 'sub' => 'Units transferred',
+                'icon' => 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5a1.5 1.5 0 010 3H3m12.75-3L21 8.25m0 0L16.5 3.75M21 8.25v13.5a1.5 1.5 0 01-1.5 1.5h-13.5',
+                'trend_color' => 'text-amber-600', 'bgColor' => 'bg-amber-50', 'borderColor' => 'border-amber-200'
+            ],
+            [
+                'label' => 'Total Disposal', 'value' => number_format($totalDisposal), 'sub' => 'Units disposed',
+                'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                'trend_color' => 'text-slate-600', 'bgColor' => 'bg-slate-50', 'borderColor' => 'border-slate-200'
+            ],
+            [
+                'label' => 'Total Items', 'value' => number_format($totalItems), 'sub' => 'Unique items',
+                'icon' => 'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375',
+                'trend_color' => 'text-purple-600', 'bgColor' => 'bg-purple-50', 'borderColor' => 'border-purple-200'
+            ],
+        ];
     @endphp
 
-    {{-- Charts Top Row --}}
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
-        {{-- Doughnut Chart: Flow Types --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-mono text-blue-600 uppercase tracking-widest mb-0.5">Chart.01</p>
-                    <p class="text-sm font-bold text-[#0f172a]">Directional Flow Volume</p>
+    {{-- KPI Category Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        @foreach($categoryCards as $card)
+            <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                {{-- Header (Label + Icon) --}}
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $card['label'] }}</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $card['bgColor'] }} {{ $card['trend_color'] }}">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}" />
+                        </svg>
+                    </div>
                 </div>
-                <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-                    <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
-                    LIVE
-                </span>
+
+                {{-- Body (Value + Subtitle) --}}
+                <div>
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $card['value'] }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $card['sub'] }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- Charts Top Row --}}
+    <div class="mb-8">
+        {{-- 7-Day Transaction Trend Line Chart --}}
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="p-5 border-b border-sky-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest mb-0.5">Timeline</p>
+                    <h3 class="text-sm font-bold text-slate-800">7-Day Transaction Trend</h3>
+                </div>
             </div>
             <div class="p-5">
                 <div class="h-[240px]">
-                    <canvas id="flowDoughnutChart"></canvas>
+                    <canvas id="transactionTrendChart"></canvas>
                 </div>
             </div>
         </div>
+    </div>
 
-        {{-- Bar Chart: Categories --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
-            <div class="px-5 py-4 border-b border-sky-100">
-                <p class="text-[10px] font-mono text-indigo-600 uppercase tracking-widest mb-0.5">Chart.02</p>
-                <p class="text-sm font-bold text-[#0f172a]">Records Breakdown By Category</p>
+    {{-- Bar Chart: Categories --}}
+    <div class="mb-8">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                <div>
+                    <p class="text-[10px] font-semibold text-indigo-600 uppercase tracking-widest mb-0.5">Chart.01</p>
+                    <h3 class="text-sm font-bold text-slate-800">Records Breakdown By Category</h3>
+                </div>
             </div>
             <div class="p-5">
                 <div class="h-[240px]">
@@ -100,23 +154,23 @@
 
     {{-- ══ STOCK ENTRIES TAB ══ --}}
     <div x-show="activeTab === 'stock-entries'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-emerald-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-widest">// Stock Entries</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-emerald-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest">Stock Entries</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">All incoming stock records. Edit quantities, lot numbers, dates.</p>
+                    <p class="text-xs text-slate-500">All incoming stock records. Edit quantities, lot numbers, dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Lot / SN #</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Expiry</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Received</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Qty</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Lot / SN #</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Expiry</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Received</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($stockEntries as $entry)
@@ -156,22 +210,22 @@
 
     {{-- ══ USAGE LOGS TAB ══ --}}
     <div x-show="activeTab === 'usage-logs'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-rose-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest">// Usage Logs</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-rose-400 to-rose-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-rose-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-rose-600 uppercase tracking-widest">Usage Logs</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">All item usage records. Fix quantities and dates.</p>
+                    <p class="text-xs text-slate-500">All item usage records. Fix quantities and dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty Used</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Used By</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Qty Used</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Used By</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Date</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($usageLogs as $log)
@@ -204,23 +258,23 @@
 
     {{-- ══ BORROWS TAB ══ --}}
     <div x-show="activeTab === 'borrows'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-blue-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">// Borrow Records</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-blue-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-blue-600 uppercase tracking-widest">Borrow Records</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">All borrow transactions. Adjust quantities, status, and dates.</p>
+                    <p class="text-xs text-slate-500">All borrow transactions. Adjust quantities, status, and dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Borrower</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Borrowed</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Returned</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Used</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Status</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Borrower</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Borrowed</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Returned</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Used</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Status</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
                             <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
@@ -270,23 +324,23 @@
 
     {{-- ══ RETURNS TAB ══ --}}
     <div x-show="activeTab === 'returns'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-teal-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">// Return Records</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-teal-400 to-teal-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-teal-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-widest">Return Records</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">History of returned items. Edit quantities or dates.</p>
+                    <p class="text-xs text-slate-500">History of returned items. Edit quantities or dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Returned On</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Staff</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Borrowed</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Returned / Used</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Returned On</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Staff</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Borrowed</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Returned / Used</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($returns as $returnRecord)
@@ -320,24 +374,24 @@
 
     {{-- ══ TRANSFERS TAB ══ --}}
     <div x-show="activeTab === 'transfers'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-amber-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">// Transfer Records</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-amber-400 to-amber-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-amber-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-amber-600 uppercase tracking-widest">Transfer Records</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">All item transfers. Fix destinations, quantities, and dates.</p>
+                    <p class="text-xs text-slate-500">All item transfers. Fix destinations, quantities, and dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Dir</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Destination</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Party</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Date</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Dir</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Qty</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Destination</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Party</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($transfers as $transfer)
@@ -399,23 +453,23 @@
 
     {{-- ══ DISPOSALS TAB ══ --}}
     <div x-show="activeTab === 'disposals'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-slate-600 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">// Disposal Records</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-sky-400 to-sky-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-slate-600 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Disposal Records</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">All disposed item records. Fix reasons, quantities, and dates.</p>
+                    <p class="text-xs text-slate-500">All disposed item records. Fix reasons, quantities, and dates.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Item</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Qty</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Reason</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Disposed By</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Date</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Item</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Qty</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Reason</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Disposed By</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Date</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($disposals as $disposal)
@@ -449,22 +503,22 @@
 
     {{-- ══ ITEMS TAB ══ --}}
     <div x-show="activeTab === 'items'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-400 to-violet-600"></div>
-            <div class="px-6 py-5 border-b border-sky-100">
-                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-violet-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">// Master Item List</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="h-1 bg-gradient-to-r from-violet-400 to-violet-600"></div>
+            <div class="p-5 border-b border-sky-100">
+                    <div class="flex items-center gap-2 mb-1"><span class="h-2 w-2 bg-violet-500 rounded-full inline-block"></span>
+                        <p class="text-[10px] font-semibold text-violet-600 uppercase tracking-widest">Master Item List</p>
                     </div>
-                    <p class="text-xs text-slate-500 font-mono">Manage or delete items directly from the database.</p>
+                    <p class="text-xs text-slate-500">Manage or delete items directly from the database.</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Name</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Category</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Location</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">Stock</th>
-                            <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 text-right">Actions</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Name</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Category</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Location</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-left">Stock</th>
+                            <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500 text-right">Actions</th>
                         </tr></thead>
                         <tbody class="divide-y divide-sky-50">
                         @forelse($items as $item)
@@ -524,40 +578,93 @@ document.addEventListener('DOMContentLoaded', function () {
         return gradient;
     };
 
-    // Doughnut Chart (In vs Out)
-    const ctxFlow = document.getElementById('flowDoughnutChart');
-    if (ctxFlow) {
-        const flowCtx = ctxFlow.getContext('2d');
-        new Chart(flowCtx, {
-            type: 'doughnut',
+    // 7-Day Transaction Trend Line Chart
+    const ctxTrend = document.getElementById('transactionTrendChart');
+    if (ctxTrend) {
+        const trendCtx = ctxTrend.getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
             data: {
-                labels: ['Units In', 'Units Out'],
-                datasets: [{
-                    data: [{{ $totalIn }}, {{ $totalOut }}],
-                    backgroundColor: [
-                        createGradient(flowCtx, 'rgba(20, 184, 166, 0.9)', 'rgba(20, 184, 166, 0.4)'),
-                        createGradient(flowCtx, 'rgba(244, 63, 94, 0.9)', 'rgba(244, 63, 94, 0.4)')
-                    ],
-                    borderColor: ['#14b8a6', '#f43f5e'],
-                    borderWidth: 2,
-                    hoverOffset: 0,
-                    hoverBorderWidth: 2
-                }]
+                labels: [
+                    @foreach($sevenDayTrend as $data)
+                        '{{ $data['date'] }}',
+                    @endforeach
+                ],
+                datasets: [
+                    {
+                        label: 'Units In',
+                        data: [
+                            @foreach($sevenDayTrend as $data)
+                                {{ $data['in'] }},
+                            @endforeach
+                        ],
+                        borderColor: '#14b8a6',
+                        backgroundColor: createGradient(trendCtx, 'rgba(20, 184, 166, 0.2)', 'rgba(20, 184, 166, 0.01)'),
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#14b8a6',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Units Out',
+                        data: [
+                            @foreach($sevenDayTrend as $data)
+                                {{ $data['out'] }},
+                            @endforeach
+                        ],
+                        borderColor: '#f43f5e',
+                        backgroundColor: createGradient(trendCtx, 'rgba(244, 63, 94, 0.2)', 'rgba(244, 63, 94, 0.01)'),
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#f43f5e',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '72%',
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     legend: {
-                        position: 'right',
+                        position: 'top',
                         labels: {
-                            padding: 20,
                             usePointStyle: true,
-                            pointStyle: 'circle',
+                            padding: 15,
                             color: '#64748b',
                             font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 10,
+                        borderRadius: 6,
+                        titleColor: '#fff',
+                        bodyColor: '#e2e8f0',
+                        borderColor: '#475569',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: '#64748b', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                        border: { display: false },
+                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
                     }
                 }
             }

@@ -10,21 +10,24 @@
 @endsection
 
 @section('content')
-    <div>
+    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
 
         {{-- Page Header --}}
-        <div class="mb-5">
-            <p class="text-[10px] font-mono font-semibold text-blue-600 uppercase tracking-[0.25em] mb-1">Usage://Log</p>
-            <h1 class="text-xl font-bold text-[#0f172a] tracking-tight">Log Item Usage</h1>
-            <p class="text-xs text-slate-400 font-mono mt-0.5">Record inventory items consumed or used during a procedure.
-            </p>
+        <div class="p-6 border-b border-sky-100 bg-white flex items-center justify-between shrink-0 mb-6">
+            <div>
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Usage://Log</p>
+                <h3 class="text-xl font-black text-[#0f172a] tracking-tight">Log Item Usage</h3>
+                <p class="text-xs text-slate-400 font-mono mt-1">Record inventory items consumed or used during a procedure.</p>
+            </div>
         </div>
+
+        <div class="p-6 pt-0">
 
         @if ($errors->any())
             <div class="mb-5 bg-rose-50 border border-rose-200 relative px-5 py-4">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-400 to-rose-600"></div>
-                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2">// Errors</p>
-                <ul class="space-y-1">
+                <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                <p class="font-mono text-[10px] text-rose-600 uppercase tracking-widest font-bold mb-2 ml-1">// Errors</p>
+                <ul class="ml-1 space-y-1">
                     @foreach ($errors->all() as $error)
                         <li class="text-sm text-rose-700">— {{ $error }}</li>
                     @endforeach
@@ -38,13 +41,12 @@
             {{-- ======================== --}}
             {{-- SECTION 1: Item Select --}}
             {{-- ======================== --}}
-            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl">
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div class="px-5 py-4">
+            <div class="bg-white border border-sky-100 mb-4 relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-blue-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">01 // Select Item
-                        </p>
+                        <p class="text-[10px] font-mono font-bold text-sky-500 uppercase tracking-widest">01 // Select Item</p>
                     </div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Item <span
                             class="text-rose-500">*</span></label>
@@ -84,17 +86,16 @@
             {{-- ========================== --}}
             {{-- SECTION 2: Stock Type --}}
             {{-- ========================== --}}
-            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="selectedItem" x-cloak x-transition>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-                <div class="px-5 py-4">
+            <div class="bg-white border border-sky-100 mb-4 relative" x-show="selectedItem" x-cloak x-transition>
+                <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+                <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-sky-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">02 // Stock Source
-                        </p>
+                        <p class="text-[10px] font-mono font-bold text-sky-600 uppercase tracking-widest">02 // Stock Source</p>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <label x-show="items[selectedItem] && items[selectedItem].new > 0"
-                            :class="stockType === 'new' ? 'border-blue-500 bg-blue-50' : 'border-sky-100 bg-sky-50 hover:bg-sky-50'"
+                            :class="stockType === 'new' ? 'border-indigo-500 bg-indigo-50' : 'border-sky-100 bg-sky-50 hover:bg-sky-50'"
                             class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
                             <input type="radio" name="stock_type" value="new" x-model="stockType"
                                 @change="selectedEntries = []" class="accent-blue-600">
@@ -126,27 +127,18 @@
             {{-- ======================================== --}}
             {{-- SECTION 3A: Device Selection (New) --}}
             {{-- ======================================== --}}
-            <div class="bg-white border border-indigo-300 mb-4 relative" x-show="isDevice() && stockType === 'new'" x-cloak
-                x-transition>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
-                <div class="ml-1">
-                    {{-- Header --}}
-                    <div class="px-5 py-4 border-b border-dashed border-slate-100">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
-                                    <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">03 // Select Devices to Use</p>
-                                </div>
-                                <p class="text-xs text-slate-500">Check each serial number you are taking out of inventory.</p>
-                            </div>
-                            <div class="shrink-0 ml-4 text-right">
-                                <p class="text-2xl font-black font-mono text-indigo-600" x-text="selectedEntries.length"></p>
-                                <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">selected</p>
-                            </div>
+            <template x-if="isDevice() && stockType === 'new'">
+                <div class="bg-white border border-sky-100 mb-4 relative" x-cloak>
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    <div class="px-5 py-4 ml-1">
+                        {{-- Header --}}
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="h-2 w-2 bg-indigo-500 inline-block"></span>
+                            <p class="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-widest">03 // Select Devices to Use</p>
                         </div>
+                        <p class="text-xs text-slate-500 mb-4">Check each serial number you are taking out of inventory.</p>
                         {{-- Search Input --}}
-                        <div class="relative mt-3">
+                        <div class="relative mb-4">
                             <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                                 <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
@@ -157,7 +149,7 @@
                                 type="text"
                                 x-model="deviceSearch"
                                 placeholder="Search serial number…"
-                                class="w-full border border-indigo-200 bg-indigo-50/40 pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-400 transition-colors"
+                                class="w-full border border-sky-100 bg-sky-50 pl-9 pr-4 py-2.5 px-3 text-sm font-mono text-[#0f172a] focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
                             />
                             <button type="button" @click="deviceSearch = ''"
                                 x-show="deviceSearch.length > 0"
@@ -167,69 +159,60 @@
                                 </svg>
                             </button>
                         </div>
-                    </div>
 
-                    {{-- Checkbox list --}}
-                    <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
-                        <template x-for="batch in filteredBatches()" :key="batch.id">
-                            <label :for="'entry_' + batch.id"
-                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'hover:bg-sky-50'"
-                                class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
-                                <input type="checkbox" :id="'entry_' + batch.id" name="selected_entries[]"
-                                    :value="String(batch.id)" x-model="selectedEntries"
-                                    class="h-4 w-4 accent-indigo-600 shrink-0">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold font-mono text-[#0f172a]"
-                                        x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
-                                    </p>
-                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5"
-                                        x-text="batch.received_date ? 'Added: ' + String(batch.received_date).substring(0, 10) : ''">
-                                    </p>
-                                </div>
-                                <div class="shrink-0 text-right">
-                                    <span class="text-xs font-mono font-bold text-teal-600"
-                                        x-text="batch.remaining + ' avail.'"></span>
-                                </div>
-                            </label>
-                        </template>
-                        <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
-                            <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                        {{-- Checkbox list --}}
+                        <div class="divide-y divide-sky-50 max-h-72 overflow-y-auto border border-sky-100">
+                            <template x-for="batch in filteredBatches()" :key="batch.id">
+                                <label :for="'entry_' + batch.id"
+                                    :class="selectedEntries.includes(String(batch.id)) ? 'bg-indigo-50' : 'hover:bg-sky-50'"
+                                    class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
+                                    <input type="checkbox" :id="'entry_' + batch.id" name="selected_entries[]"
+                                        :value="String(batch.id)" x-model="selectedEntries"
+                                        class="h-4 w-4 accent-indigo-600 shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold font-mono text-[#0f172a]"
+                                            x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
+                                        </p>
+                                        <p class="text-[10px] font-mono text-slate-400 mt-0.5"
+                                            x-text="batch.received_date ? 'Added: ' + String(batch.received_date).substring(0, 10) : ''">
+                                        </p>
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        <span class="text-xs font-mono font-bold text-teal-600"
+                                            x-text="batch.remaining + ' avail.'"></span>
+                                    </div>
+                                </label>
+                            </template>
+                            <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
+                                <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                            </div>
+                            <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
+                                <p class="text-[11px] font-mono text-slate-400">// No available units in stock</p>
+                            </div>
                         </div>
-                        <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
-                            <p class="text-[11px] font-mono text-slate-400">// No available units in stock</p>
-                        </div>
+
+                        {{-- Auto-computed hidden quantity_used --}}
+                        <input type="hidden" name="quantity_used" :value="selectedEntries.length">
+
+                        @error('selected_entries') <p class="mt-4 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
-
-                    {{-- Auto-computed hidden quantity_used --}}
-                    <input type="hidden" name="quantity_used" :value="selectedEntries.length">
-
-                    @error('selected_entries') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                 </div>
-            </div>
+            </template>
 
             {{-- ======================================== --}}
             {{-- SECTION 3A2: Device Selection (Used) --}}
             {{-- ======================================== --}}
-            <div class="bg-white border border-amber-300 mb-4 relative" x-show="isDevice() && stockType === 'used'" x-cloak
-                x-transition>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
-                <div class="ml-1">
-                    <div class="px-5 py-4 border-b border-dashed border-slate-100">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="h-2 w-2 bg-amber-500 inline-block"></span>
-                                    <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">03 // Select Used Devices</p>
-                                </div>
-                                <p class="text-xs text-slate-500">Pick one or more used serial numbers to log as used.</p>
-                            </div>
-                            <div class="shrink-0 ml-4 text-right">
-                                <p class="text-2xl font-black font-mono text-amber-600" x-text="selectedEntries.length"></p>
-                                <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">selected</p>
-                            </div>
+            <template x-if="isDevice() && stockType === 'used'">
+                <div class="bg-white border border-sky-100 mb-4 relative" x-cloak>
+                    <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                    <div class="px-5 py-4 ml-1">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="h-2 w-2 bg-amber-500 inline-block"></span>
+                            <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">03 // Select Used Devices</p>
                         </div>
+                        <p class="text-xs text-slate-500 mb-4">Pick one or more used serial numbers to log as used.</p>
                         {{-- Search Input --}}
-                        <div class="relative mt-3">
+                        <div class="relative mb-4">
                             <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                                 <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
@@ -240,7 +223,7 @@
                                 type="text"
                                 x-model="deviceSearch"
                                 placeholder="Search serial number…"
-                                class="w-full border border-amber-200 bg-amber-50/40 pl-9 pr-4 py-2 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:border-amber-400 transition-colors"
+                                class="w-full border border-sky-100 bg-sky-50 pl-9 pr-4 py-2.5 px-3 text-sm font-mono text-[#0f172a] focus:bg-white focus:border-blue-500 focus:outline-none transition-colors"
                             />
                             <button type="button" @click="deviceSearch = ''"
                                 x-show="deviceSearch.length > 0"
@@ -250,68 +233,60 @@
                                 </svg>
                             </button>
                         </div>
-                    </div>
 
-                    <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
-                        <template x-for="batch in filteredBatches()" :key="'used_' + batch.id">
-                            <label :for="'used_entry_' + batch.id"
-                                :class="selectedEntries.includes(String(batch.id)) ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-sky-50'"
-                                class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
-                                <input type="checkbox" :id="'used_entry_' + batch.id" name="selected_entries[]"
-                                    :value="String(batch.id)" x-model="selectedEntries"
-                                    class="h-4 w-4 accent-amber-500 shrink-0">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold font-mono text-[#0f172a]"
-                                        x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
-                                    </p>
-                                    <p class="text-[10px] font-mono text-slate-400 mt-0.5"
-                                        x-text="batch.received_date ? 'Added: ' + String(batch.received_date).substring(0, 10) : ''">
-                                    </p>
-                                </div>
-                                <div class="shrink-0 text-right">
-                                    <span class="text-xs font-mono font-bold text-amber-600"
-                                        x-text="batch.remaining + ' avail.'"></span>
-                                </div>
-                            </label>
-                        </template>
-                        <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
-                            <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                        <div class="divide-y divide-sky-50 max-h-72 overflow-y-auto border border-sky-100">
+                            <template x-for="batch in filteredBatches()" :key="'used_' + batch.id">
+                                <label :for="'used_entry_' + batch.id"
+                                    :class="selectedEntries.includes(String(batch.id)) ? 'bg-amber-50' : 'hover:bg-sky-50'"
+                                    class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
+                                    <input type="checkbox" :id="'used_entry_' + batch.id" name="selected_entries[]"
+                                        :value="String(batch.id)" x-model="selectedEntries"
+                                        class="h-4 w-4 accent-amber-500 shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold font-mono text-[#0f172a]"
+                                            x-text="batch.serial_number ? 'SN: ' + batch.serial_number : 'Lot: ' + (batch.lot_number || 'N/A')">
+                                        </p>
+                                        <p class="text-[10px] font-mono text-slate-400 mt-0.5"
+                                            x-text="batch.received_date ? 'Added: ' + String(batch.received_date).substring(0, 10) : ''">
+                                        </p>
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        <span class="text-xs font-mono font-bold text-amber-600"
+                                            x-text="batch.remaining + ' avail.'"></span>
+                                    </div>
+                                </label>
+                            </template>
+                            <div x-show="filteredBatches().length === 0 && getBatches().length > 0" class="px-5 py-6 text-center">
+                                <p class="text-[11px] font-mono text-slate-400">// No serial numbers match your search</p>
+                            </div>
+                            <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
+                                <p class="text-[11px] font-mono text-slate-400">// No used devices available</p>
+                            </div>
                         </div>
-                        <div x-show="getBatches().length === 0" class="px-5 py-6 text-center">
-                            <p class="text-[11px] font-mono text-slate-400">// No used devices available</p>
-                        </div>
+
+                        <input type="hidden" name="quantity_used" :value="selectedEntries.length">
+
+                        @error('selected_entries') <p class="mt-4 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
-
-                    <input type="hidden" name="quantity_used" :value="selectedEntries.length">
-
-                    @error('selected_entries') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                 </div>
-            </div>
+            </template>
 
             {{-- ============================================== --}}
             {{-- SECTION 3C: Batch Selector (expirable items) --}}
             {{-- ============================================== --}}
-            <div class="bg-white border border-amber-300 mb-4 relative"
+            <div class="bg-white border border-sky-100 mb-4 relative"
                 x-show="selectedItem && isExpirableConsumable() && stockType === 'new'" x-cloak x-transition>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-400 to-amber-600"></div>
-                <div class="ml-1">
-                    <div class="px-5 py-4 border-b border-dashed border-slate-100 flex items-center justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="h-2 w-2 bg-amber-500 inline-block"></span>
-                                <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">03 // Select Batch (FEFO)</p>
-                            </div>
-                            <p class="text-xs text-slate-500">Choose the batch to deduct from. Nearest expiry is recommended first.</p>
-                        </div>
-                        <div class="shrink-0 ml-4 text-right">
-                            <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Batch selected</p>
-                            <p class="text-sm font-black font-mono text-amber-600" x-text="selectedLot || '—'"></p>
-                        </div>
+                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="h-2 w-2 bg-amber-500 inline-block"></span>
+                        <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">03 // Select Batch (FEFO)</p>
                     </div>
-                    <div class="divide-y divide-slate-50 max-h-72 overflow-y-auto">
+                    <p class="text-xs text-slate-500 mb-4">Choose the batch to deduct from. Nearest expiry is recommended first.</p>
+                    <div class="divide-y divide-sky-50 max-h-72 overflow-y-auto border border-sky-100">
                         <template x-for="(batch, index) in getExpirableBatches()" :key="batch.id">
                             <label :for="'lot_' + batch.id"
-                                :class="selectedLot === batch.lot_number ? 'bg-amber-50 border-l-2 border-l-amber-500' : 'hover:bg-sky-50'"
+                                :class="selectedLot === batch.lot_number ? 'bg-amber-50' : 'hover:bg-sky-50'"
                                 class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors">
                                 <input type="radio" :id="'lot_' + batch.id" name="lot_number"
                                     :value="batch.lot_number" x-model="selectedLot"
@@ -337,36 +312,35 @@
                             <p class="text-[11px] font-mono text-slate-400">// No batches available</p>
                         </div>
                     </div>
-                    @error('lot_number') <p class="px-5 pb-3 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                    @error('lot_number') <p class="mt-4 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             {{-- ============================================= --}}
             {{-- SECTION 3B: Quantity (consumables / used) --}}
             {{-- ============================================= --}}
-            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl"
+            <div class="bg-white border border-sky-100 mb-4 relative"
                 x-show="selectedItem && !isDevice()" x-cloak x-transition>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
-                <div class="px-5 py-4">
+                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
+                <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-teal-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">03 // Quantity
-                            &amp; Time</p>
+                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">03 // Quantity &amp; Time</p>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-1">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-1.5">Quantity Used <span
                                     class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <input type="number" name="quantity_used" value="{{ old('quantity_used', 1) }}"
-                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors"
+                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors"
                                     min="1">
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                     <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
                                         x-text="items[selectedItem] ? items[selectedItem].unit : 'units'"></span>
                                 </div>
                             </div>
-                            @error('quantity_used') <p class="mt-1 text-xs font-mono font-bold text-rose-500">{{ $message }}
+                            @error('quantity_used') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}
                             </p> @enderror
                         </div>
                         <div>
@@ -374,7 +348,7 @@
                                     class="text-rose-500">*</span></label>
                             <input type="datetime-local" name="used_at"
                                 value="{{ old('used_at', now()->format('Y-m-d\TH:i')) }}"
-                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                                 required>
                         </div>
                     </div>
@@ -382,71 +356,72 @@
             </div>
 
             {{-- Date for device/new mode (shown separately) --}}
-            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="isDevice()" x-cloak>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
-                <div class="px-5 py-4">
+            <div class="bg-white border border-sky-100 mb-4 relative" x-show="isDevice()" x-cloak>
+                <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
+                <div class="px-5 py-4 ml-1">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-teal-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">04 // Date &amp;
-                            Time</p>
+                        <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">04 // Date &amp; Time</p>
                     </div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Date &amp; Time <span
                             class="text-rose-500">*</span></label>
                     <input type="datetime-local" name="used_at" value="{{ old('used_at', now()->format('Y-m-d\TH:i')) }}"
-                        class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
+                        class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors"
                         required>
                 </div>
             </div>
 
             {{-- ======================== --}}
-            {{-- SECTION: Clinical Info --}}
+            {{-- SECTION: Staff Member --}}
             {{-- ======================== --}}
-            <div class="bg-white border border-sky-100 mb-4 relative overflow-hidden rounded-2xl" x-show="selectedItem" x-cloak>
-                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-500"></div>
-                <div class="px-5 py-4 ml-1 space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
+            <div class="bg-white border border-sky-100 mb-4 relative" x-show="selectedItem" x-cloak>
+                <div class="absolute top-0 left-0 w-1 h-full bg-slate-400"></div>
+                <div class="px-5 py-4 ml-1">
+                    <div class="flex items-center gap-2 mb-3">
                         <span class="h-2 w-2 bg-slate-400 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Staff Member</p>
+                        <p class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">05 // Staff Member</p>
                     </div>
 
                     {{-- Used By --}}
-                    <div
+                    <div class="space-y-4 mt-1"
                         x-data="{ isOther: {{ old('_used_by_other') ? 'true' : 'false' }}, staffValue: '{{ old('_used_by_staff', '') }}', otherValue: '{{ old('used_by', '') }}' }">
-                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Used By</label>
-                        <select
-                            @change="isOther = ($event.target.value === '__other__'); if (!isOther) staffValue = $event.target.value"
-                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
-                            <option value="">— Select staff member —</option>
-                            @php 
-                                $grouped = $staffList->groupBy('type'); 
-                                $typeLabels = ['programmer' => 'Programmers', 'tech support' => 'IT / Tech Support', 'supervisor' => 'Supervisors', 'head' => 'Department Heads'];
-                            @endphp
-                            @foreach($grouped as $type => $members)
-                                <optgroup label="{{ $typeLabels[$type] ?? ucwords(str_replace('_', ' ', $type)) }}">
-                                    @foreach($members as $member)
-                                        <option value="{{ $member->display_name }}" {{ old('_used_by_staff') == $member->display_name ? 'selected' : '' }}>{{ $member->display_name }}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                            <option value="__other__" {{ old('_used_by_other') ? 'selected' : '' }}>— Others (type a name) —
-                            </option>
-                        </select>
-                        <div x-show="isOther" x-cloak class="mt-2">
-                            <input type="text" x-model="otherValue" placeholder="Enter full name..."
-                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Used By</label>
+                            <select
+                                @change="isOther = ($event.target.value === '__other__'); if (!isOther) staffValue = $event.target.value"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors">
+                                <option value="">— Select staff member —</option>
+                                @php 
+                                    $grouped = $staffList->groupBy('type'); 
+                                    $typeLabels = ['programmer' => 'Programmers', 'tech support' => 'IT / Tech Support', 'supervisor' => 'Supervisors', 'head' => 'Department Heads'];
+                                @endphp
+                                @foreach($grouped as $type => $members)
+                                    <optgroup label="{{ $typeLabels[$type] ?? ucwords(str_replace('_', ' ', $type)) }}">
+                                        @foreach($members as $member)
+                                            <option value="{{ $member->display_name }}" {{ old('_used_by_staff') == $member->display_name ? 'selected' : '' }}>{{ $member->display_name }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                                <option value="__other__" {{ old('_used_by_other') ? 'selected' : '' }}>— Others (type a name) —
+                                </option>
+                            </select>
+                            <div x-show="isOther" x-cloak class="mt-2">
+                                <input type="text" x-model="otherValue" placeholder="Enter full name..."
+                                    class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors">
+                            </div>
+                            <input type="hidden" name="used_by" x-bind:value="isOther ? otherValue : staffValue">
+                            <input type="hidden" name="_used_by_other" x-bind:value="isOther ? '1' : ''">
+                            <input type="hidden" name="_used_by_staff" x-bind:value="staffValue">
                         </div>
-                        <input type="hidden" name="used_by" x-bind:value="isOther ? otherValue : staffValue">
-                        <input type="hidden" name="_used_by_other" x-bind:value="isOther ? '1' : ''">
-                        <input type="hidden" name="_used_by_staff" x-bind:value="staffValue">
-                    </div>
 
-                    {{-- Notes --}}
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span
-                                class="font-normal text-slate-400">(Optional)</span></label>
-                        <textarea name="notes" rows="3"
-                            class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 px-3 text-sm text-[#0f172a] transition-colors placeholder:text-slate-400"
-                            placeholder="Procedure, anomalies, or context...">{{ old('notes') }}</textarea>
+                        {{-- Notes --}}
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Notes <span
+                                    class="font-normal text-slate-400">(Optional)</span></label>
+                            <textarea name="notes" rows="4"
+                                class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-blue-500 focus:outline-none py-2.5 px-3 text-sm font-mono text-[#0f172a] transition-colors placeholder:text-slate-400"
+                                placeholder="Procedure, anomalies, or context...">{{ old('notes') }}</textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -458,23 +433,17 @@
                     Cancel
                 </a>
                 <button type="submit" :disabled="isDevice() && selectedEntries.length === 0"
-                    :class="(isDevice() && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-[#0f172a] hover:bg-slate-700 border-[#0f172a]'"
+                    :class="(isDevice() && selectedEntries.length === 0) ? 'opacity-40 cursor-not-allowed bg-slate-400 border-slate-400' : 'bg-sky-500 hover:bg-sky-600 border-sky-600'"
                     class="inline-flex items-center gap-2 text-white px-6 py-2.5 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
                     <span
-                        x-text="isDevice() ? 'Log ' + selectedEntries.length + ' Device(s)' : 'Log Usage'">Log
-                        Usage</span>
+                        x-text="isDevice() ? 'Log ' + selectedEntries.length + ' Device(s)' : 'Log Usage'">Log Usage</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                        <path fill-rule="evenodd"
-                            d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd"
-                            d="M4 10a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h9a.75.75 0 00.75-.75v-4.5a.75.75 0 011.5 0v4.5a2.25 2.25 0 01-2.25 2.25h-9A2.25 2.25 0 012 15.25v-4.5A.75.75 0 014 10z"
-                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
-
         </form>
+        </div>
     </div>
 
     @php

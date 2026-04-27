@@ -18,28 +18,167 @@
         'Disposals' => $rawDisposals->count(),
         'Items' => $items->count(),
     ];
+
+    // KPI Card stats for logs page - Main overview
+    $logStats = [
+        [
+            'label' => 'Total Records', 'value' => number_format($count), 'sub' => 'All transactions', 
+            'icon' => 'M9 12h3.75M9 15h3.75M9 18h3.75m3-6H9m0 0h.008v.008H9V9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM12 9h3.75m-3.75 3h3.75m-3.75 3h3.75M9 9h.008V9H9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM9 9v6m0 0v6m3-6h6m0 0h6',
+            'trend_color' => 'text-sky-500', 'sparkline' => 'M0,20 Q10,15 20,20 T40,10 T60,15 T80,5 T100,0'
+        ],
+        [
+            'label' => 'Units In', 'value' => number_format($totalIn), 'sub' => 'Inbound flow', 
+            'icon' => 'M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75',
+            'trend_color' => 'text-emerald-500', 'sparkline' => 'M0,30 L20,20 L40,25 L60,10 L80,15 L100,5'
+        ],
+        [
+            'label' => 'Units Out', 'value' => number_format($totalOut), 'sub' => 'Outbound flow', 
+            'icon' => 'M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75',
+            'trend_color' => 'text-rose-500', 'sparkline' => 'M0,10 L20,15 L40,5 L60,20 L80,10 L100,25'
+        ],
+        [
+            'label' => 'Net Balance', 'value' => number_format($totalIn - $totalOut), 'sub' => 'In - Out', 
+            'icon' => 'M3 4.5h7.5M3 9h7.5m0 0L6 12m4.5-4.5l-4.5 3M12 6l4.5 3.75M12 6v12m0 0l-4.5-3.75M12 18l4.5-3.75',
+            'trend_color' => 'text-indigo-500', 'sparkline' => 'M0,15 Q15,5 30,15 T60,5 T90,15 L100,10'
+        ],
+    ];
+
+    // Detailed category cards
+    $categoryCards = [
+        [
+            'label' => 'Total Stock', 'value' => number_format($totalStock), 'sub' => 'Units received',
+            'icon' => 'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375M3.75 16.125v4.125C3.75 22.653 7.444 24.75 12 24.75s8.25-2.097 8.25-4.625v-4.125',
+            'trend_color' => 'text-emerald-600', 'bgColor' => 'bg-emerald-50', 'borderColor' => 'border-emerald-200'
+        ],
+        [
+            'label' => 'Total Usage', 'value' => number_format($totalUsage), 'sub' => 'Units consumed',
+            'icon' => 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 9.75h6M9 12h6m-6 2.25h6',
+            'trend_color' => 'text-rose-600', 'bgColor' => 'bg-rose-50', 'borderColor' => 'border-rose-200'
+        ],
+        [
+            'label' => 'Total Borrow', 'value' => number_format($totalBorrow), 'sub' => 'Units borrowed',
+            'icon' => 'M12 3v2.25m6.364.386l-1.591 1.591M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-6 0a3 3 0 11-6 0 3 3 0 016 0z',
+            'trend_color' => 'text-blue-600', 'bgColor' => 'bg-blue-50', 'borderColor' => 'border-blue-200'
+        ],
+        [
+            'label' => 'Total Return', 'value' => number_format($totalReturn), 'sub' => 'Units returned',
+            'icon' => 'M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3',
+            'trend_color' => 'text-teal-600', 'bgColor' => 'bg-teal-50', 'borderColor' => 'border-teal-200'
+        ],
+        [
+            'label' => 'Total Transfer', 'value' => number_format($totalTransfer), 'sub' => 'Units transferred',
+            'icon' => 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5a1.5 1.5 0 010 3H3m12.75-3L21 8.25m0 0L16.5 3.75M21 8.25v13.5a1.5 1.5 0 01-1.5 1.5h-13.5',
+            'trend_color' => 'text-amber-600', 'bgColor' => 'bg-amber-50', 'borderColor' => 'border-amber-200'
+        ],
+        [
+            'label' => 'Total Disposal', 'value' => number_format($totalDisposal), 'sub' => 'Units disposed',
+            'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+            'trend_color' => 'text-slate-600', 'bgColor' => 'bg-slate-50', 'borderColor' => 'border-slate-200'
+        ],
+        [
+            'label' => 'Total Items', 'value' => number_format($totalItems), 'sub' => 'Unique items',
+            'icon' => 'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375',
+            'trend_color' => 'text-purple-600', 'bgColor' => 'bg-purple-50', 'borderColor' => 'border-purple-200'
+        ],
+    ];
 @endphp
 
-<div x-data="{ activeTab: 'stock-entries', search: '' }">
+<div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+    {{-- KPI Cards Grid --}}
+    <div class="grid grid-cols-1 border-b border-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+        @foreach($logStats as $stat)
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                
+                {{-- Header (Label + Icon) --}}
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $stat['label'] }}</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-sky-100 group-hover:text-sky-600">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $stat['icon'] }}" />
+                        </svg>
+                    </div>
+                </div>
 
-    {{-- Page Header --}}
-    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 mb-6">
-        <div class="p-6 flex items-center justify-between">
-            <div>
-                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">System://Logs</p>
-                <h1 class="text-xl font-black text-[#0f172a] tracking-tight">Transaction History</h1>
-                <p class="text-xs text-slate-400 font-mono mt-1">Read-only view of all inward and outward movements.</p>
+                {{-- Body (Value + Sparkline Graph) --}}
+                <div class="flex items-end justify-between">
+                    <div class="z-10">
+                        <p class="text-2xl font-black tracking-tight text-slate-800">{{ $stat['value'] }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $stat['sub'] }}</p>
+                    </div>
+                    
+                    {{-- Mini Line Graph (Sparkline) --}}
+                    <div class="w-16 h-8 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg viewBox="0 0 100 30" class="w-full h-full stroke-current {{ $stat['trend_color'] }}">
+                            <path d="{{ $stat['sparkline'] }}" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                        </svg>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="rounded-lg bg-sky-50 px-3 py-1.5 text-[11px] font-bold text-sky-600">{{ $count }} records</span>
+        @endforeach
+    </div>
+
+    {{-- Detailed Category Cards --}}
+    <div class="grid grid-cols-1 border-b border-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+        @foreach($categoryCards as $card)
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                
+                {{-- Header (Label + Icon) --}}
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $card['label'] }}</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg {{ $card['bgColor'] }} {{ $card['trend_color'] }} transition-colors group-hover:shadow-md">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}" />
+                        </svg>
+                    </div>
+                </div>
+
+                {{-- Body (Value + Subtitle) --}}
+                <div class="z-10">
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $card['value'] }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $card['sub'] }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm mt-6">
+    {{-- Main Panels (Charts & Timeline) --}}
+    <div class="grid grid-cols-1 xl:grid-cols-12 bg-slate-50/30">
+        
+        {{-- Left Side: Charts & Timeline --}}
+        <div class="border-r border-slate-200 xl:col-span-12 bg-white">
+            
+            {{-- Full Width Timeline Chart --}}
+            <div class="p-5 border-b border-slate-200">
+                <div class="mb-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase tracking-widest text-sky-600">Timeline</p>
+                        <h3 class="text-sm font-bold text-slate-800">7-Day Transaction Trend</h3>
+                    </div>
+                </div>
+                <div class="h-[240px] w-full">
+                    <canvas id="transactionTrendChart"></canvas>
+                </div>
+            </div>
+
+            {{-- Bar Chart: Categories --}}
+            <div class="p-5 border-b border-slate-100 flex flex-col">
+                <div class="mb-4">
+                    <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest">Chart.01</p>
+                    <h3 class="text-sm font-bold text-slate-800">Records Breakdown By Category</h3>
+                </div>
+                <div class="flex-1 min-h-[260px] relative">
+                    <canvas id="categoryBarChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- Filter Bar --}}
-    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 mb-6 z-20 relative">
-        <div class="px-6 py-4 border-b border-sky-100">
-            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500">// Filters</p>
+    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 mb-6 z-20 relative mt-6">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-600">// Filters</p>
         </div>
         <div class="p-5">
             <form method="GET" action="{{ route('logs.index') }}" class="flex flex-wrap items-end gap-3">
@@ -55,7 +194,7 @@
                     }
                 }">
                     <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">Item Filter</label>
-                    <select x-ref="itemSelect" name="item" class="block w-full border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-[#0f172a] font-mono transition-colors" onchange="this.form.submit()">
+                    <select x-ref="itemSelect" name="item" class="block w-full border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-slate-800 font-mono transition-colors" onchange="this.form.submit()">
                         <option value="">All Items</option>
                         @foreach($items as $item)
                         <option value="{{ $item->id }}" {{ request('item') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
@@ -64,18 +203,18 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">From</label>
-                    <input type="date" name="from" value="{{ request('from') }}" class="block border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-[#0f172a] font-mono transition-colors">
+                    <input type="date" name="from" value="{{ request('from') }}" class="block border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-slate-800 font-mono transition-colors">
                 </div>
                 <div>
                     <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">To</label>
-                    <input type="date" name="to" value="{{ request('to') }}" class="block border border-sky-100 bg-sky-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-[#0f172a] font-mono transition-colors">
+                    <input type="date" name="to" value="{{ request('to') }}" class="block border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2 px-3 text-xs text-slate-800 font-mono transition-colors">
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="inline-flex items-center gap-2 bg-[#0f172a] px-5 py-2 text-[10px] font-mono font-bold text-white uppercase tracking-widest hover:bg-slate-800 transition-colors border border-[#0f172a]">
+                    <button type="submit" class="inline-flex items-center gap-2 bg-sky-600 px-5 py-2 text-[10px] font-mono font-bold text-white uppercase tracking-widest hover:bg-sky-700 transition-colors border border-sky-600">
                         Apply
                     </button>
                     @if(request('item') || request('type') || request('from') || request('to'))
-                    <a href="{{ route('logs.index') }}" class="inline-flex items-center gap-2 border border-sky-100 bg-sky-50 px-5 py-2 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-sky-100 transition-colors">
+                    <a href="{{ route('logs.index') }}" class="inline-flex items-center gap-2 border border-slate-200 bg-slate-50 px-5 py-2 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-100 transition-colors">
                         Clear
                     </a>
                     @endif
@@ -84,45 +223,7 @@
         </div>
     </div>
 
-    {{-- Charts Top Row --}}
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
-        {{-- Doughnut Chart: Flow Types --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            <div class="px-5 py-4 border-b border-sky-100 flex items-center justify-between ">
-                <div>
-                    <p class="text-[10px] font-mono text-sky-500 uppercase tracking-widest mb-0.5">Chart.01</p>
-                    <p class="text-sm font-bold text-[#0f172a]">Directional Flow Volume</p>
-                </div>
-                <span class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1">
-                    <span class="h-1.5 w-1.5 bg-emerald-500 inline-block animate-pulse"></span>
-                    LIVE
-                </span>
-            </div>
-            <div class="p-5 ">
-                <div class="h-[240px]">
-                    <canvas id="flowDoughnutChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        {{-- Bar Chart: Categories --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-400 to-violet-500"></div>
-            <div class="px-5 py-4 border-b border-sky-100 ">
-                <p class="text-[10px] font-mono text-sky-500 uppercase tracking-widest mb-0.5">Chart.02</p>
-                <p class="text-sm font-bold text-[#0f172a]">Records Breakdown By Category</p>
-            </div>
-            <div class="p-5 ">
-                <div class="h-[240px]">
-                    <canvas id="categoryBarChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    {{-- Tab Navigation --}}
+<div x-data="{ activeTab: 'stock-entries', search: '' }">
     @php
         $tabs = [
             ['id' => 'stock-entries', 'label' => 'Stock Entries',  'count' => $catCounts['Stock Entries'], 'active' => 'border-emerald-500 text-emerald-700 bg-emerald-50'],
@@ -162,19 +263,19 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-emerald-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-widest">Stock Entries</p>
+                    <span class="h-2 w-2 bg-emerald-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest">Stock Entries</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Qty</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Lot / SN #</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Expiry</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Received</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Notes</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Qty</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Lot / SN #</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Expiry</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Received</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Notes</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawStockEntries as $entry)
@@ -206,18 +307,18 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-rose-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-rose-600 uppercase tracking-widest">Usage Logs</p>
+                    <span class="h-2 w-2 bg-rose-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-rose-600 uppercase tracking-widest">Usage Logs</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Qty Used</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Used By</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Date</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Notes</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Qty Used</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Used By</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Date</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Notes</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawUsageLogs as $log)
@@ -242,19 +343,19 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-sky-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-sky-500 uppercase tracking-widest">Borrow Records</p>
+                    <span class="h-2 w-2 bg-sky-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest">Borrow Records</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Borrower</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Borrowed / Used</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Status</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Date</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Notes</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Borrower</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Borrowed / Used</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Status</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Date</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Notes</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawBorrows as $borrow)
@@ -294,18 +395,18 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-teal-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">Return Records</p>
+                    <span class="h-2 w-2 bg-teal-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-widest">Return Records</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Returned On</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Staff</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Returned / Used</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Notes</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Returned On</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Staff</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Returned / Used</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Notes</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawReturns as $return)
@@ -334,19 +435,19 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-amber-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest">Transfer Records</p>
+                    <span class="h-2 w-2 bg-amber-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-amber-600 uppercase tracking-widest">Transfer Records</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Qty</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Destination</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">By / BioID</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Date</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Notes</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Qty</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Destination</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">By / BioID</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Date</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Notes</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawTransfers as $transfer)
@@ -379,18 +480,18 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-slate-600 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-slate-700 uppercase tracking-widest">Disposal Records</p>
+                    <span class="h-2 w-2 bg-slate-600 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-slate-700 uppercase tracking-widest">Disposal Records</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Item</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Qty</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Reason</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Disposed By</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Date</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Item</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Qty</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Reason</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Disposed By</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Date</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($rawDisposals as $disposal)
@@ -416,16 +517,16 @@
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
             <div class="px-6 py-4 border-b border-sky-100">
                 <div class="flex items-center gap-2">
-                    <span class="h-2 w-2 bg-violet-500 inline-block font-mono"></span>
-                    <p class="text-[10px] font-mono font-bold text-violet-600 uppercase tracking-widest">Master Item List</p>
+                    <span class="h-2 w-2 bg-violet-500 rounded-full inline-block"></span>
+                    <p class="text-[10px] font-semibold text-violet-600 uppercase tracking-widest">Master Item List</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead><tr class="bg-sky-50/80 border-b border-sky-100">
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Name</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Category</th>
-                        <th class="px-6 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-left">Stock</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Name</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Category</th>
+                        <th class="px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-left">Stock</th>
                     </tr></thead>
                     <tbody class="divide-y divide-sky-100">
                     @forelse($items as $item)
@@ -465,40 +566,93 @@ document.addEventListener('DOMContentLoaded', function () {
         return gradient;
     };
 
-    // Doughnut Chart (In vs Out)
-    const ctxFlow = document.getElementById('flowDoughnutChart');
-    if (ctxFlow) {
-        const flowCtx = ctxFlow.getContext('2d');
-        new Chart(flowCtx, {
-            type: 'doughnut',
+    // 7-Day Transaction Trend Line Chart
+    const ctxTrend = document.getElementById('transactionTrendChart');
+    if (ctxTrend) {
+        const trendCtx = ctxTrend.getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
             data: {
-                labels: ['Units In', 'Units Out'],
-                datasets: [{
-                    data: [{{ $totalIn }}, {{ $totalOut }}],
-                    backgroundColor: [
-                        createGradient(flowCtx, 'rgba(20, 184, 166, 0.9)', 'rgba(20, 184, 166, 0.4)'),
-                        createGradient(flowCtx, 'rgba(244, 63, 94, 0.9)', 'rgba(244, 63, 94, 0.4)')
-                    ],
-                    borderColor: ['#14b8a6', '#f43f5e'],
-                    borderWidth: 2,
-                    hoverOffset: 0,
-                    hoverBorderWidth: 2
-                }]
+                labels: [
+                    @foreach($sevenDayTrend as $data)
+                        '{{ $data['date'] }}',
+                    @endforeach
+                ],
+                datasets: [
+                    {
+                        label: 'Units In',
+                        data: [
+                            @foreach($sevenDayTrend as $data)
+                                {{ $data['in'] }},
+                            @endforeach
+                        ],
+                        borderColor: '#14b8a6',
+                        backgroundColor: createGradient(trendCtx, 'rgba(20, 184, 166, 0.2)', 'rgba(20, 184, 166, 0.01)'),
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#14b8a6',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Units Out',
+                        data: [
+                            @foreach($sevenDayTrend as $data)
+                                {{ $data['out'] }},
+                            @endforeach
+                        ],
+                        borderColor: '#f43f5e',
+                        backgroundColor: createGradient(trendCtx, 'rgba(244, 63, 94, 0.2)', 'rgba(244, 63, 94, 0.01)'),
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#f43f5e',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '72%',
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     legend: {
-                        position: 'right',
+                        position: 'top',
                         labels: {
-                            padding: 20,
                             usePointStyle: true,
-                            pointStyle: 'circle',
+                            padding: 15,
                             color: '#64748b',
                             font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 10,
+                        borderRadius: 6,
+                        titleColor: '#fff',
+                        bodyColor: '#e2e8f0',
+                        borderColor: '#475569',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { color: '#64748b', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                        border: { display: false },
+                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
                     }
                 }
             }

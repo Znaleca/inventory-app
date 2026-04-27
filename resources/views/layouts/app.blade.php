@@ -196,7 +196,7 @@
 <body class="min-h-full antialiased text-slate-800 overflow-hidden"
     style="font-family: 'Plus Jakarta Sans', sans-serif;" x-data="{ sidebarExpanded: true, mobileOpen: false }">
 
-    <div class="flex h-screen w-full overflow-hidden pr-3 gap-3">
+    <div class="flex h-screen w-full overflow-hidden gap-0">
 
         {{-- Mobile Overlay --}}
         <div x-show="mobileOpen" x-transition.opacity
@@ -423,7 +423,7 @@
         {{-- ==================== --}}
         {{-- MAIN CONTENT AREA --}}
         {{-- ==================== --}}
-        <div class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#F0F4F8]">
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#F0F4F8] rounded-l-3xl">
     {{-- Top Header (Clean Modern High-Contrast) --}}
     <header class="relative z-30 flex h-[75px] items-center justify-between gap-4 px-8 bg-white/80 backdrop-blur-md border-b border-sky-100 shrink-0 shadow-sm">
         
@@ -458,13 +458,12 @@
                 </div>
 
                 {{-- Status Chip --}}
-                <div class="ml-2 flex items-center gap-1.5 rounded-md border border-slate-200/60 bg-slate-50/80 px-2.5 py-1 shadow-sm">
-                    <span class="relative flex h-1.5 w-1.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    </span>
-                    <span class="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-0.5">Sync</span>
-                </div>
+                <div class="ml-2 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200/60 bg-slate-50/80 shadow-sm" aria-label="Status active">
+    <span class="relative flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+    </span>
+</div>
             </div>
         </div>
 

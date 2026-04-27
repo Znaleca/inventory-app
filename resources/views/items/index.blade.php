@@ -186,61 +186,96 @@
     $outOfStockPct = $totalCount > 0 ? round(($outOfStockCount / $totalCount) * 100) : 0;
 @endphp
 
-{{-- Analytics Overview (Maximizing Space) --}}
-<div class="border-b border-sky-100 bg-white grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-sky-100 shrink-0">
+{{-- Analytics Overview Cards --}}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 px-4 pt-4">
     
     {{-- Metric: Total --}}
-    <div class="p-4 flex items-center justify-between">
-        <div>
-            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Registry Overview</p>
-            <div class="flex items-baseline gap-2">
-                <h3 class="text-3xl font-black text-[#0f172a] tracking-tight">{{ $totalCount }}</h3>
-                <span class="text-xs font-mono text-slate-400 font-bold uppercase tracking-widest">Items</span>
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-sky-100">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="h-2 w-2 bg-sky-500 rounded-full inline-block"></span>
+                <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest">Registry Overview</p>
             </div>
         </div>
-        <div class="h-10 w-10 rounded-full bg-sky-50 flex items-center justify-center border border-sky-100">
-            <svg class="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+        <div class="p-5">
+            <div class="flex items-end justify-between">
+                <div>
+                    <p class="text-3xl font-black text-slate-800">{{ $totalCount }}</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Items</p>
+                </div>
+                <div class="h-10 w-10 rounded-lg bg-sky-50 flex items-center justify-center">
+                    <svg class="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Chart: Stock Health --}}
-    <div class="p-4 flex flex-col justify-center">
-        <div class="flex justify-between items-end mb-2">
-            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Stock Health Tracker</p>
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-sky-100">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="h-2 w-2 bg-amber-500 rounded-full inline-block"></span>
+                <p class="text-[10px] font-semibold text-amber-600 uppercase tracking-widest">Stock Health</p>
+            </div>
         </div>
-        <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-sm border border-slate-200">
-            <div style="width: {{ $healthyPct }}%" class="bg-emerald-400" title="Healthy: {{ $healthyCount }}"></div>
-            <div style="width: {{ $reorderPct }}%" class="bg-amber-400" title="Reorder: {{ $reorderCount }}"></div>
-            <div style="width: {{ $outOfStockPct }}%" class="bg-rose-500" title="Out of Stock: {{ $outOfStockCount }}"></div>
-        </div>
-        <div class="flex justify-between mt-2">
-            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-emerald-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $healthyCount }} OK</span></div>
-            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-amber-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $reorderCount }} Low</span></div>
-            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-rose-500 rounded-full animate-pulse"></span><span class="text-[9px] font-mono font-black text-rose-600">{{ $outOfStockCount }} Empty</span></div>
+        <div class="p-5">
+            <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-full border border-sky-100 mb-3">
+                <div style="width: {{ $healthyPct }}%" class="bg-emerald-400" title="Healthy: {{ $healthyCount }}"></div>
+                <div style="width: {{ $reorderPct }}%" class="bg-amber-400" title="Reorder: {{ $reorderCount }}"></div>
+                <div style="width: {{ $outOfStockPct }}%" class="bg-rose-500" title="Out of Stock: {{ $outOfStockCount }}"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div>
+                    <p class="text-sm font-black text-emerald-600">{{ $healthyCount }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">OK</p>
+                </div>
+                <div>
+                    <p class="text-sm font-black text-amber-600">{{ $reorderCount }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Low</p>
+                </div>
+                <div>
+                    <p class="text-sm font-black text-rose-600">{{ $outOfStockCount }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Empty</p>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Chart: Category Distribution --}}
-    <div class="p-4 flex flex-col justify-center bg-slate-50/50">
-        <div class="flex justify-between items-end mb-2">
-            <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">Type Distribution</p>
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-sky-100">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="h-2 w-2 bg-violet-500 rounded-full inline-block"></span>
+                <p class="text-[10px] font-semibold text-violet-600 uppercase tracking-widest">Type Distribution</p>
+            </div>
         </div>
-        <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-sm border border-slate-200">
-            <div style="width: {{ $consumablePct }}%" class="bg-sky-400" title="Consumables: {{ $consumableCount }}"></div>
-            <div style="width: {{ $devicePct }}%" class="bg-violet-400" title="Devices: {{ $deviceCount }}"></div>
-        </div>
-        <div class="flex justify-between mt-2">
-            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-sky-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $consumableCount }} Consumable</span></div>
-            <div class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-violet-400 rounded-full"></span><span class="text-[9px] font-mono font-bold text-slate-500">{{ $deviceCount }} Device</span></div>
+        <div class="p-5">
+            <div class="w-full h-2.5 bg-slate-100 flex overflow-hidden rounded-full border border-sky-100 mb-3">
+                <div style="width: {{ $consumablePct }}%" class="bg-sky-400" title="Consumables: {{ $consumableCount }}"></div>
+                <div style="width: {{ $devicePct }}%" class="bg-violet-400" title="Devices: {{ $deviceCount }}"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div>
+                    <p class="text-sm font-black text-sky-600">{{ $consumableCount }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Consumable</p>
+                </div>
+                <div>
+                    <p class="text-sm font-black text-violet-600">{{ $deviceCount }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Device</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- Search & Filter Bar --}}
-<div class="bg-sky-50/50 border-b border-sky-100 p-4 relative">
-    <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-    <div>
-        <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3 pl-2">
+<div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden mx-4 mb-4 mt-4">
+    <div class="p-5 border-b border-sky-100">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="h-2 w-2 bg-teal-500 rounded-full inline-block"></span>
+            <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-widest">Search & Filter</p>
+        </div>
+        <form method="GET" action="{{ route('items.index') }}" class="flex flex-wrap items-center gap-3">
 
             {{-- Search Input --}}
             <div class="relative flex-1 sm:min-w-[280px]">
@@ -294,7 +329,7 @@
 </div>
 
 {{-- Main Table --}}
-<div class="bg-white border border-sky-100 relative overflow-hidden" x-data="{
+<div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden mx-4 mb-4" x-data="{
     search: '{{ request('search') }}',
     category: '{{ request('category') }}',
     type: '{{ request('type') }}',
@@ -325,20 +360,25 @@
         });
     }
 }">
-    <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+    <div class="p-5 border-b border-sky-100">
+        <div class="flex items-center gap-2">
+            <span class="h-2 w-2 bg-emerald-500 rounded-full inline-block"></span>
+            <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest">Item Registry</p>
+        </div>
+    </div>
 
     <template x-if="filteredItems.length > 0">
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead>
                 <tr class="border-b border-sky-100 bg-sky-50/80">
-                    <th scope="col" class="whitespace-nowrap pl-5 pr-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Item</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Category</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Location</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Stock / Expiry</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Unit</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Status</th>
-                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-right pr-5 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400">Actions</th>
+                    <th scope="col" class="whitespace-nowrap pl-5 pr-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Item</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Category</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Location</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Stock / Expiry</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Unit</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">Status</th>
+                    <th scope="col" class="whitespace-nowrap px-3 py-3 text-right pr-5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">

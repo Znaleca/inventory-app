@@ -8,9 +8,25 @@ use App\Models\Staff;
 use App\Models\StockEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DisposalController extends Controller
 {
+    private function disposedUsedQtyForEntry(int $entryId): int
+    {
+        if (!Schema::hasColumn('disposals', 'stock_entry_id')) {
+            return 0;
+        }
+
+        $query = Disposal::where('stock_entry_id', $entryId);
+
+        if (Schema::hasColumn('disposals', 'type')) {
+            $query->where('type', 'used');
+        }
+
+        return (int) $query->sum('quantity');
+    }
+
     public function create(Request $request)
     {
         $item = Item::findOrFail($request->item_id);
@@ -48,8 +64,12 @@ class DisposalController extends Controller
                     ->orderBy('received_date')
                     ->get()
                     ->map(function ($entry) {
-                        return array_merge($entry->toArray(), ['remaining' => 1]);
+                        $disposedQty = $this->disposedUsedQtyForEntry($entry->id);
+                        $remaining = max(0, 1 - $disposedQty);
+
+                        return array_merge($entry->toArray(), ['remaining' => $remaining]);
                     })
+                    ->filter(fn($e) => $e['remaining'] > 0)
                     ->values();
             } else {
                 $batches = StockEntry::where('item_id', $item->id)
@@ -58,17 +78,20 @@ class DisposalController extends Controller
                     ->get()
                     ->map(function ($entry) {
                         $usedQty = $entry->usageLogs()->sum('quantity_used');
-                        return array_merge($entry->toArray(), ['remaining' => $usedQty]);
+                        $disposedQty = $this->disposedUsedQtyForEntry($entry->id);
+                        $remaining = max(0, $usedQty - $disposedQty);
+
+                        return array_merge($entry->toArray(), ['remaining' => $remaining]);
                     })
                     ->filter(fn($e) => $e['remaining'] > 0)
                     ->values();
             }
 
-            if ($batches->isEmpty() && $item->stock_used <= 0) {
+            $maxQty = (int) $batches->sum('remaining');
+
+            if ($batches->isEmpty() && $maxQty <= 0) {
                 return redirect()->route('items.show', $item)->with('error', 'No used stock available to dispose.');
             }
-
-            $maxQty = $item->stock_used;
         }
 
         $staffList = Staff::orderBy('name')->get();
@@ -80,37 +103,97 @@ class DisposalController extends Controller
     {
         $item = Item::findOrFail($request->item_id);
         $disposalType = $request->input('disposal_type', 'used');
+        $hasStockEntryColumn = Schema::hasColumn('disposals', 'stock_entry_id');
+        $hasTypeColumn = Schema::hasColumn('disposals', 'type');
 
-        $maxQty = $disposalType === 'new'
-            ? StockEntry::where('item_id', $item->id)
+        if ($disposalType === 'new') {
+            $maxQty = StockEntry::where('item_id', $item->id)
                 ->whereNotNull('expiry_date')
                 ->where('expiry_date', '<', now()->startOfDay())
-                ->sum('quantity')
-            : $item->stock_used;
-
-        $validated = $request->validate([
-            'stock_entry_id' => 'nullable|exists:stock_entries,id',
-            'quantity'       => 'required|integer|min:1|max:' . max(1, $maxQty),
-            'reason'         => 'required|string|max:500',
-            'disposed_by'    => 'required|string|max:255',
-            'disposed_at'    => 'required|date',
-        ]);
-
-        DB::transaction(function () use ($item, $validated, $disposalType) {
-            // Only decrement stock_used for used disposals
-            if ($disposalType === 'used') {
-                $item->decrement('stock_used', $validated['quantity']);
+                ->sum('quantity');
+        } else {
+            if ($item->item_type === 'device') {
+                $usedBatches = StockEntry::where('item_id', $item->id)
+                    ->whereHas('usageLogs', fn($q) => $q->where('quantity_used', '>', 0))
+                    ->get()
+                    ->map(function ($entry) {
+                        $alreadyDisposed = $this->disposedUsedQtyForEntry($entry->id);
+                        return max(0, 1 - $alreadyDisposed);
+                    });
+            } else {
+                $usedBatches = StockEntry::where('item_id', $item->id)
+                    ->whereHas('usageLogs', fn($q) => $q->where('quantity_used', '>', 0))
+                    ->get()
+                    ->map(function ($entry) {
+                        $usedQty = $entry->usageLogs()->sum('quantity_used');
+                        $alreadyDisposed = $this->disposedUsedQtyForEntry($entry->id);
+                        return max(0, $usedQty - $alreadyDisposed);
+                    });
             }
 
-            Disposal::create([
-                'item_id'        => $item->id,
-                'stock_entry_id' => $validated['stock_entry_id'] ?? null,
-                'type'           => $disposalType === 'new' ? 'new' : 'used',
-                'quantity'       => $validated['quantity'],
-                'disposed_by'    => $validated['disposed_by'],
-                'disposed_at'    => $validated['disposed_at'],
-                'reason'         => $validated['reason'],
-            ]);
+            $maxQty = (int) $usedBatches->sum();
+        }
+
+        $validated = $request->validate([
+            'stock_entry_id'   => 'required|array|min:1',
+            'stock_entry_id.*' => 'exists:stock_entries,id',
+            'reason'           => 'required|string|max:500',
+            'disposed_by'      => 'required|string|max:255',
+            'disposed_at'      => 'required|date',
+        ]);
+
+        $stockEntryIds = array_filter($validated['stock_entry_id']);
+
+        DB::transaction(function () use ($item, $validated, $disposalType, $stockEntryIds, $hasStockEntryColumn, $hasTypeColumn) {
+            $disposedTotal = 0;
+
+            // Multi-batch / checklist disposal
+            foreach ($stockEntryIds as $entryId) {
+                $entry = StockEntry::find($entryId);
+                if (!$entry) continue;
+
+                // Remaining logic specific to each entry for quantity calculation
+                if ($disposalType === 'new') {
+                    $used = $entry->usageLogs()->sum('quantity_used');
+                    $qty = max(0, $entry->quantity - $used);
+                } else {
+                    if ($item->item_type === 'device') {
+                        $usedQty = $entry->usageLogs()->where('quantity_used', '>', 0)->exists() ? 1 : 0;
+                    } else {
+                        $usedQty = $entry->usageLogs()->where('quantity_used', '>', 0)->sum('quantity_used');
+                    }
+
+                    $alreadyDisposed = $this->disposedUsedQtyForEntry($entry->id);
+                    $qty = max(0, $usedQty - $alreadyDisposed);
+                }
+
+                if ($qty <= 0) continue;
+
+                $payload = [
+                    'item_id'        => $item->id,
+                    'quantity'       => $qty,
+                    'disposed_by'    => $validated['disposed_by'],
+                    'disposed_at'    => $validated['disposed_at'],
+                    'reason'         => $validated['reason'],
+                ];
+
+                if ($hasStockEntryColumn) {
+                    $payload['stock_entry_id'] = $entryId;
+                }
+
+                if ($hasTypeColumn) {
+                    $payload['type'] = $disposalType === 'new' ? 'new' : 'used';
+                }
+
+                Disposal::create($payload);
+
+                $disposedTotal += $qty;
+            }
+
+            // Only decrement stock_used for used disposals and actual disposed qty
+            if ($disposalType === 'used' && $disposedTotal > 0) {
+                $item->decrement('stock_used', $disposedTotal);
+            }
         });
 
         $msg = $disposalType === 'new'
