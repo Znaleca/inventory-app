@@ -605,69 +605,82 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
-    (function() {
-        const canvas = document.getElementById('stockDonut');
-        if (!canvas) return;
+document.addEventListener('DOMContentLoaded', function () {
+    const createVerticalGradient = (ctx, startColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
+    const createHorizontalGradient = (ctx, startColor, midColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 400, 0);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(0.5, midColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
+    const baseTickStyle = { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } };
+    const baseGrid = { color: 'rgba(15, 23, 42, 0.04)', drawBorder: false };
+
+    // 1. Doughnut Chart (Status Distribution)
+    const donutCanvas = document.getElementById('stockDonut');
+    if (donutCanvas) {
         const chartNew  = {{ $chartNew ?? 0 }};
         const chartUsed = {{ $chartUsed ?? 0 }};
         const chartLent = {{ $chartLent ?? 0 }};
         const total = chartNew + chartUsed + chartLent;
-        if (total === 0) return;
-        const ctx = canvas.getContext('2d');
-        const createGradient = (ctx, startColor, endColor) => {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-            gradient.addColorStop(0, startColor);
-            gradient.addColorStop(1, endColor);
-            return gradient;
-        };
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: ['New Stock', 'Used Stock', 'Lent Out'],
-                datasets: [{
-                    data: [chartNew, chartUsed, chartLent],
-                    backgroundColor: [
-                        createGradient(ctx, 'rgba(52, 211, 153, 0.95)', 'rgba(52, 211, 153, 0.35)'),
-                        createGradient(ctx, 'rgba(251, 191, 36, 0.95)', 'rgba(251, 191, 36, 0.35)'),
-                        createGradient(ctx, 'rgba(129, 140, 248, 0.95)', 'rgba(129, 140, 248, 0.35)')
-                    ],
-                    borderColor: ['#22c55e', '#f59e0b', '#6366f1'],
-                    borderWidth: 2,
-                    hoverOffset: 0,
-                    hoverBorderWidth: 2,
-                }]
-            },
-            options: {
-                cutout: '72%',
-                animation: { animateScale: true, duration: 600 },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed / total * 100)}%)`
-                        },
-                        bodyFont: { family: 'monospace', size: 11 },
-                        padding: 8,
+        if (total > 0) {
+            const ctx1 = donutCanvas.getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['New Stock', 'Used Stock', 'Lent Out'],
+                    datasets: [{
+                        data: [chartNew, chartUsed, chartLent],
+                        backgroundColor: [
+                            createHorizontalGradient(ctx1, '#064e3b', '#10b981', '#a7f3d0'), // Emerald
+                            createHorizontalGradient(ctx1, '#78350f', '#f59e0b', '#fde68a'), // Amber
+                            createHorizontalGradient(ctx1, '#312e81', '#6366f1', '#c7d2fe')  // Indigo
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed / total * 100)}%)`
+                            },
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#e2e8f0',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            cornerRadius: 8,
+                            bodyFont: { family: "'Fira Code', monospace", size: 11 }
+                        }
                     }
                 }
-            }
-        });
-    })();
+            });
+        }
+    }
 
-    (function() {
-        const lineCanvas = document.getElementById('itemTrendLineChart');
-        if (!lineCanvas) return;
-        const lineCtx = lineCanvas.getContext('2d');
-        const createGradient = (ctx, startColor, endColor) => {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, startColor);
-            gradient.addColorStop(1, endColor);
-            return gradient;
-        };
-        const gradientIn = createGradient(lineCtx, 'rgba(20, 184, 166, 0.30)', 'rgba(20, 184, 166, 0.02)');
-        const gradientOut = createGradient(lineCtx, 'rgba(244, 63, 94, 0.30)', 'rgba(244, 63, 94, 0.02)');
-
-        new Chart(lineCtx, {
+    // 2. Line Chart (Trend)
+    const lineCanvas = document.getElementById('itemTrendLineChart');
+    if (lineCanvas) {
+        const ctx3 = lineCanvas.getContext('2d');
+        new Chart(ctx3, {
             type: 'line',
             data: {
                 labels: @json($trendLabels),
@@ -675,71 +688,76 @@
                     {
                         label: 'Received',
                         data: @json($trendReceived),
-                        borderColor: '#14b8a6',
-                        backgroundColor: gradientIn,
+                        borderColor: '#0ea5e9',
+                        backgroundColor: createVerticalGradient(ctx3, 'rgba(14, 165, 233, 0.2)', 'rgba(14, 165, 233, 0.0)'),
                         fill: true,
-                        tension: 0.35,
-                        borderWidth: 2,
-                        pointRadius: 2.5,
-                        pointHoverRadius: 4,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#0ea5e9',
+                        pointBorderWidth: 2,
+                        pointBorderColor: '#ffffff'
                     },
                     {
                         label: 'Used',
                         data: @json($trendUsed),
-                        borderColor: '#f43f5e',
-                        backgroundColor: gradientOut,
+                        borderColor: '#0f172a',
+                        backgroundColor: createVerticalGradient(ctx3, 'rgba(15, 23, 42, 0.1)', 'rgba(15, 23, 42, 0.0)'),
                         fill: true,
-                        tension: 0.35,
-                        borderWidth: 2,
-                        pointRadius: 2.5,
-                        pointHoverRadius: 4,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#0f172a',
+                        pointBorderWidth: 2,
+                        pointBorderColor: '#ffffff'
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
                     legend: {
-                        position: 'right',
+                        position: 'top',
+                        align: 'end',
                         labels: {
-                            padding: 20,
                             usePointStyle: true,
                             pointStyle: 'circle',
-                            color: '#64748b',
-                            font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' },
+                            color: '#334155',
+                            font: { family: "ui-sans-serif, system-ui, sans-serif", size: 12, weight: '600' }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        boxPadding: 6,
+                        usePointStyle: true,
+                        cornerRadius: 8,
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.04)' },
-                        border: { display: false },
-                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
-                        ticks: { color: '#64748b', font: { family: "'Fira Code', monospace", size: 10 } }
-                    }
+                    y: { beginAtZero: true, grid: baseGrid, border: { display: false }, ticks: baseTickStyle },
+                    x: { grid: { display: false }, border: { display: false }, ticks: baseTickStyle }
                 }
             }
         });
-    })();
+    }
 
-    (function() {
-        const barCanvas = document.getElementById('itemMetricsBarChart');
-        if (!barCanvas) return;
-        const barCtx = barCanvas.getContext('2d');
-        const createGradient = (ctx, startColor, endColor) => {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, startColor);
-            gradient.addColorStop(1, endColor);
-            return gradient;
-        };
-
-        new Chart(barCtx, {
+    // 3. Bar Chart (Metrics)
+    const barCanvas = document.getElementById('itemMetricsBarChart');
+    if (barCanvas) {
+        const ctx2 = barCanvas.getContext('2d');
+        new Chart(ctx2, {
             type: 'bar',
             data: {
                 labels: @json($metricLabels),
@@ -747,40 +765,45 @@
                     label: 'Units',
                     data: @json($metricValues),
                     backgroundColor: [
-                        createGradient(barCtx, 'rgba(20, 184, 166, 0.8)', 'rgba(20, 184, 166, 0.1)'),
-                        createGradient(barCtx, 'rgba(244, 63, 94, 0.8)', 'rgba(244, 63, 94, 0.1)'),
-                        createGradient(barCtx, 'rgba(16, 185, 129, 0.8)', 'rgba(16, 185, 129, 0.1)'),
-                        createGradient(barCtx, 'rgba(245, 158, 11, 0.8)', 'rgba(245, 158, 11, 0.1)'),
-                        createGradient(barCtx, 'rgba(99, 102, 241, 0.8)', 'rgba(99, 102, 241, 0.1)')
+                        createVerticalGradient(ctx2, 'rgba(30, 58, 138, 0.9)', 'rgba(30, 58, 138, 0.1)'),
+                        createVerticalGradient(ctx2, 'rgba(245, 158, 11, 0.9)', 'rgba(245, 158, 11, 0.1)'),
+                        createVerticalGradient(ctx2, 'rgba(225, 29, 72, 0.9)', 'rgba(225, 29, 72, 0.1)'),
+                        createVerticalGradient(ctx2, 'rgba(220, 38, 38, 0.9)', 'rgba(220, 38, 38, 0.1)'),
+                        createVerticalGradient(ctx2, 'rgba(14, 165, 233, 0.9)', 'rgba(14, 165, 233, 0.1)')
                     ],
-                    borderColor: ['#0f766e', '#be123c', '#047857', '#b45309', '#4338ca'],
-                    borderWidth: { top: 2, right: 2, bottom: 0, left: 2 },
-                    borderRadius: 4,
+                    borderColor: ['#1e3a8a', '#f59e0b', '#e11d48', '#dc2626', '#0ea5e9'],
+                    borderWidth: 2,
+                    borderRadius: 6,
                     borderSkipped: false,
-                    barThickness: 32,
+                    barThickness: 'flex',
+                    maxBarThickness: 40
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.04)' },
-                        border: { display: false },
-                        ticks: { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
-                        ticks: { color: '#64748b', font: { family: "'Fira Code', monospace", size: 10 } }
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        boxPadding: 6,
+                        usePointStyle: true,
+                        cornerRadius: 8,
                     }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: baseGrid, border: { display: false }, ticks: baseTickStyle },
+                    x: { grid: { display: false }, border: { display: false }, ticks: baseTickStyle }
                 }
             }
         });
-    })();
-    </script>
+    }
+});</script>
         </div>
     </div>
 @endsection

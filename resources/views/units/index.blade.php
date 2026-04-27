@@ -32,22 +32,67 @@
     </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-2xl border border-sky-100 p-5">
-            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Total Units</p>
-            <p class="text-2xl font-black text-slate-800 mt-2">{{ $units->count() }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-sky-100 p-5">
-            <p class="text-[10px] font-semibold text-violet-500 uppercase tracking-widest">Total Items</p>
-            <p class="text-2xl font-black text-violet-600 mt-2">{{ number_format($totalItems) }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-sky-100 p-5">
-            <p class="text-[10px] font-semibold text-sky-500 uppercase tracking-widest">Avg Items / Unit</p>
-            <p class="text-2xl font-black text-sky-600 mt-2">{{ $avgItemsPerUnit }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-sky-100 p-5">
-            <p class="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">Active Units</p>
-            <p class="text-2xl font-black text-emerald-600 mt-2">{{ $units->filter(fn($u) => \App\Models\Item::where('unit', $u->name)->count() > 0)->count() }}</p>
+    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-6">
+        <div class="grid grid-cols-1 border-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0 sm:border-b">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Total Units</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-slate-200 group-hover:text-slate-600">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="z-10">
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $units->count() }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">All registered units</p>
+                </div>
+            </div>
+            
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0 sm:border-b">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Total Items</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-600 transition-colors group-hover:bg-violet-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="z-10">
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ number_format($totalItems) }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">Items with unit labels</p>
+                </div>
+            </div>
+
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Avg Items/Unit</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-sky-600 transition-colors group-hover:bg-sky-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="z-10">
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $avgItemsPerUnit }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">Distribution density</p>
+                </div>
+            </div>
+
+            <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Active Units</p>
+                    <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="z-10">
+                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $units->filter(fn($u) => \App\Models\Item::where('unit', $u->name)->count() > 0)->count() }}</p>
+                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">Units currently in use</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -138,11 +183,34 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const makeGradient = (ctx, c1, c2) => {
-        const g = ctx.createLinearGradient(0, 0, 0, 300);
-        g.addColorStop(0, c1);
-        g.addColorStop(1, c2);
-        return g;
+    const createVerticalGradient = (ctx, startColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
+    const createHorizontalGradient = (ctx, startColor, midColor, endColor) => {
+        const gradient = ctx.createLinearGradient(0, 0, 400, 0);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(0.5, midColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    };
+
+    const baseTickStyle = { color: '#94a3b8', font: { family: "'Fira Code', monospace", size: 10 } };
+    const baseGrid = { color: 'rgba(15, 23, 42, 0.04)', drawBorder: false };
+    const tooltipStyle = {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        titleColor: '#f8fafc',
+        bodyColor: '#e2e8f0',
+        borderColor: '#334155',
+        borderWidth: 1,
+        padding: 12,
+        boxPadding: 6,
+        usePointStyle: true,
+        cornerRadius: 8,
+        bodyFont: { family: "'Fira Code', monospace", size: 11 }
     };
 
     const trendCanvas = document.getElementById('unitTrendChart');
@@ -155,13 +223,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'Items per Unit',
                     data: @json($units->map(fn($u) => \App\Models\Item::where('unit', $u->name)->count())->values()),
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    borderColor: 'rgba(99, 102, 241, 0.8)',
-                    borderWidth: 2,
+                    backgroundColor: createVerticalGradient(tctx, 'rgba(14, 165, 233, 0.2)', 'rgba(14, 165, 233, 0.0)'),
+                    borderColor: '#0ea5e9',
+                    borderWidth: 3,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 4,
-                    pointBackgroundColor: 'rgba(99, 102, 241, 0.9)',
+                    pointBackgroundColor: '#0ea5e9',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
                     pointHoverRadius: 6
@@ -171,20 +239,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: true, labels: { usePointStyle: true, color: '#64748b' } }
+                    legend: { display: true, labels: { usePointStyle: true, color: '#334155', font: { family: "ui-sans-serif, system-ui, sans-serif", size: 12, weight: '600' } } },
+                    tooltip: tooltipStyle
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.04)' },
-                        border: { display: false },
-                        ticks: { color: '#94a3b8' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
-                        ticks: { color: '#64748b' }
-                    }
+                    y: { beginAtZero: true, grid: baseGrid, border: { display: false }, ticks: baseTickStyle },
+                    x: { grid: { display: false }, border: { display: false }, ticks: baseTickStyle }
                 }
             }
         });
@@ -200,15 +260,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     data: @json($topUnits->pluck('items_count')->values()),
                     backgroundColor: [
-                        'rgba(139, 92, 246, 0.9)',
-                        'rgba(14, 165, 233, 0.9)',
-                        'rgba(20, 184, 166, 0.9)',
-                        'rgba(249, 115, 22, 0.9)',
-                        'rgba(236, 72, 153, 0.9)',
-                        'rgba(34, 197, 94, 0.9)'
+                        createHorizontalGradient(bctx, '#1e3a8a', '#0ea5e9', '#7dd3fc'),
+                        createHorizontalGradient(bctx, '#0284c7', '#0ea5e9', '#bae6fd'),
+                        createHorizontalGradient(bctx, '#0f172a', '#1e3a8a', '#38bdf8'),
+                        createHorizontalGradient(bctx, '#ef4444', '#fb7185', '#fecaca'),
+                        createHorizontalGradient(bctx, '#f59e0b', '#fbbf24', '#fde68a'),
+                        createHorizontalGradient(bctx, '#10b981', '#34d399', '#a7f3d0')
                     ],
-                    borderColor: ['#8b5cf6', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#22c55e'],
-                    borderWidth: 2
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 6
                 }]
             },
             options: {
@@ -218,8 +279,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: { usePointStyle: true, pointStyle: 'circle', color: '#64748b' }
-                    }
+                        labels: { usePointStyle: true, pointStyle: 'circle', color: '#64748b', font: { family: "ui-sans-serif, system-ui, sans-serif", size: 12, weight: '600' } }
+                    },
+                    tooltip: tooltipStyle
                 }
             }
         });

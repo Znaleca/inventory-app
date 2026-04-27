@@ -12,6 +12,8 @@
     @php
         $totalIn = $stockEntries->sum('quantity') + $returns->sum('quantity_returned');
         $totalOut = $usageLogs->sum('quantity_used') + $borrows->sum('quantity_borrowed') + $transfers->sum('quantity') + $disposals->sum('quantity');
+        
+        $count = $stockEntries->count() + $usageLogs->count() + $borrows->count() + $returns->count() + $transfers->count() + $disposals->count();
 
         $tabs = [
             ['id' => 'stock-entries', 'label' => 'Stock Entries',  'count' => $stockEntries->count(), 'bar' => 'bg-emerald-500', 'active' => 'border-emerald-500 text-emerald-700 bg-emerald-50'],
@@ -21,6 +23,30 @@
             ['id' => 'transfers',    'label' => 'Transfers',      'count' => $transfers->count(),    'bar' => 'bg-amber-500',   'active' => 'border-amber-500 text-amber-700 bg-amber-50'],
             ['id' => 'disposals',    'label' => 'Disposals',      'count' => $disposals->count(),    'bar' => 'bg-slate-600',   'active' => 'border-slate-600 text-slate-700 bg-sky-50'],
             ['id' => 'items',        'label' => 'Items',          'count' => $items->count(),        'bar' => 'bg-violet-500',  'active' => 'border-violet-500 text-violet-700 bg-violet-50'],
+        ];
+
+        // KPI Card stats - Main overview
+        $logStats = [
+            [
+                'label' => 'Total Records', 'value' => number_format($count), 'sub' => 'All transactions', 
+                'icon' => 'M9 12h3.75M9 15h3.75M9 18h3.75m3-6H9m0 0h.008v.008H9V9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM12 9h3.75m-3.75 3h3.75m-3.75 3h3.75M9 9h.008V9H9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM9 9v6m0 0v6m3-6h6m0 0h6',
+                'trend_color' => 'text-sky-500', 'sparkline' => 'M0,20 Q10,15 20,20 T40,10 T60,15 T80,5 T100,0'
+            ],
+            [
+                'label' => 'Units In', 'value' => number_format($totalIn), 'sub' => 'Inbound flow', 
+                'icon' => 'M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75',
+                'trend_color' => 'text-emerald-500', 'sparkline' => 'M0,30 L20,20 L40,25 L60,10 L80,15 L100,5'
+            ],
+            [
+                'label' => 'Units Out', 'value' => number_format($totalOut), 'sub' => 'Outbound flow', 
+                'icon' => 'M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75',
+                'trend_color' => 'text-rose-500', 'sparkline' => 'M0,10 L20,15 L40,5 L60,20 L80,10 L100,25'
+            ],
+            [
+                'label' => 'Net Balance', 'value' => number_format($totalIn - $totalOut), 'sub' => 'In - Out', 
+                'icon' => 'M3 4.5h7.5M3 9h7.5m0 0L6 12m4.5-4.5l-4.5 3M12 6l4.5 3.75M12 6v12m0 0l-4.5-3.75M12 18l4.5-3.75',
+                'trend_color' => 'text-indigo-500', 'sparkline' => 'M0,15 Q15,5 30,15 T60,5 T90,15 L100,10'
+            ],
         ];
 
         // Detailed category cards
@@ -63,27 +89,63 @@
         ];
     @endphp
 
-    {{-- KPI Category Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        @foreach($categoryCards as $card)
-            <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-                {{-- Header (Label + Icon) --}}
-                <div class="flex items-center justify-between mb-3">
-                    <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $card['label'] }}</p>
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $card['bgColor'] }} {{ $card['trend_color'] }}">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}" />
-                        </svg>
+    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-6">
+        {{-- KPI Cards Grid --}}
+        <div class="grid grid-cols-1 border-b border-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach($logStats as $stat)
+                <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                    
+                    {{-- Header (Label + Icon) --}}
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $stat['label'] }}</p>
+                        <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-sky-100 group-hover:text-sky-600">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $stat['icon'] }}" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    {{-- Body (Value + Sparkline Graph) --}}
+                    <div class="flex items-end justify-between">
+                        <div class="z-10">
+                            <p class="text-2xl font-black tracking-tight text-slate-800">{{ $stat['value'] }}</p>
+                            <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $stat['sub'] }}</p>
+                        </div>
+                        
+                        {{-- Mini Line Graph (Sparkline) --}}
+                        <div class="w-16 h-8 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg viewBox="0 0 100 30" class="w-full h-full stroke-current {{ $stat['trend_color'] }}">
+                                <path d="{{ $stat['sparkline'] }}" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
+            @endforeach
+        </div>
 
-                {{-- Body (Value + Subtitle) --}}
-                <div>
-                    <p class="text-2xl font-black tracking-tight text-slate-800">{{ $card['value'] }}</p>
-                    <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $card['sub'] }}</p>
+        {{-- Detailed Category Cards --}}
+        <div class="grid grid-cols-1 border-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach($categoryCards as $card)
+                <div class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0">
+                    
+                    {{-- Header (Label + Icon) --}}
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $card['label'] }}</p>
+                        <div class="flex h-7 w-7 items-center justify-center rounded-lg {{ $card['bgColor'] }} {{ $card['trend_color'] }} transition-colors group-hover:shadow-md">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    {{-- Body (Value + Subtitle) --}}
+                    <div class="z-10">
+                        <p class="text-2xl font-black tracking-tight text-slate-800">{{ $card['value'] }}</p>
+                        <p class="mt-0.5 text-[10px] font-medium text-slate-400">{{ $card['sub'] }}</p>
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
     </div>
 
     {{-- Charts Top Row --}}
