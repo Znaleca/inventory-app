@@ -312,12 +312,11 @@
         .right-panel {
             flex: 0 0 42%;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             padding: 2rem;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .right-panel::before {
@@ -365,6 +364,7 @@
         .form-wrapper {
             width: 100%;
             max-width: 520px;
+            margin: auto;
             position: relative;
             z-index: 10;
         }
@@ -705,6 +705,11 @@
 
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1024px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
             .left-panel {
                 display: none;
             }
@@ -712,6 +717,9 @@
             .right-panel {
                 flex: 1;
                 background: linear-gradient(135deg, var(--dark-bg) 0%, #1a3a52 100%);
+                padding-top: 5rem;
+                padding-bottom: 2rem;
+                overflow-y: visible;
             }
 
             .right-panel::before {
@@ -730,7 +738,24 @@
             }
 
             .paper-box {
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(30, 41, 59, 0.7);
+                border-color: rgba(71, 85, 105, 0.6);
+                backdrop-filter: blur(10px);
+            }
+
+            .form-submit {
+                background: var(--primary);
+                border-color: var(--primary);
+            }
+
+            .form-submit:hover {
+                background: var(--primary-light);
+                border-color: var(--primary-light);
+            }
+
+            .form-header,
+            .box-bottom-footer {
+                border-color: rgba(71, 85, 105, 0.6);
             }
 
             .form-title-section h1,
