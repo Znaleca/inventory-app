@@ -114,6 +114,11 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                         ],
                     ],
                 ]);
+                
+                // Override alignment for numeric headers to be center aligned
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('F1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
                 $sheet->getRowDimension(1)->setRowHeight(24);
 
                 // ── Data rows ─────────────────────────────────────────────
@@ -170,9 +175,9 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                         ]);
                     }
 
-                    // ── Numeric columns aligned right ──────────────────────
+                    // ── Numeric columns aligned center ──────────────────────
                     $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    $sheet->getStyle("F{$row}:I{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                    $sheet->getStyle("F{$row}:I{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("F{$row}:I{$row}")->getFont()->setBold(true);
                 }
 
