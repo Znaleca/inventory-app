@@ -122,11 +122,167 @@
         </div>
     </div>
 
+
+
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-sm mb-6 overflow-x-auto">
+        <div class="p-5 border-b border-sky-100 flex items-center gap-3 bg-gradient-to-r from-slate-50 to-white rounded-t-2xl">
+            <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-blue-600 uppercase tracking-widest mb-0.5">Facility Mapping</p>
+                <h3 class="text-sm font-bold text-slate-800">Storage Floor Plans</h3>
+            </div>
+        </div>
+        <div class="p-10 md:p-16 grid grid-cols-1 xl:grid-cols-3 gap-16 bg-slate-50/50 min-w-[700px] xl:min-w-0 rounded-b-2xl">
+            <!-- Storage 1 -->
+            <div class="flex flex-col items-center xl:items-start border-b xl:border-b-0 xl:border-r border-slate-200 pb-10 xl:pb-0 xl:pr-12">
+                <div class="w-full text-center xl:text-left mb-6">
+                    <h4 class="text-lg font-black text-slate-800 tracking-tight">Storage 1</h4>
+                    <p class="text-[11px] font-medium text-slate-500 mt-1">Secondary small storage</p>
+                </div>
+                
+                <div class="relative w-full max-w-[280px] aspect-square bg-white border-4 border-slate-700 shadow-[8px_8px_0_0_rgba(15,23,42,0.1)] flex items-center justify-center mt-4">
+                    <!-- Grid Pattern -->
+                    <div class="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <pattern id="gridPatternSmall" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" stroke-width="1"/>
+                            </pattern>
+                            <rect width="100%" height="100%" fill="url(#gridPatternSmall)" />
+                        </svg>
+                    </div>
+
+                    <div class="absolute inset-0 m-6 border-2 border-dashed border-slate-300 bg-slate-50/50 flex flex-col items-center justify-center z-10">
+                        <div class="bg-white p-3 rounded-full border border-slate-200 shadow-sm mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                        </div>
+                        <span class="text-sm font-black text-slate-700 uppercase tracking-widest text-center">
+                            Storage 1
+                        </span>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1.5 bg-white px-2 py-0.5 rounded border border-slate-100">No Sections</span>
+                    </div>
+                    
+                    <!-- Door -->
+                    <div class="absolute bottom-[-4px] right-[25%] w-[45px] h-[4px] bg-white z-20"></div>
+                    <div class="absolute bottom-[-4px] right-[25%] w-[4px] h-[45px] bg-slate-800 origin-top rotate-[-45deg] shadow-lg z-20"></div>
+                    <div class="absolute -bottom-[45px] right-[25%] w-[40px] h-[40px] border-t-2 border-r-2 border-slate-300 border-dashed rounded-tr-full pointer-events-none z-10"></div>
+                    <span class="absolute -bottom-[30px] right-[5%] text-[9px] font-bold text-slate-400 uppercase tracking-widest">Door</span>
+                </div>
+            </div>
+
+            <!-- Storage 2 (Formerly B) -->
+            <div class="xl:col-span-2 flex flex-col items-center xl:items-end">
+                <div class="w-full flex justify-between items-end mb-6">
+                    <div>
+                        <h4 class="text-lg font-black text-slate-800 tracking-tight">Storage 2</h4>
+                        <p class="text-[11px] font-medium text-slate-500 mt-1">Main storage area with categorized sections</p>
+                    </div>
+                    <div class="px-3 py-1 bg-white border border-slate-200 rounded text-[10px] font-bold text-slate-600 shadow-sm">
+                        Total Sections: 6
+                    </div>
+                </div>
+                
+                <div class="relative w-full max-w-[550px] aspect-[4/3] bg-white border-4 border-slate-700 shadow-[8px_8px_0_0_rgba(15,23,42,0.1)]">
+                    <!-- Grid Pattern -->
+                    <div class="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1"/>
+                            </pattern>
+                            <rect width="100%" height="100%" fill="url(#gridPattern)" />
+                        </svg>
+                    </div>
+
+                    <!-- Floor Labels -->
+                    <div class="absolute top-[20%] -left-[60px] flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Floor</span>
+                        <div class="w-[15px] h-[1px] bg-slate-300"></div>
+                    </div>
+                    <div class="absolute top-[30%] -right-[60px] flex items-center gap-2">
+                        <div class="w-[15px] h-[1px] bg-slate-300"></div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Floor</span>
+                    </div>
+                    <div class="absolute -bottom-[35px] left-[45%] flex flex-col items-center gap-2">
+                        <div class="w-[1px] h-[15px] bg-slate-300"></div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Floor</span>
+                    </div>
+
+                    <!-- Cabinet D -->
+                    <div class="absolute top-0 right-[5%] w-[40%] h-[8%] bg-amber-50 border-b-2 border-x-2 border-slate-700 flex items-center justify-center shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-700 tracking-wider">cabinet D</span>
+                    </div>
+
+                    <!-- Section A -->
+                    <div class="absolute top-0 left-0 w-[45%] h-[35%] bg-sky-50 border-b-2 border-r-2 border-slate-700 flex flex-col items-center justify-center transition-colors hover:bg-sky-100 group cursor-pointer">
+                        <span class="font-black text-slate-800 text-2xl md:text-3xl group-hover:scale-110 transition-transform">A</span>
+                    </div>
+
+                    <!-- Section B -->
+                    <div class="absolute top-[8%] right-0 w-[55%] h-[52%] bg-indigo-50 border-b-2 border-l-2 border-slate-700 flex flex-col items-center justify-center transition-colors hover:bg-indigo-100 group cursor-pointer">
+                        <span class="font-black text-slate-800 text-3xl md:text-5xl group-hover:scale-110 transition-transform">B</span>
+                    </div>
+
+                    <!-- Section C -->
+                    <div class="absolute top-[35%] left-0 w-[22%] h-[40%] bg-emerald-50 border-b-2 border-r-2 border-slate-700 flex flex-col items-center justify-center transition-colors hover:bg-emerald-100 group cursor-pointer">
+                        <span class="font-black text-slate-800 text-xl md:text-2xl group-hover:scale-110 transition-transform">C</span>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="absolute top-[50%] -left-[20px] flex items-center">
+                        <div class="absolute -left-[35px] text-[9px] font-bold text-slate-400 uppercase tracking-widest -rotate-90">Table</div>
+                        <div class="w-[20px] h-[60px] bg-slate-100 border-2 border-slate-700 shadow-sm"></div>
+                    </div>
+
+                    <!-- Section Cr / Restroom -->
+                    <div class="absolute bottom-0 left-0 w-[30%] h-[25%] bg-white border-t-2 border-r-2 border-slate-700 flex flex-col items-center justify-center transition-colors hover:bg-slate-50 group cursor-pointer overflow-hidden p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 90" class="w-[80%] h-[80%]">
+                            <!-- Figures group: scaled down and centered -->
+                            <g transform="translate(55,42) scale(0.62) translate(-55,-38)">
+                                <!-- Female head -->
+                                <circle cx="27" cy="8" r="8" fill="#1e293b"/>
+                                <!-- Female dress body -->
+                                <path d="M13 52 L19 26 Q27 20 35 26 L41 52 Z" fill="#1e293b"/>
+                                <!-- Vertical divider -->
+                                <line x1="55" y1="0" x2="55" y2="58" stroke="#1e293b" stroke-width="3"/>
+                                <!-- Male head -->
+                                <circle cx="83" cy="8" r="8" fill="#1e293b"/>
+                                <!-- Male torso -->
+                                <rect x="74" y="20" width="18" height="20" rx="2" fill="#1e293b"/>
+                                <!-- Male left leg -->
+                                <rect x="74" y="38" width="8" height="16" rx="2" fill="#1e293b"/>
+                                <!-- Male right leg -->
+                                <rect x="84" y="38" width="8" height="16" rx="2" fill="#1e293b"/>
+                            </g>
+                            <!-- RESTROOM text always readable -->
+                            <text x="55" y="84" font-family="Arial, sans-serif" font-size="8.5" font-weight="900" fill="#1e293b" text-anchor="middle" letter-spacing="1.2">RESTROOM</text>
+                        </svg>
+                    </div>
+
+                    <!-- Section E -->
+                    <div class="absolute bottom-0 left-[30%] w-[35%] h-[25%] bg-violet-50 border-t-2 border-r-2 border-slate-700 flex flex-col items-center justify-center transition-colors hover:bg-violet-100 group cursor-pointer">
+                        <span class="font-black text-slate-800 text-xl md:text-2xl group-hover:scale-110 transition-transform">E</span>
+                    </div>
+
+                    <!-- Door -->
+                    <div class="absolute bottom-[15%] -right-[4px] w-[4px] h-[45px] bg-white"></div>
+                    <div class="absolute bottom-[15%] right-0 w-[45px] h-[4px] bg-slate-800 origin-left rotate-[45deg] shadow-lg"></div>
+                    <div class="absolute bottom-[15%] -right-[40px] w-[40px] h-[40px] border-b-2 border-l-2 border-slate-300 border-dashed rounded-bl-full pointer-events-none"></div>
+                    <span class="absolute bottom-[8%] -right-[45px] text-[9px] font-bold text-slate-400 uppercase tracking-widest">Door</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-6">
         <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
             <div class="p-5 border-b border-sky-100">
                 <p class="text-[10px] font-semibold text-indigo-600 uppercase tracking-widest mb-0.5">Chart.01</p>
-                <h3 class="text-sm font-bold text-slate-800">Storage Locations & Sections Trend</h3>
+                <h3 class="text-sm font-bold text-slate-800">Storage Locations &amp; Sections Trend</h3>
             </div>
             <div class="p-5">
                 <div class="h-[240px]"><canvas id="storageLineChart"></canvas></div>

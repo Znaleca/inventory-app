@@ -46,21 +46,23 @@ class BorrowController extends Controller
             'borrower_name'     => 'required|string|max:255',
             'bio_id'            => 'required|string|max:255',
             'department'        => 'required|string|max:255',
-            'quantity_borrowed' => $hasSelectedEntries ? 'nullable' : 'required|integer|min:1',
+            'new_quantity'      => $hasSelectedEntries ? 'nullable' : 'nullable|integer|min:0',
+            'used_quantity'     => $hasSelectedEntries ? 'nullable' : 'nullable|integer|min:0',
             'borrowed_at'       => 'required|date',
             'serial_number'     => 'nullable|string|max:255',
             'notes'             => 'nullable|string',
-            'stock_type'        => 'nullable|in:new,used',
         ]);
 
         $validated['type'] = 'out';
 
         if ($hasSelectedEntries) {
-            $stockEntries = \App\Models\StockEntry::with('usageLogs')->whereIn('id', $request->selected_entries)->get();
+            $stockEntries = \App\Models\StockEntry::whereIn('id', $request->selected_entries)->get();
             $newQty  = 0;
             $usedQty = 0;
             foreach ($stockEntries as $entry) {
-                if ($entry->usageLogs->sum('quantity_used') > 0) {
+                $isUsed = (bool) preg_match('/\[USED\]/i', $entry->serial_number ?? '') ||
+                          $entry->borrowEntries()->where('disposition', 'returned_used')->exists();
+                if ($isUsed) {
                     $usedQty++;
                 } else {
                     $newQty++;
@@ -68,14 +70,13 @@ class BorrowController extends Controller
             }
             $validated['quantity_borrowed'] = $newQty + $usedQty;
             $validated['serial_number'] = $stockEntries->pluck('serial_number')->filter()->implode(', ');
-            $validated['serial_number'] = $stockEntries->pluck('serial_number')->filter()->implode(', ');
         } else {
-            if (isset($validated['stock_type']) && $validated['stock_type'] === 'used') {
-                $newQty  = 0;
-                $usedQty = $validated['quantity_borrowed'] ?? 0;
-            } else {
-                $newQty  = $validated['quantity_borrowed'] ?? 0;
-                $usedQty = 0;
+            $newQty  = (int) ($validated['new_quantity'] ?? 0);
+            $usedQty = (int) ($validated['used_quantity'] ?? 0);
+            $validated['quantity_borrowed'] = $newQty + $usedQty;
+            
+            if ($validated['quantity_borrowed'] < 1) {
+                return back()->withErrors(['new_quantity' => 'Total borrow quantity must be at least 1.'])->withInput();
             }
         }
 
@@ -102,7 +103,9 @@ class BorrowController extends Controller
         // Create per-device borrow entries for devices so we can track return disposition
         if ($hasSelectedEntries && $item->item_type === 'device' && $validated['type'] === 'out') {
             foreach ($stockEntries as $entry) {
-                $condition = $entry->usageLogs->sum('quantity_used') > 0 ? 'used' : 'new';
+                $isUsed = (bool) preg_match('/\[USED\]/i', $entry->serial_number ?? '') ||
+                          $entry->borrowEntries()->where('disposition', 'returned_used')->exists();
+                $condition = $isUsed ? 'used' : 'new';
                 BorrowEntry::create([
                     'borrow_id'          => $borrow->id,
                     'stock_entry_id'     => $entry->id,

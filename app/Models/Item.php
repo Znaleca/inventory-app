@@ -228,9 +228,6 @@ class Item extends Model
                 $q->whereHas('borrowEntries', function($sub) {
                     $sub->where('disposition', 'returned_used');
                 })
-                ->orWhereHas('usageLogs', function($sub) {
-                    $sub->where('quantity_used', '>', 0);
-                })
                 ->orWhere('serial_number', 'LIKE', '%[USED]%');
             })
             ->orderBy('received_date', 'ASC')

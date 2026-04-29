@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
+<div class="bg-white rounded-2xl border border-sky-100">
 
     {{-- Page Header --}}
     <div class="p-6 border-b border-sky-100 flex items-center justify-between shrink-0 mb-6">
@@ -46,7 +46,7 @@
                     {{-- ======================== --}}
                     {{-- SECTION 1: Direction --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                    <div class="bg-white border border-sky-100 relative">
                         <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
                         <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
@@ -84,7 +84,7 @@
                     {{-- ======================== --}}
                     {{-- SECTION 2: Item Select --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                    <div class="bg-white border border-sky-100 relative">
                         <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
                         <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
@@ -113,7 +113,8 @@
                                         $nextTick(() => {
                                             const ts = new TomSelect($el, {
                                                 create: false,
-                                                sortField: { field: 'text', direction: 'asc' }
+                                                sortField: { field: 'text', direction: 'asc' },
+                                                dropdownParent: 'body'
                                             });
                                             ts.on('change', (val) => {
                                                 selectedItem = val;
@@ -302,7 +303,50 @@
                     </div>
 
                     {{-- ============================================= --}}
-                    {{-- SECTION 3B: Quantity & Specifics --}}
+                    {{-- SECTION 3B: Incoming Devices (Serials)        --}}
+                    {{-- ============================================= --}}
+                    <div class="bg-white border border-teal-300 relative mb-4" x-show="direction === 'in' && isDevice()" x-cloak x-transition>
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                        <div class="px-5 py-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="h-2 w-2 bg-teal-500 inline-block"></span>
+                                <p class="text-[10px] font-mono font-bold text-teal-600 uppercase tracking-widest">
+                                    03 // Incoming Devices
+                                </p>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Enter serial numbers (one per line). The quantity is calculated automatically.</p>
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                        <span>New Stock Serials</span>
+                                        <span class="text-xs font-mono text-teal-600" x-text="manualNewQty + ' new'"></span>
+                                    </label>
+                                    <textarea name="new_serial_number" id="incoming_new_serial" rows="4" 
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-teal-500 focus:outline-none py-2 px-3 text-xs font-mono text-[#0f172a] transition-colors leading-relaxed"
+                                        placeholder="1. SN-123&#10;2. SN-124"
+                                        @focus="initSerial($event)" @keydown.enter.prevent="handleSerialEnter($event)" @input="recalculateConditionQty()"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                        <span>Used Stock Serials</span>
+                                        <span class="text-xs font-mono text-amber-600" x-text="manualUsedQty + ' used'"></span>
+                                    </label>
+                                    <textarea name="used_serial_number" id="incoming_used_serial" rows="4"
+                                        class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-amber-500 focus:outline-none py-2 px-3 text-xs font-mono text-[#0f172a] transition-colors leading-relaxed"
+                                        placeholder="1. SN-OLD1&#10;2. SN-OLD2"
+                                        @focus="initSerial($event)" @keydown.enter.prevent="handleSerialEnter($event)" @input="recalculateConditionQty()"></textarea>
+                                </div>
+                            </div>
+                            @error('new_serial_number') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Hidden inputs to submit device quantities correctly --}}
+                    <input type="hidden" name="new_quantity" :value="manualNewQty" :disabled="!isDevice() || direction === 'out'">
+                    <input type="hidden" name="used_quantity" :value="manualUsedQty" :disabled="!isDevice() || direction === 'out'">
+
+                    {{-- ============================================= --}}
+                    {{-- SECTION 3C: Quantity & Specifics --}}
                     {{-- ============================================= --}}
                     <div class="bg-white border border-sky-100 relative" x-show="isNewItem || selectedItem" x-cloak
                         x-transition>
@@ -317,45 +361,33 @@
 
                             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                                {{-- Stock Type Selection (Non-Devices) --}}
-                                <div x-show="!isDevice() && (!isNewItem && selectedItem)" class="mb-4" x-cloak>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                                        <span>Stock to Transfer <span class="text-rose-500">*</span></span>
-                                    </label>
-                                    <div class="grid grid-cols-2 gap-3 sm:w-2/3">
-                                        <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
-                                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
-                                            <input type="radio" name="stock_type_selected" value="new" x-model="stockType" class="accent-blue-600 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
-                                            <div>
-                                                <p class="text-sm font-bold text-[#0f172a]">New Stock</p>
-                                                <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].new + ' avail.' : 'Transfer In'"></p>
-                                            </div>
-                                        </label>
-                                        <label x-show="direction === 'in' || hasUsedStock()"
-                                            :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
-                                            class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
-                                            <input type="radio" name="stock_type_selected" value="used" x-model="stockType" class="accent-amber-500 w-4 h-4" @change="manualNewQty=0; manualUsedQty=0;">
-                                            <div>
-                                                <p class="text-sm font-bold text-[#0f172a]">Used Stock</p>
-                                                <p class="text-[10px] font-mono text-slate-500" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].used + ' avail.' : 'Transfer In'"></p>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
                                 {{-- Quantities --}}
-                                <div x-show="!isDevice() || (direction === 'out' && getBatches().length === 0)" x-cloak class="mb-4">
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                                        <span x-text="direction === 'out' ? 'Quantity to Transfer Out' : 'Quantity Transferred In'"></span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" :name="stockType === 'new' ? 'new_quantity' : 'used_quantity'" 
-                                            :x-model="stockType === 'new' ? 'manualNewQty' : 'manualUsedQty'" 
-                                            min="0"
-                                            class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase"
-                                                x-text="getUnit()"></span>
+                                <div x-show="!isDevice() || (direction === 'out' && getBatches().length === 0)" x-cloak class="mb-4 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                            <span>New Stock Quantity</span>
+                                            <span class="text-xs font-mono text-teal-600" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].new + ' avail.' : ''"></span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" name="new_quantity" x-model="manualNewQty" min="0" value="{{ old('new_quantity', 0) }}"
+                                                class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div x-show="direction === 'in' || hasUsedStock()">
+                                        <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                            <span>Used Stock Quantity</span>
+                                            <span class="text-xs font-mono text-amber-600" x-text="direction === 'out' && items[selectedItem] ? items[selectedItem].used + ' avail.' : ''"></span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" name="used_quantity" x-model="manualUsedQty" min="0" value="{{ old('used_quantity', 0) }}"
+                                                class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

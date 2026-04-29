@@ -30,22 +30,22 @@
             [
                 'label' => 'Total Records', 'value' => number_format($count), 'sub' => 'All transactions', 
                 'icon' => 'M9 12h3.75M9 15h3.75M9 18h3.75m3-6H9m0 0h.008v.008H9V9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM12 9h3.75m-3.75 3h3.75m-3.75 3h3.75M9 9h.008V9H9zm0 3h.008v.008H9V12zm0 3h.008v.008H9V15zM9 9v6m0 0v6m3-6h6m0 0h6',
-                'trend_color' => 'text-sky-500', 'sparkline' => 'M0,20 Q10,15 20,20 T40,10 T60,15 T80,5 T100,0'
+                'trend_color' => 'text-sky-600', 'bgColor' => 'bg-sky-50', 'sparkline' => 'M0,20 Q10,15 20,20 T40,10 T60,15 T80,5 T100,0'
             ],
             [
                 'label' => 'Units In', 'value' => number_format($totalIn), 'sub' => 'Inbound flow', 
                 'icon' => 'M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75',
-                'trend_color' => 'text-emerald-500', 'sparkline' => 'M0,30 L20,20 L40,25 L60,10 L80,15 L100,5'
+                'trend_color' => 'text-emerald-600', 'bgColor' => 'bg-emerald-50', 'sparkline' => 'M0,30 L20,20 L40,25 L60,10 L80,15 L100,5'
             ],
             [
                 'label' => 'Units Out', 'value' => number_format($totalOut), 'sub' => 'Outbound flow', 
                 'icon' => 'M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75',
-                'trend_color' => 'text-rose-500', 'sparkline' => 'M0,10 L20,15 L40,5 L60,20 L80,10 L100,25'
+                'trend_color' => 'text-rose-600', 'bgColor' => 'bg-rose-50', 'sparkline' => 'M0,10 L20,15 L40,5 L60,20 L80,10 L100,25'
             ],
             [
                 'label' => 'Net Balance', 'value' => number_format($totalIn - $totalOut), 'sub' => 'In - Out', 
                 'icon' => 'M3 4.5h7.5M3 9h7.5m0 0L6 12m4.5-4.5l-4.5 3M12 6l4.5 3.75M12 6v12m0 0l-4.5-3.75M12 18l4.5-3.75',
-                'trend_color' => 'text-indigo-500', 'sparkline' => 'M0,15 Q15,5 30,15 T60,5 T90,15 L100,10'
+                'trend_color' => 'text-indigo-600', 'bgColor' => 'bg-indigo-50', 'sparkline' => 'M0,15 Q15,5 30,15 T60,5 T90,15 L100,10'
             ],
         ];
 
@@ -98,7 +98,7 @@
                     {{-- Header (Label + Icon) --}}
                     <div class="flex items-center justify-between mb-3">
                         <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">{{ $stat['label'] }}</p>
-                        <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-sky-100 group-hover:text-sky-600">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-lg {{ $stat['bgColor'] }} {{ $stat['trend_color'] }} transition-colors group-hover:shadow-md">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $stat['icon'] }}" />
                             </svg>

@@ -2,61 +2,46 @@
 
 @section('title', 'In and Out Dashboard')
 
+
+
 @section('content')
-<div x-data="{ activeTab: '{{ request('tab', 'transfer') }}' }" class="mx-auto max-w-7xl">
-    
-    {{-- Main Header --}}
-    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 mb-6">
-        <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">Inventory://Logistics</p>
-                <h1 class="text-xl font-black text-[#0f172a] tracking-tight">In / Out Dashboard</h1>
-                <p class="text-xs text-slate-400 font-mono mt-1">Manage transfers, borrows, and returns.</p>
-            </div>
-            {{-- Tab Switcher --}}
-            <div class="flex flex-wrap gap-2">
-                <button @click="activeTab = 'transfer'"
-                    :class="activeTab === 'transfer' ? 'bg-sky-500 border-sky-500 text-white' : 'bg-white border-sky-100 text-slate-500 hover:bg-sky-50'"
-                    class="flex items-center gap-2 px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
-                    Transfers
-                </button>
-                <button @click="activeTab = 'borrow'"
-                    :class="activeTab === 'borrow' ? 'bg-sky-500 border-sky-500 text-white' : 'bg-white border-sky-100 text-slate-500 hover:bg-sky-50'"
-                    class="flex items-center gap-2 px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
-                    Borrows
-                </button>
-                <button @click="activeTab = 'return'"
-                    :class="activeTab === 'return' ? 'bg-teal-500 border-teal-500 text-white' : 'bg-white border-sky-100 text-slate-500 hover:bg-sky-50'"
-                    class="flex items-center gap-2 px-5 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest transition-colors border">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
-                    Returns
-                </button>
-            </div>
+<div x-data="{ activeTab: '{{ request('tab', 'transfer') }}' }">
+
+    {{-- Actions/Tabs Row --}}
+    <div class="mb-6 flex flex-wrap items-center justify-end gap-3">
+        <div class="flex flex-wrap gap-2">
+            <button @click="activeTab = 'transfer'"
+                :class="activeTab === 'transfer' ? 'bg-sky-500 border-sky-500 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-sky-50 hover:border-sky-300'"
+                class="inline-flex items-center gap-2 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
+                Transfers
+            </button>
+            <button @click="activeTab = 'borrow'"
+                :class="activeTab === 'borrow' ? 'bg-sky-500 border-sky-500 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-sky-50 hover:border-sky-300'"
+                class="inline-flex items-center gap-2 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                Borrows
+            </button>
+            <button @click="activeTab = 'return'"
+                :class="activeTab === 'return' ? 'bg-teal-500 border-teal-500 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-teal-50 hover:border-teal-300'"
+                class="inline-flex items-center gap-2 px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+                Returns
+            </button>
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════════════ --}}
     {{-- Transfer Tab --}}
-    {{-- ══════════════════════════════════════════════ --}}
     <div x-show="activeTab === 'transfer'" x-cloak>
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            
-            {{-- Module Header --}}
-            <div class="px-6 py-5  border-b border-sky-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm">
+            <div class="p-5 border-b border-sky-100 flex items-center justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="h-2 w-2 bg-sky-500 inline-block"></span>
-                        <p class="text-[10px] font-mono font-bold text-sky-500 uppercase tracking-widest">// Logged Transfers</p>
-                    </div>
-                    <h2 class="text-xl font-bold text-[#0f172a] tracking-tight">Transfer History</h2>
-                    <p class="text-xs text-sky-500 font-mono mt-1">Record of items moved physically.</p>
+                    <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest mb-0.5">Logistics</p>
+                    <h3 class="text-sm font-bold text-slate-800">Transfer History</h3>
                 </div>
-                <a href="{{ route('transfers.create') }}" class="inline-flex items-center gap-2 bg-sky-500 px-5 py-2.5 text-[11px] font-mono font-bold text-white uppercase tracking-widest transition-colors hover:bg-sky-600 border-sky-600 hover:border-sky-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
-                    New Transfer
+                <a href="{{ route('transfers.create') }}" class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5"><path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" /></svg>
+                    New_Transfer
                 </a>
             </div>
 
@@ -137,18 +122,15 @@
     {{-- ══════════════════════════════════════════════ --}}
     <div x-show="activeTab === 'borrow'" x-cloak>
         
-        {{-- Active Borrows --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-6">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
-            
-            <div class="px-6 py-5 border-b border-sky-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm mb-6">
+            <div class="p-5 border-b border-sky-100 flex items-center justify-between gap-4">
                 <div>
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">// Active Borrows</p>
-                    <h2 class="text-xl font-black text-[#0f172a] tracking-tight">Active &amp; Partial Pending</h2>
+                    <p class="text-[10px] font-semibold text-sky-600 uppercase tracking-widest mb-0.5">Active</p>
+                    <h3 class="text-sm font-bold text-slate-800">Active &amp; Partial Borrows</h3>
                 </div>
-                <a href="{{ route('borrows.create') }}" class="inline-flex items-center gap-2 bg-[#0f172a] hover:bg-slate-800 px-5 py-2.5 text-[11px] font-mono font-bold text-white uppercase tracking-widest transition-colors border border-[#0f172a]">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
-                    New Borrow
+                <a href="{{ route('borrows.create') }}" class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 text-[11px] font-mono font-bold uppercase tracking-[0.15em] transition-colors border border-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-3.5 w-3.5"><path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z" /></svg>
+                    New_Borrow
                 </a>
             </div>
 
@@ -247,14 +229,10 @@
             @endif
         </div>
 
-        {{-- Borrow History --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-6">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-400"></div>
-            <div class="px-6 py-5 border-b border-sky-100 flex items-center justify-between">
-                <div>
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">// Archived</p>
-                    <h3 class="text-sm font-black text-[#0f172a] tracking-tight">Borrow History Log</h3>
-                </div>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm mb-6">
+            <div class="p-5 border-b border-sky-100">
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Archived</p>
+                <h3 class="text-sm font-bold text-slate-800">Borrow History Log</h3>
             </div>
 
             @if($historyBorrows->count() > 0)
@@ -304,14 +282,11 @@
     {{-- Return Tab --}}
     {{-- ══════════════════════════════════════════════ --}}
     <div x-show="activeTab === 'return'" x-cloak>
-        {{-- Pending Returns --}}
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-6">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-teal-400 to-teal-600"></div>
-            
-            <div class="px-6 py-5 border-b border-sky-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm mb-6">
+            <div class="p-5 border-b border-sky-100 flex items-center justify-between gap-4">
                 <div>
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">// Return Actions</p>
-                    <h2 class="text-xl font-black text-[#0f172a] tracking-tight">Process Imminent Returns</h2>
+                    <p class="text-[10px] font-semibold text-teal-600 uppercase tracking-widest mb-0.5">Returns</p>
+                    <h3 class="text-sm font-bold text-slate-800">Process Imminent Returns</h3>
                 </div>
             </div>
 
@@ -392,13 +367,10 @@
             @endif
         </div>
         
-        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 relative mb-6">
-            <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-slate-300 to-slate-400"></div>
-            <div class="px-6 py-5 border-b border-sky-100 flex items-center justify-between">
-                <div>
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-1">// Archived</p>
-                    <h3 class="text-sm font-black text-[#0f172a] tracking-tight">Return History Log</h3>
-                </div>
+        <div class="bg-white rounded-2xl overflow-hidden border border-sky-100 shadow-sm mb-6">
+            <div class="p-5 border-b border-sky-100">
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">Archived</p>
+                <h3 class="text-sm font-bold text-slate-800">Return History Log</h3>
             </div>
             @if($returnHistory->count() > 0)
             <div class="overflow-x-auto  opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">

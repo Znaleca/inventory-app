@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
+    <div class="bg-white rounded-2xl border border-sky-100">
 
         {{-- Page Header --}}
         <div class="p-6 border-b border-sky-100 bg-white flex items-center justify-between shrink-0 mb-6">
@@ -55,7 +55,8 @@
                             $nextTick(() => {
                                 const ts = new TomSelect($el, {
                                     create: false,
-                                    sortField: { field: 'text', direction: 'asc' }
+                                    sortField: { field: 'text', direction: 'asc' },
+                                    dropdownParent: 'body'
                                 });
                                 ts.on('change', (val) => {
                                     selectedItem = val;

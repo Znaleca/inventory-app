@@ -91,7 +91,7 @@
                 <div
                     class="group relative overflow-hidden bg-white p-4 border-r border-b border-slate-100 transition-all hover:bg-slate-50 hover:shadow-inner lg:[&:nth-child(4n)]:border-r-0 sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Avg Items/Cat</p>
+                        <p class="font-semibold text-xs text-slate-500 uppercase tracking-wider">Avg Items</p>
                         <div
                             class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">

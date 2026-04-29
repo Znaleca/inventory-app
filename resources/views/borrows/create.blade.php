@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<div class="bg-white rounded-2xl overflow-hidden border border-sky-100">
+<div class="bg-white rounded-2xl border border-sky-100">
 
     {{-- Page Header --}}
     <div class="p-6 border-b border-sky-100 flex items-center justify-between shrink-0 mb-6">
@@ -46,7 +46,7 @@
                     {{-- ======================== --}}
                     {{-- SECTION 1: Item Select  --}}
                     {{-- ======================== --}}
-                    <div class="bg-white border border-sky-100 relative overflow-hidden">
+                    <div class="bg-white border border-sky-100 relative">
                         <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-sky-400 to-sky-600"></div>
                         <div class="px-5 py-4">
                             <div class="flex items-center gap-2 mb-3">
@@ -61,7 +61,8 @@
                                         $nextTick(() => {
                                             const ts = new TomSelect($el, {
                                                 create: false,
-                                                sortField: { field: 'text', direction: 'asc' }
+                                                sortField: { field: 'text', direction: 'asc' },
+                                                dropdownParent: 'body'
                                             });
                                             ts.on('change', (val) => {
                                                 selectedItem = val;
@@ -85,33 +86,7 @@
                             </div>
 
                             <div x-show="selectedItem" class="mt-4 pt-4 border-t border-slate-100" x-cloak>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">Stock to Borrow <span class="text-rose-500">*</span></label>
-                                <div class="grid grid-cols-2 gap-3 sm:w-2/3">
-                                    <label :class="stockType === 'new' ? 'border-sky-500 bg-sky-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
-                                        class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
-                                        <input type="radio" name="stock_type" value="new" x-model="stockType"
-                                            @change="selectedEntries = []" class="accent-blue-600">
-                                        <div>
-                                            <p class="text-sm font-bold text-[#0f172a]">New Stock</p>
-                                            <p class="text-xs font-mono text-slate-500"
-                                                x-text="(items[selectedItem] ? items[selectedItem].new : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
-                                            </p>
-                                        </div>
-                                    </label>
-                                    <label x-show="items[selectedItem] && items[selectedItem].used > 0"
-                                        :class="stockType === 'used' ? 'border-amber-500 bg-amber-50' : 'border-sky-100 bg-slate-50 hover:bg-sky-50'"
-                                        class="flex items-center gap-3 border p-3 cursor-pointer transition-colors">
-                                        <input type="radio" name="stock_type" value="used" x-model="stockType"
-                                            @change="selectedEntries = []" class="accent-amber-500">
-                                        <div>
-                                            <p class="text-sm font-bold text-[#0f172a]">Used Stock</p>
-                                            <p class="text-xs font-mono text-slate-500"
-                                                x-text="(items[selectedItem] ? items[selectedItem].used : 0) + ' ' + (items[selectedItem] ? items[selectedItem].unit : '')">
-                                            </p>
-                                        </div>
-                                    </label>
-                                </div>
-                                @error('stock_type') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                <!-- Combined stock selection logic allows mixed borrowing by default -->
                             </div>
 
                         </div>
@@ -198,16 +173,36 @@
 
 
                                 {{-- Quantities --}}
-                                <div x-show="!isDevice()" x-cloak>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Borrow Quantity <span class="text-rose-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="number" name="quantity_borrowed" x-model="manualQty" min="1" value="{{ old('quantity_borrowed', 1) }}"
-                                            class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                <div x-show="!isDevice()" x-cloak class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                            <span>New Stock Quantity</span>
+                                            <span class="text-xs font-mono text-teal-600" x-text="items[selectedItem] ? items[selectedItem].new + ' avail.' : ''"></span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" name="new_quantity" x-model="manualNewQty" min="0" value="{{ old('new_quantity', 1) }}"
+                                                class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                            </div>
                                         </div>
+                                        @error('new_quantity') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
                                     </div>
-                                    @error('quantity_borrowed') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                    
+                                    <div x-show="items[selectedItem] && items[selectedItem].used > 0">
+                                        <label class="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                            <span>Used Stock Quantity</span>
+                                            <span class="text-xs font-mono text-amber-600" x-text="items[selectedItem] ? items[selectedItem].used + ' avail.' : ''"></span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" name="used_quantity" x-model="manualUsedQty" min="0" value="{{ old('used_quantity', 0) }}"
+                                                class="block w-full border border-sky-100 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none py-2.5 pl-3 pr-16 text-sm font-mono text-[#0f172a] transition-colors">
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase" x-text="getUnit()"></span>
+                                            </div>
+                                        </div>
+                                        @error('used_quantity') <p class="mt-1.5 text-xs font-mono font-bold text-rose-500">{{ $message }}</p> @enderror
+                                    </div>
                                 </div>
                                 
 
@@ -289,10 +284,10 @@
                 <div x-data="{ 
                     canSubmit() {
                         if (!selectedItem) return false;
-                        if (isDevice() && stockType === 'new') {
+                        if (isDevice()) {
                             return selectedEntries.length > 0;
                         }
-                        return (parseInt(manualQty) || 0) > 0;
+                        return (parseInt(manualNewQty) || 0) + (parseInt(manualUsedQty) || 0) > 0;
                     } 
                 }">
                     <button type="submit" :disabled="!canSubmit()"
@@ -327,10 +322,10 @@
         function borrowForm() {
             return {
                 selectedItem: {{ (old('item_id') ?? request('item_id')) ? (int) (old('item_id') ?? request('item_id')) : 'null' }},
-                stockType: 'new',
                 selectedEntries: [],
                 searchQuery: '',
-                manualQty: {{ old('quantity_borrowed', 1) }},
+                manualNewQty: {{ old('new_quantity', 1) }},
+                manualUsedQty: {{ old('used_quantity', 0) }},
                 newUnitLabel: '',
                 items: {!! json_encode($itemsJs) !!},
 
@@ -344,8 +339,7 @@
 
                 getBatches(applySearch = true) {
                     if (!this.selectedItem || !this.items[this.selectedItem]) return [];
-                    const allBatches = this.items[this.selectedItem].batches || [];
-                    let batches = allBatches.filter(b => this.stockType === 'new' ? !b.is_used : b.is_used);
+                    let batches = this.items[this.selectedItem].batches || [];
                     
                     if (applySearch && this.searchQuery) {
                         const q = this.searchQuery.toLowerCase();
@@ -360,7 +354,8 @@
 
                 onItemChange() {
                     this.selectedEntries = [];
-                    this.manualQty = 1;
+                    this.manualNewQty = 1;
+                    this.manualUsedQty = 0;
                 },
 
                 initSerial(e) {
@@ -386,7 +381,7 @@
                     const val = e.target.value;
                     const lines = val.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(l => l.length > 0);
                     // Borrow quantity usually must be at least 1, but we map it up actively
-                    this.manualQty = lines.length === 0 ? 1 : lines.length;
+                    this.manualNewQty = lines.length === 0 ? 1 : lines.length;
                 }
             };
         }
